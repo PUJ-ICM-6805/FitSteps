@@ -42,6 +42,8 @@ import com.example.fitsteps.R
 import com.example.fitsteps.navigation.AUTHENTICATION_ROUTE
 import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.HOME_ROUTE
+import com.example.fitsteps.navigation.REGISTER_NAVIGATION_ROUTE
+import com.example.fitsteps.navigation.REGISTER_ROUTE
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 
@@ -103,12 +105,16 @@ fun MainScreen(navController: NavHostController) {
                         .height(70.dp),
                     backgroundColor = Red,
                     text = stringResource(id = R.string.register),
+                    onClicked = {
+                        navController.navigate(REGISTER_NAVIGATION_ROUTE)
+                    }
                 )
                 Text(
                     text = stringResource(id = R.string.or),
                     fontWeight = FontWeight.Normal,
                     color = Color(0xFF5C5C5C),
                     fontSize = 18.sp,
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
                         .padding(0.dp, 10.dp)
                 )
@@ -131,6 +137,7 @@ fun LoginButton(
     shape: Shape = RoundedCornerShape(20.dp),
     borderColor: Color = Color.LightGray,
     backgroundColor: Color = DarkBlue,
+    colorText: Color = MaterialTheme.colorScheme.onSecondary,
     onClicked: () -> Unit = {}
 ) {
     var clicked by remember { mutableStateOf(false) }
@@ -144,6 +151,7 @@ fun LoginButton(
         shape = shape,
         border = BorderStroke(width = 1.dp, color = borderColor),
         color = backgroundColor,
+        elevation = 2.dp
     ) {
         Box(
             modifier = Modifier
@@ -154,8 +162,9 @@ fun LoginButton(
             Text(
                 text = text,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSecondary,
+                color = colorText,
                 fontSize = 20.sp,
+                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
             )
         }
     }
@@ -201,6 +210,7 @@ fun GoogleButton(
                 fontWeight = FontWeight.Medium,
                 color = DarkBlue,
                 fontSize = 20.sp,
+                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
             )
 
         }

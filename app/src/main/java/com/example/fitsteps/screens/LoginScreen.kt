@@ -84,10 +84,11 @@ fun LoginScreen(navController: NavHostController) {
                 text = stringResource(id = R.string.login_screen),
                 color = Color(0xFFF0F0F0),
                 fontSize = 36.sp,
+                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
                 fontStyle = FontStyle.Italic,
                 modifier = Modifier
-                    .padding(start = 25.dp, bottom = 20.dp)
+                    .padding(start = 25.dp, bottom = 25.dp)
             )
 
         }
@@ -116,7 +117,7 @@ fun LoginScreen(navController: NavHostController) {
                     color = DarkBlue,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                 )
                 TextFields(
                     modifier = Modifier
@@ -133,6 +134,7 @@ fun LoginScreen(navController: NavHostController) {
                     color = DarkBlue,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                 )
                 TextFields(
                     modifier = Modifier
@@ -149,6 +151,7 @@ fun LoginScreen(navController: NavHostController) {
                     color = Blue,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                 )
                 LoginButton(
                     modifier = Modifier
@@ -178,6 +181,7 @@ fun LoginScreen(navController: NavHostController) {
                         color = Color(0xFF5C5C5C),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     )
                     Text(
                         modifier = Modifier
@@ -186,6 +190,7 @@ fun LoginScreen(navController: NavHostController) {
                         color = Color(0xFFE71D36),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     )
                 }
             }

@@ -8,6 +8,7 @@ import com.example.fitsteps.screens.AnimatedSplashScreen
 import com.example.fitsteps.screens.BottomBarScreen
 import com.example.fitsteps.screens.LoginScreen
 import com.example.fitsteps.screens.MainScreen
+import com.example.fitsteps.screens.RegisterScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -35,6 +36,11 @@ fun SetupNavGraph(navController: NavHostController) {
             route = BOTTOM_NAVIGATION_ROUTE
         ) {
             BottomBarScreen()
+        }
+        composable(
+            route = REGISTER_NAVIGATION_ROUTE
+        ) {
+            RegisterScreen(mainNavController = navController)
         }
     }
 }

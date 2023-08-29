@@ -20,13 +20,26 @@ val customFontFamily = FontFamily(
     Font(R.font.poppinssemibolditalic, FontWeight.SemiBold, FontStyle.Italic),
 )
 
-val Typography = Typography(
+val customTypography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 36.sp
+    ),
+    displayMedium = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp
+    ),
     bodyLarge = TextStyle(
         fontFamily = customFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 14.sp
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

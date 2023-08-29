@@ -40,6 +40,7 @@ import com.example.fitsteps.navigation.SetupNavGraph
 import com.example.fitsteps.screens.*
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.LightBlue
+import com.example.fitsteps.ui.theme.customFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -89,8 +90,9 @@ fun RowScope.AddItem(
     currentDestination: NavDestination?,
     navController: NavHostController,
     style: TextStyle = TextStyle(
-        fontSize = 12.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Medium,
+        fontFamily = customFontFamily,
     )
 ) {
     val selected = when {
@@ -129,7 +131,8 @@ fun RowScope.AddItem(
                     if (textLayoutResult.didOverflowWidth) {
                         if(style.fontSize.isUnspecified) {
                             resizedTextStyle = resizedTextStyle.copy(
-                                fontSize = 10.sp
+                                fontSize = 10.sp,
+                                fontFamily = customFontFamily,
                             )
                         }
                         resizedTextStyle = resizedTextStyle.copy(

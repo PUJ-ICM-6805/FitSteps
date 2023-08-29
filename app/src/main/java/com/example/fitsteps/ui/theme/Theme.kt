@@ -55,7 +55,7 @@ fun FitStepsTheme(
 
     MaterialTheme(
         colorScheme = lightColorScheme,
-        typography = Typography,
+        typography = customTypography,
         content = content
     )
 }

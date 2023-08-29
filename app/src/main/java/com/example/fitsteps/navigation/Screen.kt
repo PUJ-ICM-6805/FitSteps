@@ -5,6 +5,7 @@ const val AUTHENTICATION_ROUTE = "authentication"
 const val HOME_ROUTE = "home"
 const val BOTTOM_NAVIGATION_ROUTE = "bottom_navigation"
 const val REGISTER_ROUTE = "register"
+const val REGISTER_NAVIGATION_ROUTE = "register_nav"
 const val MAIN_SCREEN_ROUTE = "main_screen"
 
 sealed class Screen(val route: String) {
