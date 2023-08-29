@@ -1,12 +1,6 @@
-package com.example.fitsteps
+package com.example.fitsteps.navigation
 
-import android.graphics.drawable.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
-import androidx.core.graphics.drawable.toDrawable
+import com.example.fitsteps.R
 
 sealed class BottomBarScreen(
     val route: String,

@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.fitsteps.BottomBarScreen
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.White
 

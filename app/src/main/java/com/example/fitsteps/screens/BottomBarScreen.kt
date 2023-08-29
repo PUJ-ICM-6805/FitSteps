@@ -1,4 +1,4 @@
-package com.example.fitsteps
+package com.example.fitsteps.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -31,6 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.navigation.BottomBarNavGraph
+import com.example.fitsteps.navigation.BottomBarScreen
+import com.example.fitsteps.navigation.HOME_ROUTE
+import com.example.fitsteps.navigation.SetupNavGraph
 import com.example.fitsteps.screens.*
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -38,13 +44,13 @@ import com.example.fitsteps.ui.theme.LightBlue
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun BottomBarScreen(navController: NavHostController = rememberNavController()) {
     Scaffold(
         modifier = Modifier
             .background(MaterialTheme.colors.surface),
         bottomBar = { BottomBar(navController = navController) }
     ) {
-        BottomNavGraph(navController = navController)
+        BottomBarNavGraph(navController = navController)
     }
 }
 
