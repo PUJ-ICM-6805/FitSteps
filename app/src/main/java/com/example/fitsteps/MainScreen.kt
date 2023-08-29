@@ -1,0 +1,145 @@
+package com.example.fitsteps
+
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isUnspecified
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.example.fitsteps.screens.*
+import com.example.fitsteps.ui.theme.Blue
+import com.example.fitsteps.ui.theme.LightBlue
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun MainScreen(navController: NavHostController) {
+    Scaffold(
+        modifier = Modifier
+            .background(MaterialTheme.colors.surface),
+        bottomBar = { BottomBar(navController = navController) }
+    ) {
+        BottomNavGraph(navController = navController)
+    }
+}
+
+@Composable
+fun BottomBar(navController: NavHostController) {
+    val screens = listOf(
+        BottomBarScreen.Summary,
+        BottomBarScreen.Running,
+        BottomBarScreen.Exercise,
+        BottomBarScreen.Body,
+        BottomBarScreen.Social,
+    )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.surface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .clip(shape = RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp)),
+    ) {
+        screens.forEach { screen ->
+            AddItem(
+                screen = screen,
+                currentDestination = currentDestination,
+                navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+fun RowScope.AddItem(
+    screen: BottomBarScreen,
+    currentDestination: NavDestination?,
+    navController: NavHostController,
+    style: TextStyle = TextStyle(
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Medium,
+    )
+) {
+    val selected = when {
+        currentDestination?.hierarchy?.any {
+            it.route == screen.route
+        } == true -> Blue
+        else -> LightBlue
+    }
+    var resizedTextStyle by remember{
+        mutableStateOf(style)
+    }
+    BottomNavigationItem(
+        selected = currentDestination?.hierarchy?.any {
+            it.route == screen.route
+        } == true,
+        onClick = {
+            navController.navigate(screen.route) {
+                popUpTo(navController.graph.findStartDestination().id)
+                launchSingleTop = true
+            }
+        },
+        icon = {
+            Icon(
+                painter = painterResource(id = screen.icon),
+                contentDescription = "Navigation Icon",
+                tint = selected,
+            )
+        },
+        label = {
+            Text(
+                text = screen.title,
+                fontWeight = FontWeight.Medium,
+                color = Blue,
+                softWrap = false,
+                onTextLayout = { textLayoutResult ->
+                    if (textLayoutResult.didOverflowWidth) {
+                        if(style.fontSize.isUnspecified) {
+                            resizedTextStyle = resizedTextStyle.copy(
+                                fontSize = 10.sp
+                            )
+                        }
+                        resizedTextStyle = resizedTextStyle.copy(
+                            fontSize = resizedTextStyle.fontSize * 0.95
+                        )
+                    }
+                },
+                style = resizedTextStyle,
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(0.dp, 20.dp)
+    )
+}
+
+
+
+
