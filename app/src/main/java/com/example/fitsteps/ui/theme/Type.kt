@@ -16,8 +16,7 @@ val customFontFamily = FontFamily(
     Font(R.font.poppinslight, FontWeight.Light),
     Font(R.font.poppinsmedium, FontWeight.Medium),
     Font(R.font.poppinssemibold, FontWeight.SemiBold),
-    Font(R.font.poppinssemibold, FontWeight.SemiBold),
-    Font(R.font.poppinssemibolditalic, FontWeight.SemiBold, FontStyle.Italic),
+    Font(R.font.poppinssemibolditalic, FontWeight.SemiBold),
 )
 
 val customTypography = Typography(
@@ -39,6 +38,7 @@ val customTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = customFontFamily,
         fontWeight = FontWeight.Normal,
+        fontStyle = FontStyle.Italic,
         fontSize = 14.sp
     )
     /* Other default text styles to override

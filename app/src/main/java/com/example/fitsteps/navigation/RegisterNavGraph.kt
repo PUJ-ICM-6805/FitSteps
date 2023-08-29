@@ -6,6 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.fitsteps.screens.RegisterScreen1
+import com.example.fitsteps.screens.RegisterScreen2
+import com.example.fitsteps.screens.RegisterScreen3
+import com.example.fitsteps.screens.RegisterScreen4
+import com.example.fitsteps.screens.RegisterScreen5
 
 
 @Composable
@@ -22,16 +26,16 @@ fun RegisterNavGraph(
             RegisterScreen1(navController = navController, mainNavController = mainNavController)
         }
         composable(route = Screen.RegisterScreen2.route) {
-            RegisterScreen1(navController = navController, mainNavController = mainNavController)
+            RegisterScreen2(navController = navController, mainNavController = mainNavController)
         }
         composable(route = Screen.RegisterScreen3.route) {
-            RegisterScreen1(navController = navController, mainNavController = mainNavController)
+            RegisterScreen3(navController = navController, mainNavController = mainNavController)
         }
         composable(route = Screen.RegisterScreen4.route) {
-            RegisterScreen1(navController = navController, mainNavController = mainNavController)
+            RegisterScreen4(navController = navController, mainNavController = mainNavController)
         }
         composable(route = Screen.RegisterScreen5.route) {
-            RegisterScreen1(navController = navController, mainNavController = mainNavController)
+            RegisterScreen5(navController = navController, mainNavController = mainNavController)
         }
     }
 }

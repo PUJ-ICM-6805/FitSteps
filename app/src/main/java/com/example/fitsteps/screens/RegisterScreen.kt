@@ -4,47 +4,65 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.RadioButton
+import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.Visibility
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
 import com.example.fitsteps.navigation.RegisterNavGraph
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
+import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
-import com.example.fitsteps.ui.theme.White
+import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
 fun RegisterScreen(
@@ -56,7 +74,7 @@ fun RegisterScreen(
     ){
         Box(
             modifier = Modifier
-                .weight(1f),
+                .weight(2f),
             contentAlignment = Alignment.BottomStart
         ) {
             Image(
@@ -64,7 +82,7 @@ fun RegisterScreen(
                 contentDescription = "",
                 modifier = Modifier
                     .fillMaxSize(),
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Crop,
                 alignment = Alignment.BottomCenter,
             )
             Box(
@@ -85,11 +103,13 @@ fun RegisterScreen(
                 text = stringResource(id = R.string.register_process),
                 color = Color(0xFFF0F0F0),
                 fontSize = 36.sp,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                fontStyle = FontStyle.Italic,
                 modifier = Modifier
-                    .padding(start = 25.dp, bottom = 25.dp)
+                    .padding(start = 25.dp, bottom = 25.dp),
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontStyle = FontStyle.Italic,
+                )
             )
 
         }
@@ -98,7 +118,7 @@ fun RegisterScreen(
                 .fillMaxWidth()
                 .height(20.dp)
                 .background(Color(0xFFF4F4F4))
-                .weight(2f)
+                .weight(5f)
                 .border(
                     5.dp,
                     Color(0xFFF4F4F4)
@@ -133,8 +153,11 @@ fun RegisterScreen(
                             text = stringResource(id = R.string.having_account),
                             color = Color(0xFF5C5C5C),
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Normal,
+                                fontStyle = FontStyle.Normal,
+                            ),
                         )
                         Text(
                             modifier = Modifier
@@ -142,8 +165,11 @@ fun RegisterScreen(
                             text = stringResource(id = R.string.login_link),
                             color = DarkBlue,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontStyle = FontStyle.Normal,
+                            ),
                         )
                     }
                 }
@@ -170,8 +196,11 @@ fun RegisterScreen1(navController: NavHostController, mainNavController: NavHost
             text = stringResource(id = R.string.name),
             color = DarkBlue,
             fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.bodyLarge,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
         )
         TextFields(
             modifier = Modifier
@@ -188,7 +217,11 @@ fun RegisterScreen1(navController: NavHostController, mainNavController: NavHost
             color = DarkBlue,
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.bodyLarge,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
         )
         TextFields(
             modifier = Modifier
@@ -197,47 +230,460 @@ fun RegisterScreen1(navController: NavHostController, mainNavController: NavHost
                 .height(70.dp),
             text = "",
         )
+        ForwardBackButtons(
+            onClickedBack = {
+                mainNavController.navigate(
+                    MAIN_SCREEN_ROUTE,
+                    builder = {
+                        popUpTo(route = MAIN_SCREEN_ROUTE) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                )
+            },
+            onClickedForward = {
+                navController.navigate(
+                    Screen.RegisterScreen2.route,
+                )
+            }
+        )
+    }
+}
 
-        Row(
+@Composable
+fun RegisterScreen2(navController: NavHostController, mainNavController: NavHostController) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        RoundedLinearProgressIndicator(
+            progress = 0.25f,
+            modifier = Modifier.padding(start = 20.dp, bottom = 40.dp, end = 20.dp, top = 5.dp)
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 10.dp),
+            text = stringResource(id = R.string.birth_date),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, bottom = 30.dp)
+                .height(70.dp),
+            shape = RoundedCornerShape(20.dp),
+            color = Color.White,
         ) {
-            LoginButton(
+            Box(
+                contentAlignment = Alignment.CenterStart,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 40.dp, end = 10.dp)
-                    .height(70.dp),
-                onClicked = {
-                    mainNavController.navigate(
-                        MAIN_SCREEN_ROUTE,
-                        builder = {
-                            popUpTo(route = MAIN_SCREEN_ROUTE) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    )
-                },
-                text = stringResource(id = R.string.back),
-                backgroundColor = Color(0xFFE1E1E1),
-                colorText = DarkBlue,
-                borderColor = Color.Transparent,
-            )
-            LoginButton(
+                    .fillMaxSize(),
+            ) {
+                Text(
+                    text = "DD/MM/YYYY",
+                    color = Blue,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .padding(start = 20.dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Light,
+                        fontStyle = FontStyle.Italic,
+                    ),
+                )
+            }
+        }
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 10.dp),
+            text = stringResource(id = R.string.gender),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        RadioButtonGroup()
+        Spacer(modifier = Modifier.height(20.dp))
+        ForwardBackButtons(
+            onClickedBack = {
+                navController.popBackStack()
+            },
+            onClickedForward = {
+                navController.navigate(
+                    Screen.RegisterScreen3.route,
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun RegisterScreen3(navController: NavHostController, mainNavController: NavHostController) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        RoundedLinearProgressIndicator(
+            progress = 0.5f,
+            modifier = Modifier.padding(start = 20.dp, bottom = 40.dp, end = 20.dp, top = 5.dp)
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 10.dp),
+            text = stringResource(id = R.string.weight),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        TextFields(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, bottom = 30.dp)
+                .height(70.dp),
+            text = "",
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 10.dp),
+            text = stringResource(id = R.string.height),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        TextFields(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
+                .height(70.dp),
+            text = "",
+        )
+        ForwardBackButtons(
+            onClickedBack = {
+                navController.popBackStack()
+            },
+            onClickedForward = {
+                navController.navigate(
+                    Screen.RegisterScreen4.route,
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun RegisterScreen4(navController: NavHostController, mainNavController: NavHostController) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        RoundedLinearProgressIndicator(
+            progress = 0.75f,
+            modifier = Modifier.padding(start = 20.dp, bottom = 40.dp, end = 20.dp, top = 5.dp)
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 5.dp),
+            text = stringResource(id = R.string.experience),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        ButtonsList()
+        Spacer(modifier = Modifier.height(20.dp))
+        ForwardBackButtons(
+            onClickedBack = {
+                navController.popBackStack()
+            },
+            onClickedForward = {
+                navController.navigate(
+                    Screen.RegisterScreen5.route,
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun RegisterScreen5(navController: NavHostController, mainNavController: NavHostController) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        RoundedLinearProgressIndicator(
+            progress = 1.0f,
+            modifier = Modifier.padding(start = 20.dp, bottom = 40.dp, end = 20.dp, top = 5.dp)
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 10.dp),
+            text = stringResource(id = R.string.password),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        PasswordField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
+                .height(70.dp),
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 50.dp, bottom = 10.dp),
+            text = stringResource(id = R.string.confirm_password),
+            color = DarkBlue,
+            fontSize = 20.sp,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontStyle = FontStyle.Normal,
+            ),
+        )
+        PasswordField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
+                .height(70.dp),
+        )
+        ForwardBackButtons(
+            onClickedBack = {
+                navController.popBackStack()
+            },
+            onClickedForward = {
+                mainNavController.popBackStack()
+            },
+            backButtonText = stringResource(id = R.string.back),
+            forwardButtonText = stringResource(id = R.string.create_profile)
+        )
+    }
+}
+
+@Composable
+fun ButtonsList() {
+    val selectedValue = remember { mutableStateOf("") }
+    val items = listOf(
+        stringResource(id = R.string.novice),
+        stringResource(id = R.string.intermediate),
+        stringResource(id = R.string.advanced),
+        )
+    Column(Modifier.padding(horizontal = 40.dp)) {
+        items.forEach { item ->
+            Surface(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 40.dp, start = 10.dp)
-                    .height(70.dp),
-                onClicked = {
-                    navController.navigate(
-                        Screen.RegisterScreen2.route,
+                    .selectable(
+                        selected = (selectedValue.value == item),
+                        onClick = { selectedValue.value = item },
+                        role = Role.RadioButton
                     )
-                },
-                text = stringResource(id = R.string.forward),
-                backgroundColor = Red,
-                colorText = Color.White,
-                borderColor = Color.Transparent,
+                    .padding(vertical = 10.dp),
+                shape = RoundedCornerShape(20.dp),
+                color = if (selectedValue.value == item) DarkBlue else Color.White,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = item,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = TextStyle(
+                            fontFamily = customFontFamily,
+                            fontWeight = FontWeight.Medium,
+                            fontStyle = FontStyle.Normal,
+                        ),
+                        color = if (selectedValue.value == item) Color.White else DarkBlue,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+fun PasswordField(
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(20.dp),
+    backgroundColor: Color = Color.White,
+) {
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    Surface(
+        shape = shape,
+        color = backgroundColor,
+        modifier = modifier
+    ) {
+        TextField(
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = backgroundColor,
+                focusedIndicatorColor = DarkBlue,
+                cursorColor = DarkBlue,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                textColor = Blue,
+                ),
+            value = password,
+            onValueChange = { password = it },
+            singleLine = true,
+            placeholder = { Text("************") },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Filled.Visibility
+                else Icons.Filled.VisibilityOff
+
+                // Please provide localized description for accessibility services
+                val description = if (passwordVisible) "Hide password" else "Show password"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = image,
+                        description,
+                        tint = LightBlue,
+                    )
+                }
+            }
+        )
+    }
+}
+@Composable
+fun ForwardBackButtons(
+    onClickedBack: () -> Unit = {},
+    onClickedForward: () -> Unit = {},
+    backButtonText: String = stringResource(id = R.string.back),
+    forwardButtonText: String = stringResource(id = R.string.forward),
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        LoginButton(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 40.dp, end = 10.dp)
+                .height(70.dp),
+            onClicked = {
+                onClickedBack()
+            },
+            text = backButtonText,
+            backgroundColor = Color(0xFFE1E1E1),
+            colorText = DarkBlue,
+            borderColor = Color.Transparent,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.Normal,
+                fontStyle = FontStyle.Normal,
             )
+        )
+        LoginButton(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 40.dp, start = 10.dp)
+                .height(70.dp),
+            onClicked = {
+                onClickedForward()
+            },
+            text = forwardButtonText,
+            backgroundColor = Red,
+            colorText = Color.White,
+            borderColor = Color.Transparent,
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontStyle = FontStyle.Normal,
+            )
+        )
+    }
+}
+@Composable
+fun RadioButtonGroup() {
+    val selectedValue = remember { mutableStateOf("") }
+
+    val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
+    val onChangeState: (String) -> Unit = { selectedValue.value = it }
+
+    val items = listOf(
+        stringResource(id = R.string.men),
+        stringResource(id = R.string.women),
+        stringResource(id = R.string.not_ask))
+    Column(Modifier.padding(horizontal = 40.dp)) {
+        items.forEach { item ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .selectable(
+                        selected = isSelectedItem(item),
+                        onClick = { onChangeState(item) },
+                        role = Role.RadioButton
+                    )
+                    .padding(8.dp)
+            ) {
+                RadioButton(
+                    selected = isSelectedItem(item),
+                    onClick = null,
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = DarkBlue,
+                        unselectedColor = DarkBlue,
+                        disabledColor = Color.White
+                    ),
+                )
+                Text(
+                    text = item,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp),
+                    color = DarkBlue,
+                    fontSize = 18.sp,
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Light,
+                        fontStyle = FontStyle.Normal,
+                    )
+                )
+            }
         }
     }
 }

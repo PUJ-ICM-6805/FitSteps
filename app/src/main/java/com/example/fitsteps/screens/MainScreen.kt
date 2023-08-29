@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -46,6 +48,7 @@ import com.example.fitsteps.navigation.REGISTER_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.REGISTER_ROUTE
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
+import com.example.fitsteps.ui.theme.customFontFamily
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -111,12 +114,15 @@ fun MainScreen(navController: NavHostController) {
                 )
                 Text(
                     text = stringResource(id = R.string.or),
-                    fontWeight = FontWeight.Normal,
                     color = Color(0xFF5C5C5C),
                     fontSize = 18.sp,
-                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .padding(0.dp, 10.dp)
+                        .padding(0.dp, 10.dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontStyle = FontStyle.Normal,
+                    )
                 )
                 GoogleButton(
                     modifier = Modifier
@@ -138,7 +144,12 @@ fun LoginButton(
     borderColor: Color = Color.LightGray,
     backgroundColor: Color = DarkBlue,
     colorText: Color = MaterialTheme.colorScheme.onSecondary,
-    onClicked: () -> Unit = {}
+    onClicked: () -> Unit = {},
+    style: TextStyle = TextStyle(
+        fontFamily = customFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontStyle = FontStyle.Normal,
+    )
 ) {
     var clicked by remember { mutableStateOf(false) }
     Surface(
@@ -161,10 +172,9 @@ fun LoginButton(
         ) {
             Text(
                 text = text,
-                fontWeight = FontWeight.Medium,
                 color = colorText,
                 fontSize = 20.sp,
-                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                style = style
             )
         }
     }
@@ -210,7 +220,11 @@ fun GoogleButton(
                 fontWeight = FontWeight.Medium,
                 color = DarkBlue,
                 fontSize = 20.sp,
-                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontStyle = FontStyle.Normal,
+                )
             )
 
         }
