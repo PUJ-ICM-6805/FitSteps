@@ -45,7 +45,21 @@
     <string name="average_time">Tiempo promedio</string>
     <string name="total_days">Total días de entreno</string>
     <string name="stats">Estadísticas</string>
-    <string name="today">Hoy</string>
     <string name="social">Social</string>
+    <string name="today">Hoy</string>
+    <string name="monday_letter">L</string>
+    <string name="tuesday_letter">M</string>
+    <string name="wednesday_letter">M</string>
+    <string name="thursday_letter">J</string>
+    <string name="friday_letter">V</string>
+    <string name="saturday_letter">S</string>
+    <string name="sunday_letter">D</string>
+    <string name="progress">Progreso</string>
+    <string name="edit">Editar</string>
+    <string name="training">Entrenamiento</string>
+    <string name="my_training">Mi entrenamiento</string>
+    <string name="my_collection">Mi colección</string>
+    <string name="add_new_routine">Añadir nueva rutina</string>
+    <string name="add_personalized_routine">Generar rutina personalizada</string>
 
 </resources>

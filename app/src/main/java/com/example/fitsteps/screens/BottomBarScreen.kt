@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
@@ -71,7 +73,7 @@ fun BottomBar(navController: NavHostController) {
         backgroundColor = MaterialTheme.colors.surface,
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(70.dp)
             .clip(shape = RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp)),
     ) {
         screens.forEach { screen ->
@@ -101,9 +103,6 @@ fun RowScope.AddItem(
         } == true -> Blue
         else -> LightBlue
     }
-    var resizedTextStyle by remember{
-        mutableStateOf(style)
-    }
     BottomNavigationItem(
         selected = currentDestination?.hierarchy?.any {
             it.route == screen.route
@@ -127,25 +126,17 @@ fun RowScope.AddItem(
                 fontWeight = FontWeight.Medium,
                 color = Blue,
                 softWrap = false,
-                onTextLayout = { textLayoutResult ->
-                    if (textLayoutResult.didOverflowWidth) {
-                        if(style.fontSize.isUnspecified) {
-                            resizedTextStyle = resizedTextStyle.copy(
-                                fontSize = 10.sp,
-                                fontFamily = customFontFamily,
-                            )
-                        }
-                        resizedTextStyle = resizedTextStyle.copy(
-                            fontSize = resizedTextStyle.fontSize * 0.95
-                        )
-                    }
-                },
-                style = resizedTextStyle,
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = customFontFamily,
+                    fontStyle = FontStyle.Normal,
+                ),
             )
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(0.dp, 20.dp)
+            .padding(0.dp, 10.dp)
     )
 }
 

@@ -22,7 +22,7 @@ sealed class BottomBarScreen(
 
     object Exercise : BottomBarScreen(
         route = "exercise",
-        title = "Ejercicio",
+        title = "Entreno",
         icon = R.drawable.ic_exercise
     )
     object Body : BottomBarScreen(
