@@ -61,5 +61,26 @@
     <string name="my_collection">Mi colección</string>
     <string name="add_new_routine">Añadir nueva rutina</string>
     <string name="add_personalized_routine">Generar rutina personalizada</string>
-
+    <string name="body">Cuerpo</string>
+    <string name="add">Añadir</string>
+    <string name="weight2">Peso</string>
+    <string name="diagnostic">Diagnóstico</string>
+    <string name="measures">Medidas</string>
+    <string name="initial">● Inicial</string>
+    <string name="current">● Actual</string>
+    <string name="BMI">BMI</string>
+    <string name="bodyfat">% Grasa</string>
+    <string name="idealWeight">Peso Ideal</string>
+    <string name="Deltoids">Hombros</string>
+    <string name="Chest">Pecho</string>
+    <string name="LeftForearm">Antebrazo izquierdo</string>
+    <string name="RightForearm">Antebrazo derecho</string>
+    <string name="LeftArm">Brazo izquierdo</string>
+    <string name="RightArm">Brazo derecho</string>
+    <string name="Waist">Cintura</string>
+    <string name="Hips">Cadera</string>
+    <string name="LeftLeg">Pierna izquierda</string>
+    <string name="RightLeg">Pierna derecha</string>
+    <string name="LeftCalf">Pantorrilla izquierda</string>
+    <string name="RightCalf">Pantorrilla derecha</string>
 </resources>
