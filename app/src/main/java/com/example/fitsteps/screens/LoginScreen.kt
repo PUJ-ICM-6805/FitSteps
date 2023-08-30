@@ -61,7 +61,7 @@ fun LoginScreen(navController: NavHostController) {
             contentAlignment = Alignment.BottomStart
         ) {
             Image(
-                painter = painterResource(id = R.drawable.pesaslogin),
+                painter = painterResource(id = R.drawable.exercise_default),
                 contentDescription = "",
                 modifier = Modifier
                     .fillMaxSize(),
