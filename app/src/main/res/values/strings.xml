@@ -30,5 +30,22 @@
     <string name="advanced">AVANZADO</string>
     <string name="experience">Experiencia</string>
     <string name="create_profile">CREAR PERFIL</string>
+    <string name="hello">Hola,</string>
+    <string name="casual">Casual</string>
+    <string name="calisthenics">Calistenia</string>
+    <string name="powerlifter">Powerlifter</string>
+    <string name="this_week">Esta semana</string>
+    <string name="last_week">Semana pasada</string>
+    <string name="two_weeks_ago">Hace 2 semanas</string>
+    <string name="three_weeks_ago">Hace 3 semanas</string>
+    <string name="four_weeks_ago">Hace 4 semanas</string>
+    <string name="five_weeks_ago">Hace 5 semanas</string>
+    <string name="km">Kilómetros recorridos</string>
+    <string name="lifted_weight">Peso levantado</string>
+    <string name="average_time">Tiempo promedio</string>
+    <string name="total_days">Total días de entreno</string>
+    <string name="stats">Estadísticas</string>
+    <string name="today">Hoy</string>
+    <string name="social">Social</string>
 
 </resources>

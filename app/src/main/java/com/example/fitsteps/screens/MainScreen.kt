@@ -174,7 +174,9 @@ fun LoginButton(
                 text = text,
                 color = colorText,
                 fontSize = 20.sp,
-                style = style
+                style = style,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 5.dp),
             )
         }
     }

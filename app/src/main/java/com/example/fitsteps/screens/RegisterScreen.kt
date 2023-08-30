@@ -492,7 +492,9 @@ fun RegisterScreen5(navController: NavHostController, mainNavController: NavHost
                 mainNavController.popBackStack()
             },
             backButtonText = stringResource(id = R.string.back),
-            forwardButtonText = stringResource(id = R.string.create_profile)
+            forwardButtonText = stringResource(id = R.string.create_profile),
+            backButtonWeight = 3f,
+            forwardButtonWeight = 4f,
         )
     }
 }
@@ -539,7 +541,6 @@ fun ButtonsList() {
             }
         }
     }
-
 }
 
 @Composable
@@ -595,6 +596,8 @@ fun ForwardBackButtons(
     onClickedForward: () -> Unit = {},
     backButtonText: String = stringResource(id = R.string.back),
     forwardButtonText: String = stringResource(id = R.string.forward),
+    backButtonWeight: Float = 1f,
+    forwardButtonWeight: Float = 1f,
 ) {
     Row(
         modifier = Modifier
@@ -602,7 +605,7 @@ fun ForwardBackButtons(
     ) {
         LoginButton(
             modifier = Modifier
-                .weight(1f)
+                .weight(backButtonWeight)
                 .padding(start = 40.dp, end = 10.dp)
                 .height(70.dp),
             onClicked = {
@@ -620,7 +623,7 @@ fun ForwardBackButtons(
         )
         LoginButton(
             modifier = Modifier
-                .weight(1f)
+                .weight(forwardButtonWeight)
                 .padding(end = 40.dp, start = 10.dp)
                 .height(70.dp),
             onClicked = {

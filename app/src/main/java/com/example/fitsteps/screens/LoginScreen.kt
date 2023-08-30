@@ -242,7 +242,6 @@ fun TextFields(
                 cursorColor = DarkBlue,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
-
             ),
         )
     }
