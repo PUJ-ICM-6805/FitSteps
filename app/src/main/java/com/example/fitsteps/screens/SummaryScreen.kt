@@ -77,7 +77,6 @@ fun SummaryScreen() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD1D1D1))
     ) {
         item {
             Box(
