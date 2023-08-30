@@ -83,4 +83,7 @@
     <string name="RightLeg">Pierna derecha</string>
     <string name="LeftCalf">Pantorrilla izquierda</string>
     <string name="RightCalf">Pantorrilla derecha</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save"> Guardar</string>
+    <string name="addRegistry"> Añadir Registro</string>
 </resources>
