@@ -35,7 +35,7 @@ fun SetupNavGraph(navController: NavHostController) {
         composable(
             route = BOTTOM_NAVIGATION_ROUTE
         ) {
-            BottomBarScreen()
+            BottomBarScreen(rootNavController = navController)
         }
         composable(
             route = REGISTER_NAVIGATION_ROUTE

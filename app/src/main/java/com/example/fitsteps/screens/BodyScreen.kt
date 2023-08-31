@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.Screen
@@ -42,7 +44,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreen(navController: NavController) {
+fun BodyScreen(navController: NavHostController, rootNavController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -52,13 +54,18 @@ fun BodyScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopEnd
         ) {
-            Icon(
-                modifier = Modifier
-                    .padding(16.dp),
-                painter = painterResource(id = R.drawable.ic_config_button),
-                contentDescription = "Configuration Button",
-                tint = DarkBlue
-            )
+            Column {
+                Spacer(modifier = Modifier.height(20.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    HamburgersDropList(navController = navController, rootNavController = rootNavController)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
         }
         Box(
             modifier = Modifier
@@ -382,5 +389,5 @@ fun DiagnosticCard(){
 @Composable
 @Preview
 fun BodyScreenPreview() {
-    BodyScreen(navController = rememberNavController())
+    BodyScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }

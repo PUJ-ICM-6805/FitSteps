@@ -5,7 +5,8 @@ import com.example.fitsteps.R
 sealed class BottomBarScreen(
     val route: String,
     val title: String,
-    val icon: Int
+    val icon: Int,
+    val screens: List<String> = listOf(route),
 ) {
     //object SplashScreen : Screen
     object Summary : BottomBarScreen(
@@ -23,7 +24,17 @@ sealed class BottomBarScreen(
     object Exercise : BottomBarScreen(
         route = "exercise",
         title = "Entreno",
-        icon = R.drawable.ic_exercise
+        icon = R.drawable.ic_exercise,
+        screens = listOf(
+            "exercise",
+            Screen.CustomRoutineMain.route,
+            Screen.CustomRoutineScreen1.route,
+            Screen.CustomRoutineScreen2.route,
+            Screen.CustomRoutineScreen3.route,
+            Screen.CustomRoutineScreen4.route,
+            Screen.CustomRoutineScreen5.route,
+            Screen.CustomRoutineScreen6.route,
+        )
     )
     object Body : BottomBarScreen(
         route = "body",
