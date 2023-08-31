@@ -8,7 +8,8 @@ import com.example.fitsteps.screens.BodyScreen
 import com.example.fitsteps.screens.BodyScreen2
 
 fun NavGraphBuilder.bodyNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    rootNavController: NavHostController,
 ) {
     navigation(
         startDestination = Screen.BodyScreen.route,
@@ -17,12 +18,12 @@ fun NavGraphBuilder.bodyNavGraph(
         composable(
             route = Screen.BodyScreen.route
         ) {
-            BodyScreen(navController = navController)
+            BodyScreen(navController = navController, rootNavController = rootNavController)
         }
         composable(
             route = Screen.BodyScreen2.route
         ) {
-            BodyScreen2(navController = navController)
+            BodyScreen2(navController = navController, rootNavController = rootNavController)
         }
     }
 }

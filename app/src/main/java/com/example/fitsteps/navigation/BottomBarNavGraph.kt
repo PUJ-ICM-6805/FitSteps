@@ -8,13 +8,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.fitsteps.screens.BodyScreen
 import com.example.fitsteps.screens.ExerciseScreen
+import com.example.fitsteps.screens.ProfileScreen
 import com.example.fitsteps.screens.RunningScreen
 import com.example.fitsteps.screens.SocialScreen
 import com.example.fitsteps.screens.SummaryScreen
 
 @Composable
 fun BottomBarNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    rootNavController: NavHostController,
 ){
     NavHost(
         navController = navController,
@@ -22,18 +24,21 @@ fun BottomBarNavGraph(
         startDestination = BottomBarScreen.Summary.route
     ) {
         composable(route = BottomBarScreen.Summary.route) {
-            SummaryScreen(navController = navController)
+            SummaryScreen(navController = navController, rootNavController = rootNavController)
         }
         composable(route = BottomBarScreen.Running.route) {
             RunningScreen()
         }
         composable(route = BottomBarScreen.Exercise.route) {
-            ExerciseScreen(navController = navController)
+            ExerciseScreen(navController = navController, rootNavController = rootNavController)
         }
         composable(route = BottomBarScreen.Social.route) {
             SocialScreen()
         }
         customRoutineNavGraph(navController = navController)
-        bodyNavGraph(navController = navController)
+        bodyNavGraph(navController = navController, rootNavController = rootNavController)
+        composable(route = Screen.ProfileScreen.route) {
+            ProfileScreen(navController = navController, rootNavController = rootNavController)
+        }
     }
 }

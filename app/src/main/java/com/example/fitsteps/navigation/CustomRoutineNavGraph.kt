@@ -3,6 +3,7 @@ package com.example.fitsteps.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -13,7 +14,7 @@ import com.example.fitsteps.screens.CustomRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreenSteps
 
 fun NavGraphBuilder.customRoutineNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
 ){
     navigation(
         startDestination = Screen.CustomRoutineMain.route,

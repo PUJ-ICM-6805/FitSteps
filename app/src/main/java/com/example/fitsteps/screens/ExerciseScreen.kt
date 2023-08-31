@@ -61,7 +61,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun ExerciseScreen(navController: NavHostController) {
+fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +76,7 @@ fun ExerciseScreen(navController: NavHostController) {
                     .height(30.dp),
                 contentAlignment = Alignment.CenterStart,
             ) {
-                HamburgersDropList(navController = navController)
+                HamburgersDropList(navController = navController, rootNavController = rootNavController)
             }
         }
         item {
@@ -421,5 +421,5 @@ fun LargeButtons(
 @Composable
 @Preview
 fun ExerciseScreenPreview() {
-    ExerciseScreen(navController = rememberNavController())
+    ExerciseScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }

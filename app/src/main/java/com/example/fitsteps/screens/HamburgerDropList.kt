@@ -51,6 +51,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.HOME_ROUTE
+import com.example.fitsteps.navigation.ROOT_ROUTE
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -58,7 +59,7 @@ import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun HamburgersDropList(navController: NavHostController){
+fun HamburgersDropList(navController: NavHostController, rootNavController: NavHostController){
     val suggestions = listOf(
         stringResource(id = R.string.home),
         stringResource(id = R.string.profile),
@@ -118,17 +119,13 @@ fun HamburgersDropList(navController: NavHostController){
                         selectedText = label
                         when(selectedText) {
                             suggestions[1] -> {navController.navigate(
-                                HOME_ROUTE,
-                                builder = {
-                                    popUpTo(route = HOME_ROUTE) {
-                                        inclusive = true
-                                    }
-                                })
+                                Screen.ProfileScreen.route,
+                                )
                             }
-                            suggestions[2] -> {navController.navigate(
-                                HOME_ROUTE,
+                            suggestions[2] -> {rootNavController.navigate(
+                                ROOT_ROUTE,
                                 builder = {
-                                    popUpTo(route = HOME_ROUTE) {
+                                    popUpTo(route = ROOT_ROUTE) {
                                         inclusive = true
                                     }
                                 })
@@ -189,5 +186,5 @@ fun HamburgersDropList(navController: NavHostController){
 @Composable
 @Preview
 fun HamburgersDropListPreview(){
-    HamburgersDropList(navController = rememberNavController())
+    HamburgersDropList(navController = rememberNavController(), rootNavController = rememberNavController())
 }

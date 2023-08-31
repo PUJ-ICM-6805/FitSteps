@@ -38,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.navigation.BottomBarNavGraph
 import com.example.fitsteps.navigation.BottomBarScreen
 import com.example.fitsteps.navigation.HOME_ROUTE
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.navigation.SetupNavGraph
 import com.example.fitsteps.screens.*
 import com.example.fitsteps.ui.theme.Blue
@@ -47,13 +48,13 @@ import com.example.fitsteps.ui.theme.customFontFamily
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BottomBarScreen(navController: NavHostController = rememberNavController()) {
+fun BottomBarScreen(navController: NavHostController = rememberNavController(), rootNavController: NavHostController) {
     Scaffold(
         modifier = Modifier
             .background(MaterialTheme.colors.surface),
         bottomBar = { BottomBar(navController = navController) }
     ) {
-        BottomBarNavGraph(navController = navController)
+        BottomBarNavGraph(navController = navController, rootNavController = rootNavController)
     }
 }
 
@@ -66,22 +67,40 @@ fun BottomBar(navController: NavHostController) {
         BottomBarScreen.Body,
         BottomBarScreen.Social,
     )
+    val posibleDestinations = listOf(
+        BottomBarScreen.Summary.route,
+        BottomBarScreen.Running.route,
+        BottomBarScreen.Exercise.route,
+        BottomBarScreen.Body.route,
+        BottomBarScreen.Social.route,
+        Screen.CustomRoutineMain.route,
+        Screen.CustomRoutineScreen1.route,
+        Screen.CustomRoutineScreen2.route,
+        Screen.CustomRoutineScreen3.route,
+        Screen.CustomRoutineScreen4.route,
+        Screen.CustomRoutineScreen5.route,
+        Screen.CustomRoutineScreen6.route,
+        Screen.BodyScreen.route,
+        Screen.BodyScreen2.route,
+    )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
-    BottomNavigation(
-        backgroundColor = MaterialTheme.colors.surface,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(70.dp)
-            .clip(shape = RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp)),
-    ) {
-        screens.forEach { screen ->
-            AddItem(
-                screen = screen,
-                currentDestination = currentDestination,
-                navController = navController
-            )
+    val bottomBarDestination = posibleDestinations.any { it == currentDestination?.route }
+    if (bottomBarDestination) {
+        BottomNavigation(
+            backgroundColor = MaterialTheme.colors.surface,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .clip(shape = RoundedCornerShape(30.dp, 30.dp, 0.dp, 0.dp)),
+        ) {
+            screens.forEach { screen ->
+                AddItem(
+                    screen = screen,
+                    currentDestination = currentDestination,
+                    navController = navController
+                )
+            }
         }
     }
 }

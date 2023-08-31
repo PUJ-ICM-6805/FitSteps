@@ -44,7 +44,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreen(navController: NavHostController) {
+fun BodyScreen(navController: NavHostController, rootNavController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +62,7 @@ fun BodyScreen(navController: NavHostController) {
                         .height(30.dp),
                     contentAlignment = Alignment.CenterStart,
                 ) {
-                    HamburgersDropList(navController = navController)
+                    HamburgersDropList(navController = navController, rootNavController = rootNavController)
                 }
                 Spacer(modifier = Modifier.height(40.dp))
             }
@@ -389,5 +389,5 @@ fun DiagnosticCard(){
 @Composable
 @Preview
 fun BodyScreenPreview() {
-    BodyScreen(navController = rememberNavController())
+    BodyScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }
