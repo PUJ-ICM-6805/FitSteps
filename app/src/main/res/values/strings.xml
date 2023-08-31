@@ -152,4 +152,14 @@
         Haz añadido una nueva rutina
     </string>
     <string name="create">CREAR</string>
+    <string name="gallery">Galería</string>
+    <string name="squat">Sentadilla</string>
+    <string name="bench_press">Press de banca</string>
+    <string name="deadlift">Peso muerto</string>
+    <string name="plank">Plancha</string>
+    <string name="legElevation">Elevacion de pierna</string>
+    <string name="series">Series</string>
+    <string name="repetitions">Repeticiones</string>
+    <string name="leg">Pierna</string>
+
 </resources>

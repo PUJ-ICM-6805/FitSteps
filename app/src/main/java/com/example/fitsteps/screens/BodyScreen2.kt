@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -22,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -113,8 +117,39 @@ fun BodyScreen2(navController: NavController) {
                 )
             )
         }
-        Box {
+        Box (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
+                .height(300.dp),
+            contentAlignment = Alignment.TopStart,
+        ){
             MeasuresTable()
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
+            contentAlignment = Alignment.TopStart,
+        ){
+            Text(stringId = R.string.gallery,
+                weight = FontWeight.SemiBold,
+                size = 23, color = DarkBlue)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 2.dp, bottom = 0.dp, start = 20.dp, end = 0.dp),
+            contentAlignment = Alignment.TopStart
+        ){
+            LazyRow(){
+                item {
+                    GalleryCard()
+                }
+                item {
+                    GalleryCard()
+                }
+            }
         }
     }
 
@@ -178,8 +213,6 @@ fun Navigation2(navController: NavController){
 fun MeasuresTable(){
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 10.dp, bottom = 105.dp, start = 20.dp, end = 20.dp)
             .background(
                 Color.White,
                 RoundedCornerShape(8.dp)
@@ -256,7 +289,6 @@ fun TableColumns(item1 :String, item2: String){
             )
         )
     }
-
     Divider(
         modifier = Modifier
             .fillMaxWidth(),
@@ -264,6 +296,56 @@ fun TableColumns(item1 :String, item2: String){
     )
 
 
+}
+@Composable
+fun GalleryCard() {
+    Card(
+        modifier = Modifier
+            .height(150.dp)
+            .width(300.dp)
+            .padding(end = 20.dp),
+        shape = RoundedCornerShape(20.dp),
+        backgroundColor = Color.White,
+
+    ){
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.woman),
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.BottomCenter,
+            )
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(10.dp),
+                text = "30/08/23",
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp,
+                    fontStyle = FontStyle.Italic,
+                    color = White,
+                )
+            )
+        }
+    }
+}
+@Composable
+fun Text(stringId: Int, weight: FontWeight,size: Int, color: Color){
+    Text(
+        text = stringResource(id = stringId),
+        style = TextStyle(
+            fontFamily = customFontFamily,
+            fontWeight = weight,
+            fontSize = size.sp,
+            fontStyle = FontStyle.Normal,
+            color = color,
+        )
+    )
 }
 @Composable
 @Preview
