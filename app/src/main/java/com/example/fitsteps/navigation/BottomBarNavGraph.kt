@@ -28,7 +28,7 @@ fun BottomBarNavGraph(
             RunningScreen()
         }
         composable(route = BottomBarScreen.Exercise.route) {
-            ExerciseScreen()
+            ExerciseScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Body.route) {
             BodyScreen()
@@ -36,5 +36,6 @@ fun BottomBarNavGraph(
         composable(route = BottomBarScreen.Social.route) {
             SocialScreen()
         }
+        customRoutineNavGraph(navController = navController)
     }
 }

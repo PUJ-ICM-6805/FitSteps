@@ -259,7 +259,14 @@ fun ImageCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black
+                            ), startY = 400f, endY = 700f
+                        )
+                    )
             )
             Box(
                 modifier = Modifier

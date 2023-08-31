@@ -50,7 +50,7 @@ import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun MainScreen(navController: NavHostController) {
     Box() {

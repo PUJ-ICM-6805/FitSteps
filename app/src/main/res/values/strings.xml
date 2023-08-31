@@ -61,29 +61,71 @@
     <string name="my_collection">Mi colección</string>
     <string name="add_new_routine">Añadir nueva rutina</string>
     <string name="add_personalized_routine">Generar rutina personalizada</string>
-    <string name="body">Cuerpo</string>
-    <string name="add">Añadir</string>
-    <string name="weight2">Peso</string>
-    <string name="diagnostic">Diagnóstico</string>
-    <string name="measures">Medidas</string>
-    <string name="initial">● Inicial</string>
-    <string name="current">● Actual</string>
-    <string name="BMI">BMI</string>
-    <string name="bodyfat">% Grasa</string>
-    <string name="idealWeight">Peso Ideal</string>
-    <string name="Deltoids">Hombros</string>
-    <string name="Chest">Pecho</string>
-    <string name="LeftForearm">Antebrazo izquierdo</string>
-    <string name="RightForearm">Antebrazo derecho</string>
-    <string name="LeftArm">Brazo izquierdo</string>
-    <string name="RightArm">Brazo derecho</string>
-    <string name="Waist">Cintura</string>
-    <string name="Hips">Cadera</string>
-    <string name="LeftLeg">Pierna izquierda</string>
-    <string name="RightLeg">Pierna derecha</string>
-    <string name="LeftCalf">Pantorrilla izquierda</string>
-    <string name="RightCalf">Pantorrilla derecha</string>
-    <string name="cancel">Cancelar</string>
-    <string name="save"> Guardar</string>
-    <string name="addRegistry"> Añadir Registro</string>
+    <string name="create_new_routine">Crear nueva rutina</string>
+    <string name="personalized">Personalizada</string>
+    <string name="routine">Rutina</string>
+    <string name="create_routine_description">
+        Crearemos una rutina personalizada de acuerdo a tus objetivos y perfil
+    </string>
+    <string name="what_objective">¿Cuál es tu objetivo?</string>
+    <string name="hypertrophy">Hipertrofia</string>
+    <string name="gain_muscle">Gana masa muscular y construye músculo</string>
+    <string name="muscle_definition">Definición muscular</string>
+    <string name="muscle_strengthen">Fortalecimiento de los músculos</string>
+    <string name="weight_loss">Pérdida de peso</string>
+    <string name="grease_loss">Perder grasa corporal</string>
+    <array name="muscles_groups">
+        <item>Cuerpo completo</item>
+        <item>Pecho</item>
+        <item>Espalda</item>
+        <item>Brazos</item>
+        <item>Piernas</item>
+        <item>Abdominales</item>
+        <item>Glúteos</item>
+    </array>
+    <array name="training_sites">
+        <item>Gimnasio</item>
+        <item>Casa</item>
+        <item>Parque</item>
+    </array>
+    <array name="yes_no">
+        <item>SÍ</item>
+        <item>NO</item>
+    </array>
+    <array name="training_days">
+        <item>Lunes</item>
+        <item>Martes</item>
+        <item>Miércoles</item>
+        <item>Jueves</item>
+        <item>Viernes</item>
+        <item>Sábado</item>
+        <item>Domingo</item>
+    </array>
+    <array name="preferences">
+        <item>Casual</item>
+        <item>Running</item>
+        <item>Calistenia</item>
+        <item>Powerlifter</item>
+    </array>
+    <string name="what_muscle_group">
+        ¿En qué grupo muscular te gustaría enfocarte?
+    </string>
+    <string name="where_to_train">
+        ¿En dónde te gustaría entrenar?
+    </string>
+    <string name="yes_no_cardio">
+        ¿Te gustaría incluir ejercicios de cardio?
+    </string>
+    <string name="what_days">
+        ¿Qué días te gustaría entrenar?
+    </string>
+    <string name="preferences_profiles">
+        Elige 1 o más perfiles de tu preferencia
+    </string>
+    <string name="congratulations">¡Felicidades!</string>
+    <string name="new_routine_added">
+        Haz añadido una nueva rutina
+    </string>
+    <string name="create">CREAR</string>
+
 </resources>

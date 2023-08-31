@@ -49,7 +49,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -58,7 +61,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun ExerciseScreen() {
+fun ExerciseScreen(navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -150,7 +153,9 @@ fun ExerciseScreen() {
         item {
             LargeButtons(
                 text = stringResource(id = R.string.add_personalized_routine),
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(CUSTOM_ROUTINE_ROUTE)
+                },
                 color = androidx.compose.material.MaterialTheme.colors.background,
                 borderColor = Red,
                 textColor = Red,
@@ -416,5 +421,5 @@ fun LargeButtons(
 @Composable
 @Preview
 fun ExerciseScreenPreview() {
-    ExerciseScreen()
+    ExerciseScreen(navController = rememberNavController())
 }
