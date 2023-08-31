@@ -23,4 +23,6 @@ sealed class Screen(val route: String) {
     object CustomRoutineScreen4: Screen(route = "custom_routine_screen_4")
     object CustomRoutineScreen5: Screen(route = "custom_routine_screen_5")
     object CustomRoutineScreen6: Screen(route = "custom_routine_screen_6")
+    object BodyScreen: Screen(route = "body_screen")
+    object BodyScreen2: Screen(route = "body_screen_2")
 }

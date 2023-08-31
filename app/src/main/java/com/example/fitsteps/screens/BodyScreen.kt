@@ -2,6 +2,7 @@ package com.example.fitsteps.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -38,7 +42,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreen() {
+fun BodyScreen(navController: NavController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +79,7 @@ fun BodyScreen() {
             )
             Text(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd),
+                    .align(Alignment.CenterEnd),
                 text = stringResource(id = R.string.add),
                 style = TextStyle(
                     fontFamily = customFontFamily,
@@ -91,7 +95,7 @@ fun BodyScreen() {
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ){
-            Navigation()
+            Navigation(navController = navController)
         }
         Box(
             modifier = Modifier
@@ -143,7 +147,7 @@ fun BodyScreen() {
 
 }
 @Composable
-fun Navigation(){
+fun Navigation(navController: NavController){
     Row(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
@@ -175,7 +179,10 @@ fun Navigation(){
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
-                .clip(shape = RoundedCornerShape(8.dp)),
+                .clip(shape = RoundedCornerShape(8.dp))
+                .clickable {
+                    navController.navigate(Screen.BodyScreen2.route)
+                },
             contentAlignment = Alignment.Center
 
         ) {
@@ -217,7 +224,7 @@ fun WeightCard(){
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text(
-                    modifier =Modifier.padding(start = 2.dp),
+                    modifier = Modifier.padding(start = 2.dp),
                     text = stringResource(id =R.string.initial),
                     style = TextStyle(
                         fontFamily = customFontFamily,
@@ -228,7 +235,7 @@ fun WeightCard(){
                     )
                 )
                 Text(
-                    modifier =Modifier.padding(end = 10.dp),
+                    modifier = Modifier.padding(end = 10.dp),
                     text = stringResource(id =R.string.current),
                     style = TextStyle(
                         fontFamily = customFontFamily,
@@ -375,5 +382,5 @@ fun DiagnosticCard(){
 @Composable
 @Preview
 fun BodyScreenPreview() {
-    BodyScreen()
+    BodyScreen(navController = rememberNavController())
 }

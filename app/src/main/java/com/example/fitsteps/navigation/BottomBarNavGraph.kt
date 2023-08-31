@@ -30,12 +30,10 @@ fun BottomBarNavGraph(
         composable(route = BottomBarScreen.Exercise.route) {
             ExerciseScreen(navController = navController)
         }
-        composable(route = BottomBarScreen.Body.route) {
-            BodyScreen()
-        }
         composable(route = BottomBarScreen.Social.route) {
             SocialScreen()
         }
         customRoutineNavGraph(navController = navController)
+        bodyNavGraph(navController = navController)
     }
 }

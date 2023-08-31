@@ -1,6 +1,7 @@
 package com.example.fitsteps.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -28,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -37,7 +41,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreen2() {
+fun BodyScreen2(navController: NavController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +78,7 @@ fun BodyScreen2() {
             )
             Text(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd),
+                    .align(Alignment.CenterEnd),
                 text = stringResource(id = R.string.add),
                 style = TextStyle(
                     fontFamily = customFontFamily,
@@ -90,7 +94,7 @@ fun BodyScreen2() {
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ){
-            Navigation2()
+            Navigation2(navController = navController)
         }
         Box(
             modifier = Modifier
@@ -116,7 +120,7 @@ fun BodyScreen2() {
 
 }
 @Composable
-fun Navigation2(){
+fun Navigation2(navController: NavController){
     Row(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
@@ -128,7 +132,10 @@ fun Navigation2(){
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
-                .clip(shape = RoundedCornerShape(8.dp)),
+                .clip(shape = RoundedCornerShape(8.dp))
+                .clickable {
+                    navController.popBackStack()
+                },
             contentAlignment = Alignment.Center
 
         ) {
@@ -169,31 +176,55 @@ fun Navigation2(){
 }
 @Composable
 fun MeasuresTable(){
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 10.dp, bottom = 105.dp, start = 20.dp, end = 20.dp)
             .background(
                 Color.White,
-                RoundedCornerShape(8)
+                RoundedCornerShape(8.dp)
             ),
     ) {
         Spacer(modifier = Modifier.height(2.dp))
-        TableColumns(stringResource(id = R.string.Deltoids), "--")
-        TableColumns(stringResource(id = R.string.Chest), "--")
-        TableColumns(stringResource(id = R.string.LeftForearm), "--")
-        TableColumns(stringResource(id = R.string.RightForearm), "--")
-        TableColumns(stringResource(id = R.string.LeftArm), "--")
-        TableColumns(stringResource(id = R.string.RightArm), "--")
-        TableColumns(stringResource(id = R.string.Waist), "--")
-        TableColumns(stringResource(id = R.string.Hips), "--")
-        TableColumns(stringResource(id = R.string.LeftLeg), "--")
-        TableColumns(stringResource(id = R.string.RightLeg), "--")
-        TableColumns(stringResource(id = R.string.LeftCalf), "--")
-        TableColumns(stringResource(id = R.string.RightCalf), "--")
+        LazyColumn() {
+            item {
+                TableColumns(stringResource(id = R.string.Deltoids), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.Chest), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.LeftForearm), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.RightForearm), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.LeftArm), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.RightArm), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.Waist), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.Hips), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.LeftLeg), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.RightLeg), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.LeftCalf), "--")
+            }
+            item {
+                TableColumns(stringResource(id = R.string.RightCalf), "--")
+            }
+        }
         Spacer(modifier = Modifier.height(2.dp))
-
-
     }
 }
 @Composable
@@ -237,5 +268,5 @@ fun TableColumns(item1 :String, item2: String){
 @Composable
 @Preview
 fun BodyScreen2Preview() {
-    BodyScreen2()
+    BodyScreen2(navController = rememberNavController())
 }
