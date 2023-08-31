@@ -62,6 +62,13 @@ import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
 fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController) {
+    var showCreateRoutineFrame by remember { mutableStateOf(false) }
+    if (showCreateRoutineFrame) {
+        CreateNewRoutineFrame(
+            show = showCreateRoutineFrame,
+            setShow = { showCreateRoutineFrame = it }
+        )
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -141,7 +148,7 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
         item {
             LargeButtons(
                 text = stringResource(id = R.string.add_new_routine),
-                onClick = { /*TODO*/ },
+                onClick = { showCreateRoutineFrame = true },
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 20.dp)
                     .fillMaxWidth(),

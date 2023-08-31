@@ -118,7 +118,7 @@ fun RowScope.AddItem(
 ) {
     val selected = when {
         currentDestination?.hierarchy?.any {
-            it.route == screen.route
+            screen.screens.contains(it.route)
         } == true -> Blue
         else -> LightBlue
     }

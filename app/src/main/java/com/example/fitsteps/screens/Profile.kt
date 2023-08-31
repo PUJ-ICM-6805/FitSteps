@@ -121,7 +121,7 @@ fun ProfileScreen(navController: NavHostController, rootNavController: NavHostCo
                     .padding(horizontal = 15.dp, vertical = 5.dp),
             ) {
                 Text(
-                    text = stringResource(id = R.string.name),
+                    text = stringResource(id = R.string.name_ex),
                     modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,

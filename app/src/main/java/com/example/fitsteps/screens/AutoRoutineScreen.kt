@@ -114,7 +114,7 @@ fun AutoRoutineMainScreen(navController: NavController) {
                 ),
                 modifier = Modifier
                     .padding(start = 20.dp, top = 0.dp, bottom = 0.dp)
-                    .height(42.dp),
+                    .height(45.dp),
             )
             Text(
                 text = stringResource(id = R.string.create_routine_description),

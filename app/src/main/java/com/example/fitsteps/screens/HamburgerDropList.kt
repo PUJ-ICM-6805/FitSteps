@@ -120,7 +120,11 @@ fun HamburgersDropList(navController: NavHostController, rootNavController: NavH
                         when(selectedText) {
                             suggestions[1] -> {navController.navigate(
                                 Screen.ProfileScreen.route,
-                                )
+                                builder = {
+                                    popUpTo(route = Screen.ProfileScreen.route) {
+                                        inclusive = true
+                                    }
+                                })
                             }
                             suggestions[2] -> {rootNavController.navigate(
                                 ROOT_ROUTE,
