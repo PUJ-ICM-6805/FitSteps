@@ -37,7 +37,8 @@ fun NavGraphBuilder.customRoutineNavGraph(
                 progress = 0.2f,
                 items = stringArrayResource(id = R.array.muscles_groups),
                 onClick = {navController.navigate(Screen.CustomRoutineScreen3.route)},
-                mainText = stringResource(id = R.string.what_muscle_group)
+                mainText = stringResource(id = R.string.what_muscle_group),
+                multipleItems = true,
             )
         }
         composable(
