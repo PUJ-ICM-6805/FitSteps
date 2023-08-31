@@ -22,7 +22,7 @@ fun BottomBarNavGraph(
         startDestination = BottomBarScreen.Summary.route
     ) {
         composable(route = BottomBarScreen.Summary.route) {
-            SummaryScreen()
+            SummaryScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Running.route) {
             RunningScreen()

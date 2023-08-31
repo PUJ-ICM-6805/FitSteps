@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Blue
@@ -41,7 +42,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreen2(navController: NavController) {
+fun BodyScreen2(navController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -51,13 +52,18 @@ fun BodyScreen2(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopEnd
         ) {
-            Icon(
-                modifier = Modifier
-                    .padding(16.dp),
-                painter = painterResource(id = R.drawable.ic_config_button),
-                contentDescription = "Configuration Button",
-                tint = DarkBlue
-            )
+            Column {
+                Spacer(modifier = Modifier.height(20.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    HamburgersDropList(navController = navController)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
         }
         Box(
             modifier = Modifier

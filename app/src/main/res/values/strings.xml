@@ -152,4 +152,7 @@
         Haz añadido una nueva rutina
     </string>
     <string name="create">CREAR</string>
+    <string name="home">Home</string>
+    <string name="profile">Mi Perfil</string>
+    <string name="close_session">Cerrar sesión</string>
 </resources>

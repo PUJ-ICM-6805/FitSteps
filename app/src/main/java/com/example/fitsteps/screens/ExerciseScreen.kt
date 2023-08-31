@@ -67,25 +67,25 @@ fun ExerciseScreen(navController: NavHostController) {
             .fillMaxSize()
     ) {
         item {
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+        item {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd,
+                    .fillMaxWidth()
+                    .height(30.dp),
+                contentAlignment = Alignment.CenterStart,
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_settings),
-                    contentDescription = "",
-                    tint = DarkBlue,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable { true }
-                )
+                HamburgersDropList(navController = navController)
             }
+        }
+        item {
+            Spacer(modifier = Modifier.height(40.dp))
         }
         item {
             Text(
                 text = stringResource(id = R.string.training),
-                modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp),
+                modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.SemiBold,

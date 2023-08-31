@@ -64,6 +64,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -73,26 +75,26 @@ import com.example.fitsteps.ui.theme.customFontFamily
 
 
 @Composable
-fun SummaryScreen() {
+fun SummaryScreen(navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_settings),
-                    contentDescription = "",
-                    tint = DarkBlue,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable { true }
-                )
-            }
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+        item {
+               Box(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .height(30.dp),
+                   contentAlignment = Alignment.CenterStart,
+               ) {
+                   HamburgersDropList(navController = navController)
+               }
+        }
+        item {
+            Spacer(modifier = Modifier.height(40.dp))
         }
         item {
             Box (
@@ -751,6 +753,6 @@ fun DropDownMenu2() {
 @Composable
 @Preview
 fun SummaryScreenPreview() {
-    SummaryScreen()
+    SummaryScreen(navController = rememberNavController())
 }
 
