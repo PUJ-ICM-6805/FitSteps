@@ -163,7 +163,7 @@ fun RowScope.AddItem(
 @Composable
 @Preview
 fun PreviewBottomBar() {
-    BottomBarScreen()
+    BottomBarScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }
 
 

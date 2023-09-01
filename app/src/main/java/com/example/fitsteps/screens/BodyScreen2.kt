@@ -47,115 +47,137 @@ import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
 fun BodyScreen2(navController: NavHostController, rootNavController: NavHostController) {
-    Column (
+    LazyColumn (
         modifier = Modifier
             .fillMaxSize()
             .background(White),
     ){
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            Column {
-                Spacer(modifier = Modifier.height(20.dp))
-                Box(
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        HamburgersDropList(
+                            navController = navController,
+                            rootNavController = rootNavController
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+            }
+        }
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+            ) {
+                Text(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(30.dp),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    HamburgersDropList(navController = navController, rootNavController = rootNavController)
-                }
-                Spacer(modifier = Modifier.height(40.dp))
+                        .align(Alignment.TopStart),
+                    text = stringResource(id = R.string.body),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 30.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd),
+                    text = stringResource(id = R.string.add),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = Red,
+                    )
+                )
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-        ) {
-            Text(
+        item {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopStart),
-                text = stringResource(id = R.string.body),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 30.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
-                )
-            )
-            Text(
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Navigation2(navController = navController)
+            }
+        }
+        item {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd),
-                text = stringResource(id = R.string.add),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = Red,
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.measures),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 23.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
                 )
-            )
+            }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ){
-            Navigation2(navController = navController)
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
+                    .height(500.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                MeasuresTable()
+            }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
-            contentAlignment = Alignment.TopStart,
-        ){
-            Text(
-                text = stringResource(id = R.string.measures),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 23.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                Text(
+                    stringId = R.string.gallery,
+                    weight = FontWeight.SemiBold,
+                    size = 23, color = DarkBlue
                 )
-            )
+            }
         }
-        Box (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
-                .height(300.dp),
-            contentAlignment = Alignment.TopStart,
-        ){
-            MeasuresTable()
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
-            contentAlignment = Alignment.TopStart,
-        ){
-            Text(stringId = R.string.gallery,
-                weight = FontWeight.SemiBold,
-                size = 23, color = DarkBlue)
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 2.dp, bottom = 0.dp, start = 20.dp, end = 0.dp),
-            contentAlignment = Alignment.TopStart
-        ){
-            LazyRow(){
-                item {
-                    GalleryCard()
-                }
-                item {
-                    GalleryCard()
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 2.dp, bottom = 0.dp, start = 20.dp, end = 0.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                LazyRow() {
+                    item {
+                        GalleryCard()
+                    }
+                    item {
+                        GalleryCard()
+                    }
                 }
             }
+        }
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 
