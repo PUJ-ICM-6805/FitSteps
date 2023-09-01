@@ -48,7 +48,7 @@ import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun CreateNewRoutineFrame(
+fun CreateNewTrainingPlanFrame(
     style: TextStyle = TextStyle(
         fontFamily = customFontFamily,
         fontWeight = FontWeight.SemiBold,
@@ -57,7 +57,7 @@ fun CreateNewRoutineFrame(
         textAlign = TextAlign.Center,
     ),
     show: Boolean,
-    setShow: (Boolean, Boolean) -> Unit,
+    setShow: (Boolean) -> Unit,
 ){
     var resizedTextStyle by remember { mutableStateOf(style) }
     var input_name by remember {
@@ -122,7 +122,7 @@ fun CreateNewRoutineFrame(
                             verticalArrangement = Arrangement.Bottom,
                         ) {
                             Text(
-                                text = stringResource(id = R.string.create_routine),
+                                text = stringResource(id = R.string.create_new_plan),
                                 softWrap = false,
                                 /*onTextLayout = {
                                         result ->
@@ -142,6 +142,22 @@ fun CreateNewRoutineFrame(
                                 ),
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp, vertical = 0.dp),
+                            )
+                            Text(
+                                text = stringResource(id = R.string.create_new_plan_description),
+                                /*style = resizedTextStyle.copy(
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = resizedTextStyle.fontSize * 0.7f,
+                                ),*/
+                                style = TextStyle(
+                                    fontFamily = customFontFamily,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFF4F4F4),
+                                    textAlign = TextAlign.Start,
+                                ),
+                                modifier = Modifier
+                                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
                             )
                         }
                     }
@@ -185,7 +201,7 @@ fun CreateNewRoutineFrame(
                                         onValueChange = { input_name = it},
                                         placeholder = {
                                             Text(
-                                                text = stringResource(id = R.string.example_routine_name),
+                                                text = stringResource(id = R.string.my_plan),
                                                 style = TextStyle(
                                                     fontFamily = customFontFamily,
                                                     fontWeight = FontWeight.Light,
@@ -215,7 +231,7 @@ fun CreateNewRoutineFrame(
                                 }
                             }
                             Text(
-                                text = stringResource(id = R.string.exercise_days),
+                                text = stringResource(id = R.string.description),
                                 style = TextStyle(
                                     fontFamily = customFontFamily,
                                     fontWeight = FontWeight.Medium,
@@ -226,13 +242,56 @@ fun CreateNewRoutineFrame(
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp, vertical = 5.dp),
                             )
-                            WeekButtonsRow()
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color.White,
+                                elevation = 3.dp,
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp, vertical = 0.dp)
+                            ){
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    contentAlignment = Alignment.CenterStart,
+                                ){
+                                    TextField(
+                                        value = input_desc,
+                                        onValueChange = { input_desc = it},
+                                        placeholder = {
+                                            Text(
+                                                text = stringResource(id = R.string.description),
+                                                style = TextStyle(
+                                                    fontFamily = customFontFamily,
+                                                    fontWeight = FontWeight.Light,
+                                                    fontSize = 12.sp,
+                                                    color = DarkBlue,
+                                                    textAlign = TextAlign.Start,
+                                                ),
+                                            )
+                                        },
+                                        textStyle = TextStyle(
+                                            fontFamily = customFontFamily,
+                                            fontWeight = FontWeight.Normal,
+                                            fontSize = 12.sp,
+                                            color = DarkBlue,
+                                            textAlign = TextAlign.Start,
+                                        ),
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            backgroundColor = Color.White,
+                                            focusedIndicatorColor = DarkBlue,
+                                            cursorColor = DarkBlue,
+                                            unfocusedIndicatorColor = Color.Transparent,
+                                            disabledIndicatorColor = Color.Transparent,
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(80.dp),
+                                    )
+                                }
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier
-                        .height(1.dp)
-                        .background(LightBlue)
-                        .fillMaxWidth())
+                    Spacer(modifier = Modifier.height(1.dp).background(LightBlue).fillMaxWidth())
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -250,7 +309,7 @@ fun CreateNewRoutineFrame(
                                     .weight(1f)
                                     .fillMaxSize()
                                     .background(Color.White)
-                                    .clickable { setShow(false, false) },
+                                    .clickable {setShow(false)},
                                 contentAlignment = Alignment.Center,
                             ) {
 
@@ -265,16 +324,13 @@ fun CreateNewRoutineFrame(
                                     ),
                                 )
                             }
-                            Spacer(modifier = Modifier
-                                .width(1.dp)
-                                .background(LightBlue)
-                                .fillMaxHeight())
+                            Spacer(modifier = Modifier.width(1.dp).background(LightBlue).fillMaxHeight())
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .weight(1f)
                                     .background(Color.White)
-                                    .clickable { setShow(false, true) },
+                                    .clickable { setShow(false) },
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
@@ -299,6 +355,6 @@ fun CreateNewRoutineFrame(
 
 @Composable
 @Preview
-fun CreateNewRoutineFramePreview(){
-    CreateNewRoutineFrame(show = true, setShow = { _, _ -> })
+fun CreateNewTrainingFramePreview(){
+    CreateNewTrainingPlanFrame(show = true, setShow = {})
 }
