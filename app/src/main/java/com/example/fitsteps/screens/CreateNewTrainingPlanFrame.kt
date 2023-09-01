@@ -57,7 +57,7 @@ fun CreateNewTrainingPlanFrame(
         textAlign = TextAlign.Center,
     ),
     show: Boolean,
-    setShow: (Boolean) -> Unit,
+    setShow: (Boolean, Boolean) -> Unit,
 ){
     var resizedTextStyle by remember { mutableStateOf(style) }
     var input_name by remember {
@@ -309,7 +309,7 @@ fun CreateNewTrainingPlanFrame(
                                     .weight(1f)
                                     .fillMaxSize()
                                     .background(Color.White)
-                                    .clickable {setShow(false)},
+                                    .clickable {setShow(false, false)},
                                 contentAlignment = Alignment.Center,
                             ) {
 
@@ -330,7 +330,7 @@ fun CreateNewTrainingPlanFrame(
                                     .fillMaxSize()
                                     .weight(1f)
                                     .background(Color.White)
-                                    .clickable { setShow(false) },
+                                    .clickable { setShow(false, true) },
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
@@ -356,5 +356,5 @@ fun CreateNewTrainingPlanFrame(
 @Composable
 @Preview
 fun CreateNewTrainingFramePreview(){
-    CreateNewTrainingPlanFrame(show = true, setShow = {})
+    CreateNewTrainingPlanFrame(show = true, setShow = {_, _ -> })
 }

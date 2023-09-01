@@ -83,6 +83,7 @@ fun BottomBar(navController: NavHostController) {
         Screen.CustomRoutineScreen6.route,
         Screen.BodyScreen.route,
         Screen.BodyScreen2.route,
+        Screen.PlanScreen.route,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
