@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -142,7 +142,7 @@ fun BodyScreen2(navController: NavHostController, rootNavController: NavHostCont
                     .height(500.dp),
                 contentAlignment = Alignment.TopStart,
             ) {
-                MeasuresTable()
+                MeasuresTable(editable= false)
             }
         }
         item {
@@ -238,7 +238,7 @@ fun Navigation2(navController: NavController){
 
 }
 @Composable
-fun MeasuresTable(){
+fun MeasuresTable(editable: Boolean){
     Box(
         modifier = Modifier
             .background(
@@ -249,47 +249,47 @@ fun MeasuresTable(){
         Spacer(modifier = Modifier.height(2.dp))
         LazyColumn() {
             item {
-                TableColumns(stringResource(id = R.string.Deltoids), "--")
+                TableColumns(stringResource(id = R.string.Deltoids), "--",editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.Chest), "--")
+                TableColumns(stringResource(id = R.string.Chest), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.LeftForearm), "--")
+                TableColumns(stringResource(id = R.string.LeftForearm), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.RightForearm), "--")
+                TableColumns(stringResource(id = R.string.RightForearm), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.LeftArm), "--")
+                TableColumns(stringResource(id = R.string.LeftArm), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.RightArm), "--")
+                TableColumns(stringResource(id = R.string.RightArm), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.Waist), "--")
+                TableColumns(stringResource(id = R.string.Waist), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.Hips), "--")
+                TableColumns(stringResource(id = R.string.Hips), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.LeftLeg), "--")
+                TableColumns(stringResource(id = R.string.LeftLeg), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.RightLeg), "--")
+                TableColumns(stringResource(id = R.string.RightLeg), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.LeftCalf), "--")
+                TableColumns(stringResource(id = R.string.LeftCalf), "--", editable)
             }
             item {
-                TableColumns(stringResource(id = R.string.RightCalf), "--")
+                TableColumns(stringResource(id = R.string.RightCalf), "--", editable)
             }
         }
         Spacer(modifier = Modifier.height(2.dp))
     }
 }
 @Composable
-fun TableColumns(item1 :String, item2: String){
+fun TableColumns(item1 :String, item2: String, editable: Boolean){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -306,7 +306,31 @@ fun TableColumns(item1 :String, item2: String){
                 color = Blue,
             )
         )
+if(editable) {
+    Box(
+        modifier = Modifier.size(75.dp, 30.dp)
+            .background(Blue, RoundedCornerShape(5.dp)),
+        contentAlignment = Alignment.CenterEnd
+    ) {
         Text(
+            modifier = Modifier.padding(end = 7.dp),
+            text = "$item2 cm",
+            style = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontSize = 15.sp,
+                fontStyle = FontStyle.Normal,
+                color = LightBlue,
+            )
+        )
+    }
+}else{
+    Box(
+        modifier = Modifier.size(75.dp, 30.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Text(
+            modifier = Modifier.padding(end = 7.dp),
             text = "$item2 cm",
             style = TextStyle(
                 fontFamily = customFontFamily,
@@ -316,6 +340,8 @@ fun TableColumns(item1 :String, item2: String){
                 color = Blue,
             )
         )
+    }
+}
     }
     Divider(
         modifier = Modifier
