@@ -37,6 +37,7 @@ fun BottomBarNavGraph(
         }
         customRoutineNavGraph(navController = navController)
         bodyNavGraph(navController = navController, rootNavController = rootNavController)
+        exerciseNavGraph(navController = navController)
         composable(route = Screen.ProfileScreen.route) {
             ProfileScreen(navController = navController, rootNavController = rootNavController)
         }

@@ -2,6 +2,7 @@ package com.example.fitsteps.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -42,7 +44,9 @@ import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun CreateRoutineScreen() {
+fun CreateRoutineScreen(
+    navController: NavHostController,
+) {
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     var showExercises by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
@@ -135,7 +139,9 @@ fun CreateRoutineScreen() {
             }else {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ){
                     Text(
                         text = stringResource(id = R.string.routines),

@@ -181,5 +181,6 @@
     <string name="example_routine_name">Ej. Pecho</string>
     <string name="exercise_days">Día(s) de este ejercicio</string>
     <string name="routines">Rutinas</string>
+    <string name="fitsteps_plans">Programas Fitsteps</string>
 
 </resources>

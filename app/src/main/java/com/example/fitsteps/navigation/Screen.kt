@@ -8,6 +8,7 @@ const val REGISTER_ROUTE = "register"
 const val REGISTER_NAVIGATION_ROUTE = "register_nav"
 const val MAIN_SCREEN_ROUTE = "main_screen"
 const val CUSTOM_ROUTINE_ROUTE = "custom_routine"
+const val PLAN_ROUTE = "plan_route"
 
 sealed class Screen(val route: String) {
     object SplashScreen : Screen(route = "splash_screen")
@@ -26,4 +27,5 @@ sealed class Screen(val route: String) {
     object BodyScreen: Screen(route = "body_screen")
     object BodyScreen2: Screen(route = "body_screen_2")
     object ProfileScreen: Screen(route = "profile_screen")
+    object PlanScreen: Screen(route = "plan_screen")
 }
