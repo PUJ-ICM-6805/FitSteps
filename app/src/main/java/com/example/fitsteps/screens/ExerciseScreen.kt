@@ -64,7 +64,7 @@ import com.example.fitsteps.ui.theme.customFontFamily
 fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController) {
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
-        CreateNewRoutineFrame(
+        CreateNewTrainingPlanFrame(
             show = showCreateRoutineFrame,
             setShow = { showCreateRoutineFrame = it }
         )
@@ -138,10 +138,10 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                     .padding(15.dp)
             ) {
                 item {
-                    RoutineCard()
+                    RoutineCard(navController = navController)
                 }
                 item {
-                    RoutineCard()
+                    RoutineCard(navController = navController)
                 }
             }
         }
@@ -175,7 +175,7 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
 }
 
 @Composable
-fun RoutineCard() {
+fun RoutineCard(navController: NavHostController) {
     Card(
         modifier = Modifier
             .height(190.dp)
@@ -273,7 +273,9 @@ fun RoutineCard() {
                 ) {
                     Text(
                         text = stringResource(id = R.string.edit),
-                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp),
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp, vertical = 10.dp)
+                            .clickable {  },
                         style = TextStyle(
                             fontFamily = customFontFamily,
                             fontWeight = FontWeight.Light,

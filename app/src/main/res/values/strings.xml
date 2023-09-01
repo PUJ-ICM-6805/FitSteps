@@ -59,7 +59,7 @@
     <string name="training">Entrenamiento</string>
     <string name="my_training">Mi entrenamiento</string>
     <string name="my_collection">Mi colección</string>
-    <string name="add_new_routine">Añadir nueva rutina</string>
+    <string name="add_new_routine">Añadir nuevo plan</string>
     <string name="add_personalized_routine">Generar rutina personalizada</string>
     <string name="body">Cuerpo</string>
     <string name="add">Añadir</string>
@@ -165,11 +165,21 @@
     <string name="home">Home</string>
     <string name="profile">Mi Perfil</string>
     <string name="close_session">Cerrar sesión</string>
-    <string name="create_new_routine_description">
-        Crea tu propia rutina con los ejercicios que elijas
+    <string name="create_new_plan_description">
+        Crea tu plan de entrenamiento con los ejercicios que elijas
     </string>
     <string name="name_ex">Nombre</string>
     <string name="my_routine">Mi rutina</string>
     <string name="description">Descripción</string>
+    <string name="description_routine_creation">
+        Crea tus rutinas separadas por días de la semana y/o por grupos musculares
+    </string>
+    <string name="create_routine">Crear rutina</string>
+    <string name="create_new_plan">Crear nuevo plan</string>
+    <string name="my_plan">Mi plan de entrenamiento</string>
+    <string name="my_plan_ex">Mi plan</string>
+    <string name="example_routine_name">Ej. Pecho</string>
+    <string name="exercise_days">Día(s) de este ejercicio</string>
+    <string name="routines">Rutinas</string>
 
 </resources>
