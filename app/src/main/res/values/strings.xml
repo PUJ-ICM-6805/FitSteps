@@ -182,4 +182,17 @@
     <string name="exercise_days">Día(s) de este ejercicio</string>
     <string name="routines">Rutinas</string>
     <string name="addPhoto">Añadir Foto</string>
+    <string name="abs">Abdomen</string>
+    <string name="min">min</string>
+    <string name="exercises">ejercicios</string>
+    <string name="Exercises">Ejercicios</string>
+    <string name="kcal">kcal</string>
+    <string name="startRoutine">Iniciar Rutina</string>
+    <string name="noExercisesYet">No hay ejercicios aún</string>
+    <string name="description_noExercisesYet">
+        Añade ejercicios a tu rutina para empezar a entrenar
+    </string>
+    <string name="addExercise">Añadir Ejercicio</string>
+
+
 </resources>
