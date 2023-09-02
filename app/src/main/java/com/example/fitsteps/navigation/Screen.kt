@@ -28,4 +28,9 @@ sealed class Screen(val route: String) {
     object BodyScreen2: Screen(route = "body_screen_2")
     object ProfileScreen: Screen(route = "profile_screen")
     object PlanScreen: Screen(route = "plan_screen")
+    object DemoPrepareScreen: Screen(route = "demo_prepare_screen")
+    object DemoPrepareScreen1: Screen(route = "demo_prepare_screen_1")
+    object DemoPrepareScreen2: Screen(route = "demo_prepare_screen_2")
+    object DemoPrepareScreen3: Screen(route = "demo_prepare_screen_3")
+    object DemoPrepareScreen4: Screen(route = "demo_prepare_screen_4")
 }
