@@ -242,5 +242,6 @@
     <string name="Barbell_bp">Barbell Bench Press</string>
     <string name="backlc">Atrás</string>
     <string name="kg">Kg</string>
+    <string name="lbs">Lbs</string>
     <string name="carga">Carga</string>
 </resources>
