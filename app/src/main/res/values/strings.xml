@@ -182,5 +182,19 @@
     <string name="exercise_days">Día(s) de este ejercicio</string>
     <string name="routines">Rutinas</string>
     <string name="fitsteps_plans">Programas Fitsteps</string>
+    <string name="labelSocial"> Todavía no estás conectado a tus contactos </string>
+    <string name="contacts"> Conectar contactos </string>
+    <string name="search"> Buscar </string>
+    <string name="walking"> Caminadora </string>
+    <string name="backminus">&lt; Atrás</string>
+    <string name="goal"> Meta: 30 min </string>
+    <string name="prepare"> Preparáte </string>
+    <string name="preparesegs"> 3 </string>
+    <string name="nextexercise"> Siguiente ejercicio</string>
+    <string name="series_example"> 2 series, 1 min c/u </string>
+    <string name="goon"> Sigue así </string>
+    <string name="finish"> Has terminado </string>
+    <string name="resume"> Resumen </string>
+
 
 </resources>
