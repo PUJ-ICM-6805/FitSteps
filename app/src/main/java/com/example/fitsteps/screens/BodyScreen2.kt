@@ -237,7 +237,6 @@ fun Navigation2(navController: NavController){
 
         }
     }
-
 }
 @Composable
 fun MeasuresTable(editable: Boolean){

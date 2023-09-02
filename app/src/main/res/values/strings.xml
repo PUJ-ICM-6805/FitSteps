@@ -195,6 +195,20 @@
     <string name="finish"> Has terminado </string>
     <string name="resume"> Resumen </string>
 
+    <string name="running">Running</string>
+    <string name="iniciar">INICIAR</string>
+    <string name="myroutes">Mis rutas</string>
+    <string name="details">Detalles</string>
+    <string name="duration">Duración</string>
+    <string name="calories">Calorías</string>
+    <string name="ritmo">Ritmo promedio</string>
+    <string name="speed">Velocidad promedio</string>
+    <string name="cadencia">Cadencia media</string>
+    <string name="zancada">Zancada promedio</string>
+    <string name="pasos">Pasos</string>
+    <string name="frecuencia">Frecuencia cardiaca promedio</string>
+    <string name="inclinacion">Inclinación</string>
+
     <string name="addPhoto">Añadir Foto</string>
     <string name="abs">Abdomen</string>
     <string name="min">min</string>
