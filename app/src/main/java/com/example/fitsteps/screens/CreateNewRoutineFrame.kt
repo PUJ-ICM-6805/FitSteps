@@ -226,7 +226,9 @@ fun CreateNewRoutineFrame(
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp, vertical = 5.dp),
                             )
-                            WeekButtonsRow()
+                            WeekButtonsRow(
+                                multipleItems = true,
+                            )
                         }
                     }
                     Spacer(modifier = Modifier

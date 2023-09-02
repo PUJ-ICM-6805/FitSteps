@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,6 +54,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
+import com.example.fitsteps.navigation.PLAN_ROUTE
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -62,11 +64,17 @@ import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
 fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController) {
+    var havePlans by remember {
+        mutableStateOf(false)
+    }
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
         CreateNewTrainingPlanFrame(
             show = showCreateRoutineFrame,
-            setShow = { showCreateRoutineFrame = it }
+            setShow = { showFrame, showExercise ->
+                showCreateRoutineFrame = showFrame
+                havePlans = showExercise
+            }
         )
     }
     LazyColumn(
@@ -120,8 +128,38 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
             WeekButtonsRow()
         }
         item {
+            if(havePlans) {
+                Text(
+                    text = stringResource(id = R.string.my_collection),
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 22.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+            }
+        }
+        item {
+            if (havePlans) {
+                LazyRow(
+                    modifier = Modifier
+                        .padding(15.dp)
+                ) {
+                    item {
+                        RoutineCard(navController = navController)
+                    }
+                    item {
+                        RoutineCard(navController = navController)
+                    }
+                }
+            }
+        }
+        item {
             Text(
-                text = stringResource(id = R.string.my_collection),
+                text = stringResource(id = R.string.fitsteps_plans),
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
                 style = TextStyle(
                     fontFamily = customFontFamily,
@@ -171,6 +209,9 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                     .fillMaxWidth(),
             )
         }
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
     }
 }
 
@@ -180,13 +221,17 @@ fun RoutineCard(navController: NavHostController) {
         modifier = Modifier
             .height(190.dp)
             .width(300.dp)
-            .padding(end = 20.dp),
+            .padding(end = 20.dp)
+            .clickable {
+                navController.navigate(PLAN_ROUTE)
+            },
         shape = RoundedCornerShape(20.dp),
         backgroundColor = Color.White,
     ){
         Box(
             modifier = Modifier
                 .fillMaxSize(),
+            contentAlignment = Alignment.BottomStart,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.woman),
@@ -194,104 +239,81 @@ fun RoutineCard(navController: NavHostController) {
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.BottomCenter,
             )
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Column(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Bottom,
             ) {
-                Column(
+                Text(
+                    text = "Full body", // TODO: Change for the actual routine type
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 22.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = Color.White,
+                    )
+                )
+                Text(
+                    text = "Pérdida de grasa", //TODO: Change for the actual activity
+                    modifier = Modifier.padding(start = 15.dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = Color.White,
+                    )
+                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .weight(3f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom,
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(0.dp),
                 ) {
                     Text(
-                        text = "Full body", // TODO: Change for the actual routine type
+                        text = stringResource(id = R.string.progress),
                         modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
                         style = TextStyle(
                             fontFamily = customFontFamily,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp,
                             fontStyle = FontStyle.Normal,
-                            color = Color.White,
+                            color = Color(0xFFF4F4F4),
                         )
                     )
                     Text(
-                        text = "Pérdida de grasa", //TODO: Change for the actual activity
-                        modifier = Modifier.padding(start = 15.dp),
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 20.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = Color.White,
-                        )
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(0.dp),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.progress),
-                            modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
-                            style = TextStyle(
-                                fontFamily = customFontFamily,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 12.sp,
-                                fontStyle = FontStyle.Normal,
-                                color = Color(0xFFF4F4F4),
-                            )
-                        )
-                        Text(
-                            text = "5%", //TODO: Change for the actual progress
-                            modifier = Modifier.padding(start = 15.dp),
-                            style = TextStyle(
-                                fontFamily = customFontFamily,
-                                fontWeight = FontWeight.Light,
-                                fontSize = 12.sp,
-                                fontStyle = FontStyle.Italic,
-                                color = Color(0xFFF4F4F4),
-                            )
-                        )
-                    }
-                    RoundedLinearProgressIndicator(
-                        modifier = Modifier
-                            .padding(top = 0.dp, bottom = 10.dp, start = 15.dp)
-                            .height(10.dp),
-                        progress = 0.1f,
-                        progressColor = Blue,
-                        backgroundColor = LightBlue,
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.TopEnd,
-                    modifier = Modifier
-                        .weight(1f),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.edit),
-                        modifier = Modifier
-                            .padding(horizontal = 15.dp, vertical = 10.dp)
-                            .clickable {  },
+                        text = "5%", //TODO: Change for the actual progress
+                        modifier = Modifier.padding(end = 15.dp),
                         style = TextStyle(
                             fontFamily = customFontFamily,
                             fontWeight = FontWeight.Light,
                             fontSize = 12.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = Color.White,
+                            fontStyle = FontStyle.Italic,
+                            color = Color(0xFFF4F4F4),
                         )
                     )
                 }
+                RoundedLinearProgressIndicator(
+                    modifier = Modifier
+                        .padding(top = 0.dp, bottom = 10.dp, start = 15.dp, end = 15.dp)
+                        .height(10.dp),
+                    progress = 0.1f,
+                    progressColor = Blue,
+                    backgroundColor = LightBlue,
+                )
             }
         }
     }
 }
 @Composable
-fun WeekButtonsRow() {
+fun WeekButtonsRow(
+    multipleItems: Boolean = false,
+) {
     val selectedValue = remember { mutableStateOf("") }
+    val selectedValues = remember { mutableStateListOf<String>() }
     val items = listOf(
         "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
     )
@@ -302,6 +324,7 @@ fun WeekButtonsRow() {
     ) {
 
         items.forEach { item ->
+            val isSelected = if(multipleItems) (selectedValues.contains(item)) else (selectedValue.value == item)
             Box(
                 modifier = Modifier
                     .wrapContentSize()
@@ -311,14 +334,24 @@ fun WeekButtonsRow() {
                 androidx.compose.material3.Surface(
                     modifier = Modifier
                         .selectable(
-                            selected = (selectedValue.value == item),
-                            onClick = { selectedValue.value = item },
+                            selected = if (multipleItems) (selectedValues.contains(item)) else (selectedValue.value == item),
+                            onClick = {
+                                if (multipleItems) {
+                                    if (selectedValues.contains(item)) {
+                                        selectedValues.remove(item)
+                                    } else {
+                                        selectedValues.add(item)
+                                    }
+                                } else {
+                                    selectedValue.value = item
+                                }
+                            },
                             role = Role.RadioButton
                         )
                         .wrapContentWidth()
                         .height(45.dp),
                     shape = RoundedCornerShape(5.dp),
-                    color = if (selectedValue.value == item) Blue else LightBlue,
+                    color = if (isSelected) Blue else LightBlue,
                 ) {
                     Text(
                         text = when(item) {
@@ -344,7 +377,7 @@ fun WeekButtonsRow() {
                                 stringResource(id = R.string.sunday_letter)
                             }
                         },
-                        color = if (selectedValue.value == item) LightBlue else Blue,
+                        color = if (isSelected) LightBlue else Blue,
                         modifier = Modifier
                             .padding(horizontal = 10.dp, vertical = 10.dp)
                             .width(20.dp)
