@@ -35,6 +35,8 @@ sealed class BottomBarScreen(
             Screen.CustomRoutineScreen5.route,
             Screen.CustomRoutineScreen6.route,
             Screen.PlanScreen.route,
+            Screen.RoutineScreen.route,
+            Screen.AddExerciseScreen.route,
         )
     )
     object Body : BottomBarScreen(

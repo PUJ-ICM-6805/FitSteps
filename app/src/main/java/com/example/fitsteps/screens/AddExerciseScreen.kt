@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -38,7 +39,12 @@ import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
 import  androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.White
 
 @Composable
@@ -101,14 +107,29 @@ fun AddExerciseScreen(navController: NavHostController){
             }
 
         }
-            MusclesList()
-        Spacer(Modifier.height(80.dp))
-
+        Box(
+            modifier = Modifier
+                .padding(bottom = 60.dp)
+        ) {
+            MusclesList(navController = navController)
+        }
     }
 
 }
 @Composable
-fun MusclesList(){
+fun MusclesList(
+    navController: NavHostController,
+){
+    var resizedTextStyle by remember {
+        mutableStateOf(
+            TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                fontStyle = FontStyle.Normal,
+                color = Blue,
+            )
+        ) }
     val items: Array<String> = stringArrayResource(id = R.array.muscles)
     val color = remember{
         mutableStateOf(LightBlue)
@@ -116,35 +137,46 @@ fun MusclesList(){
     LazyVerticalGrid(
     columns = GridCells.Fixed(3),
     modifier = Modifier
-            .padding(top = 20.dp)
-){
-    items(items){item->
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 5.dp, vertical = 10.dp)
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(10.dp))
-                .background(color.value)
-                .clickable {
-                    color.value = Blue
-                },
-            contentAlignment = Alignment.Center
-        ){
-           Text(
+        .padding(top = 20.dp)
+        .wrapContentHeight(),
+    ){
+        items(items){item->
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center),
-                text = item,
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = Blue,
+                    .padding(horizontal = 5.dp, vertical = 10.dp)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(color.value)
+                    .clickable {
+                        color.value = Blue
+                        navController.navigate(Screen.AddSpecificExerciseScreen.route)
+                    },
+                contentAlignment = Alignment.Center
+            ){
+               Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = item,
+                    style = resizedTextStyle,
+                    /*style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = Blue,
+                    ),*/
+                   onTextLayout = { result ->
+                       if (result.didOverflowWidth) {
+                           resizedTextStyle = resizedTextStyle.copy(
+                               fontSize = resizedTextStyle.fontSize * 0.95f,
+                           )
+                       }
+                   },
+                   softWrap = false,
                 )
-            )
+            }
         }
     }
-}
 }
 @Composable
 @Preview

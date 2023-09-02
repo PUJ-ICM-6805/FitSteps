@@ -1,6 +1,7 @@
 package com.example.fitsteps.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -38,7 +43,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun RoutinePreviewScreen() {
+fun RoutinePreviewScreen(navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -120,7 +125,9 @@ fun RoutinePreviewScreen() {
                         fontFamily = customFontFamily,
                         fontStyle = FontStyle.Normal,
                         color = Red,
-                    )
+                    ),
+                    modifier = Modifier
+                        .clickable { navController.navigate(Screen.AddExerciseScreen.route) }
                 )
             }
         }
@@ -233,5 +240,5 @@ fun RoutineDetails(minutes: String, numExercises: String, kcal: String) {
 @Composable
 @Preview
 fun RoutinePreviewScreenPreview() {
-    RoutinePreviewScreen()
+    RoutinePreviewScreen(navController = rememberNavController())
 }

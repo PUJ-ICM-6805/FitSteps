@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -36,7 +38,9 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun RoutinePreviewScreen2() {
+fun RoutinePreviewScreen2(
+    navController: NavHostController
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -240,5 +244,5 @@ fun IconAndText(iconId: Int, contentDescription : String, text: String){
 @Composable
 @Preview
 fun RoutinePreviewScreen2Preview() {
-    RoutinePreviewScreen2()
+    RoutinePreviewScreen2(navController = rememberNavController())
 }

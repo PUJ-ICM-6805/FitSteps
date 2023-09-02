@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.fitsteps.R
+import com.example.fitsteps.screens.AddExerciseScreen
 import com.example.fitsteps.screens.AutoRoutineMainScreen
 import com.example.fitsteps.screens.BarbelBenchScreen
 import com.example.fitsteps.screens.CreateRoutineScreen
@@ -18,6 +19,7 @@ import com.example.fitsteps.screens.PrepareScreen1
 import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3
 import com.example.fitsteps.screens.PrepareScreen4
+import com.example.fitsteps.screens.RoutinePreviewScreen
 
 fun NavGraphBuilder.exerciseNavGraph(
     navController: NavHostController,
@@ -34,7 +36,7 @@ fun NavGraphBuilder.exerciseNavGraph(
         composable(
             route = Screen.AddExerciseScreen.route
         ) {
-            CreateRoutineScreen(navController = navController)
+            AddExerciseScreen(navController = navController)
         }
         composable(
             route = Screen.AddSpecificExerciseScreen.route
@@ -44,7 +46,7 @@ fun NavGraphBuilder.exerciseNavGraph(
         composable(
             route = Screen.RoutineScreen.route
         ) {
-            CreateRoutineScreen(navController = navController)
+            RoutinePreviewScreen(navController = navController)
         }
         composable(
             route = Screen.DemoPrepareScreen.route
