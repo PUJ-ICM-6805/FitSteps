@@ -43,7 +43,6 @@ import com.example.fitsteps.ui.theme.customFontFamily
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.navigation.Screen
@@ -340,7 +339,6 @@ fun WeightSelectionButtons(){
     Row(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
-            .background(LightBlue)
             .fillMaxWidth()
             .wrapContentHeight(),
     ) {
@@ -348,40 +346,44 @@ fun WeightSelectionButtons(){
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
+                .background(
+                    if (selectedWeight) Blue else LightBlue
+                )
                 .clip(shape = RoundedCornerShape(8.dp))
-                .clickable {
-
-                },
+                .clickable { selectedWeight = true },
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.material3.Text(
-                text = stringResource(id = R.string.myroutes),
+                text = stringResource(id = R.string.kg),
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     fontStyle = FontStyle.Normal,
-                    color = Blue,
+                    color = if (selectedWeight) LightBlue else Blue,
                 )
             )
         }
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Blue)
+                .background(
+                    if (!selectedWeight) Blue else LightBlue
+                )
                 .weight(1f)
-                .clip(shape = RoundedCornerShape(8.dp)),
+                .clip(shape = RoundedCornerShape(8.dp))
+                .clickable { selectedWeight = false },
             contentAlignment = Alignment.Center
 
         ) {
             androidx.compose.material3.Text(
-                text = stringResource(id = R.string.details),
+                text = stringResource(id = R.string.lbs),
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     fontStyle = FontStyle.Normal,
-                    color = White,
+                    color = if (!selectedWeight) LightBlue else Blue,
                 )
             )
 
