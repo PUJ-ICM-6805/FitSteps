@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.White
 
@@ -181,5 +182,5 @@ fun MusclesList(
 @Composable
 @Preview
 fun AddExerciseScreenPreview(){
-    AddExerciseScreen(navController = NavHostController(LocalContext.current))
+    AddExerciseScreen(navController = rememberNavController())
 }

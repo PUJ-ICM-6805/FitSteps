@@ -16,6 +16,7 @@ import com.example.fitsteps.screens.BodyScreen2Edit
 import com.example.fitsteps.screens.CreateRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreenSteps
+import com.example.fitsteps.screens.ExercisesPerMuscleScreen
 import com.example.fitsteps.screens.PrepareScreen1
 import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3
@@ -42,12 +43,7 @@ fun NavGraphBuilder.exerciseNavGraph(
         composable(
             route = Screen.AddSpecificExerciseScreen.route
         ) {
-            CreateRoutineScreen(navController = navController)
-        }
-        composable(
-            route = Screen.AddSpecificExerciseScreen.route
-        ) {
-            CreateRoutineScreen(navController = navController)
+            ExercisesPerMuscleScreen(navController = navController)
         }
         composable(
             route = Screen.RoutineScreen.route

@@ -30,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -37,7 +39,9 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun ExercisesPerMuscleScreen() {
+fun ExercisesPerMuscleScreen(
+    navController: NavHostController,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,7 +100,12 @@ fun ExercisesPerMuscleScreen() {
             }
 
         }
-        ExercisesCardList()
+        Box(
+            modifier = Modifier
+                .padding(bottom = 60.dp)
+        ) {
+            ExercisesCardList()
+        }
 
 
     }
@@ -185,5 +194,5 @@ fun ExercisesCard(
 @Composable
 @Preview
 fun ExercisesPerMuscleScreenPreview() {
-    ExercisesPerMuscleScreen()
+    ExercisesPerMuscleScreen(navController = rememberNavController())
 }
