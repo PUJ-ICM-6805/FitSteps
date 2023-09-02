@@ -18,7 +18,13 @@ sealed class BottomBarScreen(
     object Running : BottomBarScreen(
         route = "running",
         title = "Running",
-        icon = R.drawable.ic_running
+        icon = R.drawable.ic_running,
+        screens = listOf(
+            "running",
+            Screen.RunningMapScreen.route,
+            Screen.RunningRouteDetails.route,
+            Screen.RunningRouteDetails2.route,
+        )
     )
 
     object Exercise : BottomBarScreen(
