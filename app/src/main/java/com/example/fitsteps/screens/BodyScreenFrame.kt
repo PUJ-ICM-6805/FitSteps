@@ -1,6 +1,7 @@
 package com.example.fitsteps.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,9 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreenFrame(){
+fun BodyScreenFrame(
+    onClick: (Boolean) -> Unit = { _ -> }
+){
     var input_name by remember {
         mutableStateOf("")
     }
@@ -71,7 +74,8 @@ fun BodyScreenFrame(){
                     .padding(20.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
@@ -82,7 +86,8 @@ fun BodyScreenFrame(){
                             fontSize = 15.sp,
                             fontStyle = FontStyle.Normal,
                             color = Red,
-                        )
+                        ),
+                        modifier = Modifier.clickable { onClick(false) }
                     )
                     Text(
                         text = stringResource(id = R.string.save),
@@ -92,7 +97,8 @@ fun BodyScreenFrame(){
                             fontSize = 15.sp,
                             fontStyle = FontStyle.Normal,
                             color = Red,
-                        )
+                        ),
+                        modifier = Modifier.clickable { onClick(false) }
                     )
 
                 }

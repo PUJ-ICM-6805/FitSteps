@@ -19,6 +19,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +49,16 @@ import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
 fun BodyScreen(navController: NavHostController, rootNavController: NavHostController) {
+    var showBodyFrame by remember {
+        mutableStateOf(false)
+    }
+    if (showBodyFrame) {
+        BodyScreenFrame(
+            onClick = { showFrame ->
+                showBodyFrame = showFrame
+            }
+        )
+    }
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +100,10 @@ fun BodyScreen(navController: NavHostController, rootNavController: NavHostContr
             )
             Text(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd),
+                    .align(Alignment.CenterEnd)
+                    .clickable {
+                         showBodyFrame = true
+                    },
                 text = stringResource(id = R.string.add),
                 style = TextStyle(
                     fontFamily = customFontFamily,
