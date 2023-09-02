@@ -9,15 +9,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.fitsteps.R
+import com.example.fitsteps.screens.AddExerciseScreen
 import com.example.fitsteps.screens.AutoRoutineMainScreen
 import com.example.fitsteps.screens.BarbelBenchScreen
+import com.example.fitsteps.screens.BodyScreen2Edit
 import com.example.fitsteps.screens.CreateRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreenSteps
+import com.example.fitsteps.screens.ExercisesPerMuscleScreen
 import com.example.fitsteps.screens.PrepareScreen1
 import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3
 import com.example.fitsteps.screens.PrepareScreen4
+import com.example.fitsteps.screens.RoutinePreviewScreen
+import com.example.fitsteps.screens.RoutinePreviewScreen2
 
 fun NavGraphBuilder.exerciseNavGraph(
     navController: NavHostController,
@@ -30,6 +35,21 @@ fun NavGraphBuilder.exerciseNavGraph(
             route = Screen.PlanScreen.route
         ) {
             CreateRoutineScreen(navController = navController)
+        }
+        composable(
+            route = Screen.AddExerciseScreen.route
+        ) {
+            AddExerciseScreen(navController = navController)
+        }
+        composable(
+            route = Screen.AddSpecificExerciseScreen.route
+        ) {
+            ExercisesPerMuscleScreen(navController = navController)
+        }
+        composable(
+            route = Screen.RoutineScreen.route
+        ) {
+            RoutinePreviewScreen(navController = navController)
         }
         composable(
             route = Screen.DemoPrepareScreen.route
@@ -55,6 +75,11 @@ fun NavGraphBuilder.exerciseNavGraph(
             route = Screen.DemoPrepareScreen4.route
         ) {
             PrepareScreen4(navController = navController)
+        }
+        composable(
+            route = Screen.RoutineScreen2.route
+        ) {
+            RoutinePreviewScreen2(navController = navController)
         }
     }
 }

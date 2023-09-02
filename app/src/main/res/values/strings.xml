@@ -184,7 +184,6 @@
     <string name="fitsteps_plans">Programas Fitsteps</string>
     <string name="labelSocial"> Todavía no estás conectado a tus contactos </string>
     <string name="contacts"> Conectar contactos </string>
-    <string name="search"> Buscar </string>
     <string name="walking"> Caminadora </string>
     <string name="backminus">&lt; Atrás</string>
     <string name="goal"> Meta: 30 min </string>
@@ -196,5 +195,52 @@
     <string name="finish"> Has terminado </string>
     <string name="resume"> Resumen </string>
 
+    <string name="running">Running</string>
+    <string name="iniciar">INICIAR</string>
+    <string name="myroutes">Mis rutas</string>
+    <string name="details">Detalles</string>
+    <string name="duration">Duración</string>
+    <string name="calories">Calorías</string>
+    <string name="ritmo">Ritmo promedio</string>
+    <string name="speed">Velocidad promedio</string>
+    <string name="cadencia">Cadencia media</string>
+    <string name="zancada">Zancada promedio</string>
+    <string name="pasos">Pasos</string>
+    <string name="frecuencia">Frecuencia cardiaca promedio</string>
+    <string name="inclinacion">Inclinación</string>
 
+    <string name="addPhoto">Añadir Foto</string>
+    <string name="abs">Abdomen</string>
+    <string name="min">min</string>
+    <string name="exercises">ejercicios</string>
+    <string name="Exercises">Ejercicios</string>
+    <string name="kcal">kcal</string>
+    <string name="startRoutine">Iniciar Rutina</string>
+    <string name="noExercisesYet">No hay ejercicios aún</string>
+    <string name="description_noExercisesYet">
+        Añade ejercicios a tu rutina para empezar a entrenar
+    </string>
+    <string name="addExercise">Añadir Ejercicio</string>
+    <array name="muscles">
+        <item>Pecho</item>
+        <item>Abdomen</item>
+        <item>Hombro</item>
+        <item>Biceps</item>
+        <item>Oblicuos</item>
+        <item>Triceps</item>
+        <item>Gluteos</item>
+        <item>Pierna</item>
+        <item>Espalda</item>
+        <item>Antebrazo</item>
+        <item>Pantorrilla</item>
+        <item>Dorsales</item>
+        <item>Aductores</item>
+
+    </array>
+    <string name="search">Buscar</string>
+    <string name="chest">Pecho</string>
+    <string name="Barbell_bp">Barbell Bench Press</string>
+    <string name="backlc">Atrás</string>
+    <string name="kg">Kg</string>
+    <string name="carga">Carga</string>
 </resources>
