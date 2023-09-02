@@ -9,7 +9,6 @@ import androidx.navigation.navigation
 import com.example.fitsteps.screens.BodyScreen
 import com.example.fitsteps.screens.ExerciseScreen
 import com.example.fitsteps.screens.ProfileScreen
-import com.example.fitsteps.screens.RunningScreen
 import com.example.fitsteps.screens.SocialScreen
 import com.example.fitsteps.screens.SummaryScreen
 import com.example.fitsteps.screens.running.MainRunning

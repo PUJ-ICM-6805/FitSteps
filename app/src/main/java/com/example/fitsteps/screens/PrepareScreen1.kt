@@ -2,6 +2,7 @@ package com.example.fitsteps.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -153,12 +155,12 @@ fun PrepareScreen1(navController: NavHostController) {
                 fontSize = 25.sp
             )
         }
-        DataRoutine()
+        DataRoutine(navController = navController)
     }
 }
 
 @Composable
-fun DataRoutine(){
+fun DataRoutine(navController: NavHostController){
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -255,6 +257,7 @@ fun DataRoutine(){
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
                             .background(color = LightBlue, shape = RoundedCornerShape(10.dp))
+                            .clickable { navController.popBackStack() }
                     ){
                         Text(
                             modifier = Modifier
@@ -297,6 +300,7 @@ fun DataRoutine(){
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
                             .background(color = LightBlue, shape = RoundedCornerShape(10.dp))
+                            .clickable { navController.navigate(Screen.DemoPrepareScreen2.route) }
                     ){
                         Text(
                             modifier = Modifier

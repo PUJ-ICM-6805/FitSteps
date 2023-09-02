@@ -2,6 +2,7 @@ package com.example.fitsteps.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -42,6 +47,17 @@ import com.example.fitsteps.ui.theme.customFontFamily
 fun ExercisesPerMuscleScreen(
     navController: NavHostController,
 ) {
+    var showExerciseFrame by remember {
+        mutableStateOf(false)
+    }
+    if (showExerciseFrame) {
+        DetailsPerExerciseScreen(
+            navController = navController,
+            setShow = { showFrame ->
+                showExerciseFrame = showFrame
+            }
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -104,7 +120,11 @@ fun ExercisesPerMuscleScreen(
             modifier = Modifier
                 .padding(bottom = 60.dp)
         ) {
-            ExercisesCardList()
+            ExercisesCardList(
+                onClick = {
+                    showExerciseFrame = it
+                }
+            )
         }
 
 
@@ -113,14 +133,22 @@ fun ExercisesPerMuscleScreen(
 
 }
 @Composable
-fun ExercisesCardList(){
+fun ExercisesCardList(
+    onClick: (Boolean) -> Unit = {}
+){
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
             .padding(top = 20.dp)
     ){
         items(8){item->
-            Box(Modifier.padding(10.dp)) {
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clickable {
+                        onClick(true)
+                    }
+            ) {
                 ExercisesCard(
                     painter = painterResource(id = R.drawable.benchpress),
                     contentDescription = "a",

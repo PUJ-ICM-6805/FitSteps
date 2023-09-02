@@ -87,6 +87,7 @@ fun BottomBar(navController: NavHostController) {
         Screen.PlanScreen.route,
         Screen.PlanScreen.route,
         Screen.RoutineScreen.route,
+        Screen.RoutineScreen2.route,
         Screen.AddExerciseScreen.route,
         Screen.AddSpecificExerciseScreen.route,
         Screen.RunningRouteDetails.route,

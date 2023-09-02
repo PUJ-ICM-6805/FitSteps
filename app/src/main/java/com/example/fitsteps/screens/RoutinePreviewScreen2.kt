@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -80,7 +81,9 @@ fun RoutinePreviewScreen2(
         }
         item {
             LargeButtons(text = stringResource(id = R.string.startRoutine),
-                onClick = { /*TODO*/ },
+                onClick = {
+                     navController.navigate(Screen.DemoPrepareScreen1.route)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start=25.dp, end=25.dp, top=20.dp, bottom=20.dp)

@@ -22,6 +22,7 @@ import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3
 import com.example.fitsteps.screens.PrepareScreen4
 import com.example.fitsteps.screens.RoutinePreviewScreen
+import com.example.fitsteps.screens.RoutinePreviewScreen2
 
 fun NavGraphBuilder.exerciseNavGraph(
     navController: NavHostController,
@@ -74,6 +75,11 @@ fun NavGraphBuilder.exerciseNavGraph(
             route = Screen.DemoPrepareScreen4.route
         ) {
             PrepareScreen4(navController = navController)
+        }
+        composable(
+            route = Screen.RoutineScreen2.route
+        ) {
+            RoutinePreviewScreen2(navController = navController)
         }
     }
 }
