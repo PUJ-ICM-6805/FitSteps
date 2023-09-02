@@ -36,7 +36,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -172,7 +174,12 @@ fun CreateRoutineScreen(
         //TODO for each routine create an item
         item{
             if(showExercises)
-                RoutineCardExercises("Lunes | Miércoles | Viernes","Abdomen","0 ejercicios | 0 min | 0 kcal")
+                RoutineCardExercises(
+                    "Lunes | Miércoles | Viernes",
+                    "Abdomen",
+                    "0 ejercicios | 0 min | 0 kcal",
+                    navController
+                )
         }
         item {
             Spacer(modifier = Modifier.height(80.dp))
@@ -185,12 +192,14 @@ fun RoutineCardExercises(
     days: String,
     name: String,
     description: String,
+    navController: NavHostController,
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(20.dp),
+            .padding(20.dp)
+            .clickable { navController.navigate(Screen.RoutineScreen.route) },
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -237,5 +246,10 @@ fun RoutineCardExercises(
 @Composable
 @Preview
 fun CreateRoutineScreenPreview() {
-    RoutineCardExercises("Lunes | Miércoles | Viernes","Abdomen","0 ejercicios | 0 min | 0 kcal")
+    RoutineCardExercises(
+        "Lunes | Miércoles | Viernes",
+        "Abdomen",
+        "0 ejercicios | 0 min | 0 kcal",
+        navController = rememberNavController()
+    )
 }

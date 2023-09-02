@@ -145,6 +145,9 @@ fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHost
                 )
             }
         }
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
     }
 
 

@@ -102,6 +102,7 @@ fun AddExerciseScreen(navController: NavHostController){
 
         }
             MusclesList()
+        Spacer(Modifier.height(80.dp))
 
     }
 

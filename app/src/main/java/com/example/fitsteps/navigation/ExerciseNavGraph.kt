@@ -32,6 +32,21 @@ fun NavGraphBuilder.exerciseNavGraph(
             CreateRoutineScreen(navController = navController)
         }
         composable(
+            route = Screen.AddExerciseScreen.route
+        ) {
+            CreateRoutineScreen(navController = navController)
+        }
+        composable(
+            route = Screen.AddSpecificExerciseScreen.route
+        ) {
+            CreateRoutineScreen(navController = navController)
+        }
+        composable(
+            route = Screen.RoutineScreen.route
+        ) {
+            CreateRoutineScreen(navController = navController)
+        }
+        composable(
             route = Screen.DemoPrepareScreen.route
         ) {
             BarbelBenchScreen(navController = navController)
