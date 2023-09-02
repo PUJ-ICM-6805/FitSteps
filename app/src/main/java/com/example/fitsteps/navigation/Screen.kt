@@ -37,4 +37,7 @@ sealed class Screen(val route: String) {
     object DemoPrepareScreen2: Screen(route = "demo_prepare_screen_2")
     object DemoPrepareScreen3: Screen(route = "demo_prepare_screen_3")
     object DemoPrepareScreen4: Screen(route = "demo_prepare_screen_4")
+    object RunningMapScreen: Screen(route = "running_map_screen")
+    object RunningRouteDetails: Screen(route = "running_route_screen_1")
+    object RunningRouteDetails2: Screen(route = "running_route_screen_2")
 }

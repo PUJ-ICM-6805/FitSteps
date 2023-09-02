@@ -1,10 +1,9 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.running
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,14 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,10 +32,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.ui.theme.Blue
-import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
-import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
@@ -49,7 +44,7 @@ fun MyRoutesPartOne(navController: NavHostController, rootNavController: NavHost
         modifier = Modifier
             .fillMaxSize()
             .background(
-                  Color(212121))
+                  Color(0xFF212121))
     ) {
         item {
             Spacer(modifier = Modifier.height(20.dp))
@@ -125,15 +120,13 @@ fun MyRoutesPartOne(navController: NavHostController, rootNavController: NavHost
                     .fillMaxWidth()
                     .padding(20.dp)
             ) {
-                ImageCard(
+                Image(
                     painter = painterResource(id = R.drawable.expanded_map),
                     contentDescription = "",
-                    title = "",
                     modifier = Modifier
                         .width(333.dp)
                         .height(400.dp)
                         .align(Alignment.Center),
-                    type = "Mapa"
                 )
             }
 
@@ -179,7 +172,7 @@ fun Navigation3(navController: NavController){
                 .weight(1f)
                 .clip(shape = RoundedCornerShape(8.dp))
                 .clickable {
-                   // navController.navigate(Screen.MyRoutesPartTwo.route)
+                    navController.navigate(Screen.RunningRouteDetails2.route)
                 },
             contentAlignment = Alignment.Center
 

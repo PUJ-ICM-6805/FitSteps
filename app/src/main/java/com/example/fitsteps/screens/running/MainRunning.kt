@@ -1,9 +1,7 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.running
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,23 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -39,17 +29,16 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
+import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.screens.HamburgersDropList
+import com.example.fitsteps.screens.LargeButtons
 import com.example.fitsteps.ui.theme.DarkBlue
-import com.example.fitsteps.ui.theme.Red
-import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
@@ -98,38 +87,43 @@ fun MainRunning(navController: NavHostController, rootNavController: NavHostCont
             Spacer(modifier = Modifier.height(10.dp))
         }
         item {
-            Box(
-                contentAlignment = Alignment.BottomCenter,
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(20.dp),
+                shape = RoundedCornerShape(15.dp),
+                elevation = 5.dp
             ) {
-                ImageCard(
-                    painter = painterMap,
-                    contentDescription = "",
-                    title = "",
-                    modifier = Modifier
-                        .width(333.dp)
-                        .height(300.dp)
-                        .align(Alignment.Center),
-                    type = "Mapa"
-                )
                 Box(
-                    contentAlignment = Alignment.BottomCenter, modifier = Modifier
-                        .padding(start = 20.dp)
-                        .fillMaxHeight()
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
-                    LargeButtons(
-                        text = stringResource(id = R.string.iniciar),
-                        onClick = {
-                            //navController.navigate(CUSTOM_ROUTINE_ROUTE)
-                        },
+                    Image(
+                        painter = painterMap,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .padding(horizontal = 15.dp, vertical = 20.dp)
-                            .size(200.dp, 50.dp),
-                        needIcon = true,
-                        icon = R.drawable.ic_play_icon
+                            .fillMaxWidth()
+                            .height(350.dp)
                     )
+                    Box(
+                        contentAlignment = Alignment.BottomCenter, modifier = Modifier
+                            .padding(start = 20.dp)
+                            .fillMaxHeight()
+                    ) {
+                        LargeButtons(
+                            text = stringResource(id = R.string.iniciar),
+                            onClick = {
+                                navController.navigate(Screen.RunningMapScreen.route)
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 15.dp, vertical = 20.dp)
+                                .size(200.dp, 50.dp),
+                            needIcon = true,
+                            icon = R.drawable.ic_play_icon
+                        )
+                    }
                 }
             }
         }
@@ -168,7 +162,7 @@ fun MainRunning(navController: NavHostController, rootNavController: NavHostCont
                             .padding(end = 16.dp)
                             .width(300.dp)
                             .height(175.dp),
-                        type = "Ruta"
+                        navController = navController
                     )
                 }
             }
@@ -186,10 +180,14 @@ fun ImageCard(
     contentDescription: String,
     title: String,
     modifier: Modifier = Modifier,
-    type: String
+    navController: NavHostController,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate(Screen.RunningRouteDetails.route)
+            },
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
@@ -214,26 +212,17 @@ fun ImageCard(
                     .padding(12.dp),
                 contentAlignment = Alignment.BottomStart
             ) {
-                if (type.equals("Rutina")) {
-                    Text(
-                        title,
-                        style = TextStyle(color = Color.White, fontSize = 22.sp),
-                        modifier = Modifier.padding(bottom = 30.dp)
+                Text(
+                    title,
+                    style = TextStyle(
+                        color = Color(0xFFD3E7EF),
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(R.font.poppinslight)),
+                        fontWeight = FontWeight(400),
+                        fontStyle = FontStyle.Italic
                     )
-                } else if (type.equals("Ruta")) {
-                    Text(
-                        title,
-                        style = TextStyle(
-                            color = Color(0xFFD3E7EF),
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.poppinslight)),
-                            fontWeight = FontWeight(400),
-                            fontStyle = FontStyle.Italic
-                        )
-                    )
-                }
+                )
             }
-
         }
     }
 }
