@@ -211,4 +211,6 @@
     </array>
     <string name="search">Buscar</string>
     <string name="chest">Pecho</string>
+    <string name="Barbell_bp">Barbell Bench Press</string>
+    <string name="backlc">Atrás</string>
 </resources>
