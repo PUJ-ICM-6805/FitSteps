@@ -26,6 +26,7 @@ sealed class Screen(val route: String) {
     object CustomRoutineScreen6: Screen(route = "custom_routine_screen_6")
     object BodyScreen: Screen(route = "body_screen")
     object BodyScreen2: Screen(route = "body_screen_2")
+    object BodyScreenEditable: Screen(route = "body_screen_editable")
     object ProfileScreen: Screen(route = "profile_screen")
     object PlanScreen: Screen(route = "plan_screen")
     object RoutineScreen: Screen(route = "routine_screen")

@@ -1,6 +1,7 @@
 package com.example.fitsteps.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -77,8 +78,9 @@ fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHost
                 )
                 androidx.compose.material3.Text(
                     modifier = Modifier
-                        .align(Alignment.CenterEnd),
-                    text = stringResource(id = R.string.add),
+                        .align(Alignment.CenterEnd)
+                        .clickable { navController.popBackStack() },
+                    text = stringResource(id = R.string.save),
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Normal,

@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -94,7 +95,8 @@ fun BodyScreen2(navController: NavHostController, rootNavController: NavHostCont
                 )
                 Text(
                     modifier = Modifier
-                        .align(Alignment.CenterEnd),
+                        .align(Alignment.CenterEnd)
+                        .clickable { navController.navigate(Screen.BodyScreenEditable.route) },
                     text = stringResource(id = R.string.add),
                     style = TextStyle(
                         fontFamily = customFontFamily,

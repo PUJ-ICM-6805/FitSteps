@@ -12,6 +12,7 @@ import com.example.fitsteps.R
 import com.example.fitsteps.screens.AddExerciseScreen
 import com.example.fitsteps.screens.AutoRoutineMainScreen
 import com.example.fitsteps.screens.BarbelBenchScreen
+import com.example.fitsteps.screens.BodyScreen2Edit
 import com.example.fitsteps.screens.CreateRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreen
 import com.example.fitsteps.screens.CustomRoutineScreenSteps
@@ -37,6 +38,11 @@ fun NavGraphBuilder.exerciseNavGraph(
             route = Screen.AddExerciseScreen.route
         ) {
             AddExerciseScreen(navController = navController)
+        }
+        composable(
+            route = Screen.AddSpecificExerciseScreen.route
+        ) {
+            CreateRoutineScreen(navController = navController)
         }
         composable(
             route = Screen.AddSpecificExerciseScreen.route

@@ -83,6 +83,7 @@ fun BottomBar(navController: NavHostController) {
         Screen.CustomRoutineScreen6.route,
         Screen.BodyScreen.route,
         Screen.BodyScreen2.route,
+        Screen.BodyScreenEditable.route,
         Screen.PlanScreen.route,
         Screen.PlanScreen.route,
         Screen.RoutineScreen.route,
