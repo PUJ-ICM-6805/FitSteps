@@ -244,4 +244,7 @@
     <string name="kg">Kg</string>
     <string name="lbs">Lbs</string>
     <string name="carga">Carga</string>
+
+    <string name="game_view_content_description" translatable="false">Game view</string>
+    <string name="unity">Prueba FindSteps ahora!</string>
 </resources>

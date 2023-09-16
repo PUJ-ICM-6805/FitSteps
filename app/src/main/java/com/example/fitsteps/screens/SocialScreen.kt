@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens
 
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -46,9 +48,11 @@ import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.unity3d.player.UnityPlayerActivity
 
 @Composable
 fun SocialScreen() {
+    val unityContext = LocalContext.current
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -85,7 +89,7 @@ fun SocialScreen() {
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(bottom = 40.dp, top = 20.dp, start = 20.dp, end = 20.dp),
-            text = stringResource(id = R.string.labelSocial),
+            text = stringResource(id = R.string.unity),
             color = Blue,
             fontSize = 15.sp,
             style = TextStyle(
@@ -119,7 +123,10 @@ fun SocialScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                    .height(70.dp)
+                    .height(70.dp),
+                onClicked = {
+                    unityContext.startActivity(Intent(unityContext, UnityPlayerActivity::class.java)) //TODO quitarlo de aquí y ponerlo donde debería ser
+                }
             )
         }
 
@@ -174,7 +181,7 @@ fun SearchBar(
 @Composable
 fun SocialButton(
     modifier: Modifier = Modifier,
-    text: String = stringResource(id = R.string.contacts),
+    text: String = "FindSteps", //TODO Replace for the actual name
     shape: Shape = RoundedCornerShape(20.dp),
     borderColor: Color = Color.LightGray,
     backgroundColor: Color = Red,
