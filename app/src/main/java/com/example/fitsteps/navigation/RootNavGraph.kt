@@ -6,9 +6,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.fitsteps.screens.AnimatedSplashScreen
 import com.example.fitsteps.screens.BottomBarScreen
-import com.example.fitsteps.screens.LoginScreen
+import com.example.fitsteps.screens.authentication.LoginScreen
 import com.example.fitsteps.screens.MainScreen
-import com.example.fitsteps.screens.RegisterScreen
+import com.example.fitsteps.screens.authentication.RegisterScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {

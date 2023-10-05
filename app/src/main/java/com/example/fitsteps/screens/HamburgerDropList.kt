@@ -57,6 +57,8 @@ import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun HamburgersDropList(navController: NavHostController, rootNavController: NavHostController){
@@ -133,6 +135,7 @@ fun HamburgersDropList(navController: NavHostController, rootNavController: NavH
                                         inclusive = true
                                     }
                                 })
+                                FirebaseAuth.getInstance().signOut()
                             }
                             else -> {navController.navigate(
                                 HOME_ROUTE,

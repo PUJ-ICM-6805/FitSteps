@@ -2,7 +2,6 @@ package com.example.fitsteps.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,11 +53,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
 import com.example.fitsteps.navigation.PLAN_ROUTE
+import com.example.fitsteps.screens.authentication.RoundedLinearProgressIndicator
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
-import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
