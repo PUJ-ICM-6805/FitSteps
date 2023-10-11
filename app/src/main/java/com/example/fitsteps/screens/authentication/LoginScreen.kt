@@ -1,8 +1,10 @@
 package com.example.fitsteps.screens.authentication
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,12 +48,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.authentication.LoginViewModel
+import com.example.fitsteps.navigation.AUTHENTICATION_ROUTE
 import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
+import com.example.fitsteps.navigation.REGISTER_NAVIGATION_ROUTE
+import com.example.fitsteps.navigation.REGISTER_ROUTE
 import com.example.fitsteps.screens.LoginButton
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun LoginScreen(
@@ -59,6 +67,7 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -171,7 +180,32 @@ fun LoginScreen(
                 Text(
                     modifier = Modifier
                         .align(Alignment.End)
-                        .padding(end = 50.dp, bottom = 40.dp),
+                        .padding(end = 50.dp, bottom = 40.dp)
+                        .clickable {
+                            if (email.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "Please enter your email",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                                    .addOnSuccessListener { task ->
+                                        Toast.makeText(
+                                            context,
+                                            "An email has been sent to $email",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Toast.makeText(
+                                            context,
+                                            exception.message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            }
+                        },
                     text = stringResource(id = R.string.forgot_password),
                     color = Blue,
                     fontSize = 16.sp,
@@ -187,22 +221,50 @@ fun LoginScreen(
                         .padding(start = 40.dp, end = 40.dp, bottom = 20.dp)
                         .height(70.dp),
                     onClicked = {
-                        viewModel.signInWithEmailAndPassword(email, password) {
-                            navController.navigate(
-                                BOTTOM_NAVIGATION_ROUTE,
-                                builder = {
-                                    popUpTo(route = MAIN_SCREEN_ROUTE) {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
+                        if (email.isNotEmpty() && password.isNotEmpty()) {
+                            viewModel.signInWithEmailAndPassword(email, password,
+                                home = {
+                                    navController.navigate(
+                                        BOTTOM_NAVIGATION_ROUTE,
+                                        builder = {
+                                            popUpTo(route = MAIN_SCREEN_ROUTE) {
+                                                inclusive = true
+                                            }
+                                            launchSingleTop = true
+                                        }
+                                    )
+                                },
+                                error = {
+                                    Toast.makeText(
+                                        context,
+                                        it,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             )
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Por favor ingrese sus datos",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 )
                 Row(
                     modifier = Modifier
                         .padding(top = 40.dp)
+                        .clickable {
+                            navController.navigate(
+                                route = REGISTER_NAVIGATION_ROUTE,
+                                builder = {
+                                    popUpTo(route = AUTHENTICATION_ROUTE) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            )
+                        }
                 ) {
                     Text(
                         modifier = Modifier
@@ -288,8 +350,6 @@ fun TextFields(
         )
     }
 }
-
-
 
 @Composable
 @Preview

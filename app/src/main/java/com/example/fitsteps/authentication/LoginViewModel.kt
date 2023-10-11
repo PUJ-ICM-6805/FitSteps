@@ -9,13 +9,12 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class LoginViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
 
-    fun signInWithEmailAndPassword(email: String, password: String, home: ()-> Unit)
+    fun signInWithEmailAndPassword(email: String, password: String, home: ()-> Unit, error: (String)-> Unit)
     = viewModelScope.launch {
         try {
             auth.signInWithEmailAndPassword(email, password)
@@ -26,10 +25,12 @@ class LoginViewModel : ViewModel() {
                     }
                     else {
                         Log.d("Autenticación", "no logueado")
+                        error("Datos incorrectos, verifique e intente nuevamente")
                     }
                 }
         }catch(ex: Exception) {
             Log.d("Autenticacion", "fallo en logueo: ${ex.message}")
+            error("Error en login, intente nuevamente")
         }
     }
 

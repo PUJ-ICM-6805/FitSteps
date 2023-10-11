@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.fitsteps.screens.AnimatedSplashScreen
+import com.example.fitsteps.screens.authentication.AnimatedSplashScreen
 import com.example.fitsteps.screens.BottomBarScreen
 import com.example.fitsteps.screens.authentication.LoginScreen
 import com.example.fitsteps.screens.MainScreen

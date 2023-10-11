@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.authentication
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -20,11 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.alpha
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
-import com.example.fitsteps.navigation.HOME_ROUTE
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
 import com.example.fitsteps.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
