@@ -1,10 +1,8 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.authentication
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,44 +11,55 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.navigation.AUTHENTICATION_ROUTE
+import com.example.fitsteps.authentication.LoginViewModel
 import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
-import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.screens.LoginButton
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
-import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,7 +141,9 @@ fun LoginScreen(navController: NavHostController) {
                         .fillMaxWidth()
                         .padding(start = 40.dp, end = 40.dp, bottom = 40.dp)
                         .height(70.dp),
-                    text = "",
+                    onTextChange = {
+                        email = it
+                    },
                 )
                 Text(
                     modifier = Modifier
@@ -148,12 +159,14 @@ fun LoginScreen(navController: NavHostController) {
                         fontStyle = FontStyle.Normal,
                     ),
                 )
-                TextFields(
+                PasswordField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 40.dp, end = 40.dp, bottom = 10.dp)
                         .height(70.dp),
-                    text = "",
+                    onPasswordChange = {
+                       password = it
+                    },
                 )
                 Text(
                     modifier = Modifier
@@ -174,15 +187,17 @@ fun LoginScreen(navController: NavHostController) {
                         .padding(start = 40.dp, end = 40.dp, bottom = 20.dp)
                         .height(70.dp),
                     onClicked = {
-                        navController.navigate(
-                            BOTTOM_NAVIGATION_ROUTE,
-                            builder = {
-                                popUpTo(route = MAIN_SCREEN_ROUTE) {
-                                    inclusive = true
+                        viewModel.signInWithEmailAndPassword(email, password) {
+                            navController.navigate(
+                                BOTTOM_NAVIGATION_ROUTE,
+                                builder = {
+                                    popUpTo(route = MAIN_SCREEN_ROUTE) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
                                 }
-                                launchSingleTop = true
-                            }
-                        )
+                            )
+                        }
                     }
                 )
                 Row(
@@ -219,22 +234,43 @@ fun LoginScreen(navController: NavHostController) {
     }
 }
 
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFields(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(20.dp),
     backgroundColor: Color = Color.White,
-    text: String = stringResource(id = R.string.user),
+    text: String = "",
     label: String = "",
+    onTextChange: (String) -> Unit,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Done
+    ),
 ) {
+    var textData by remember {
+        mutableStateOf(label)
+    }
+    val keyboardController = LocalSoftwareKeyboardController.current
     Surface(
         modifier = modifier,
         shape = shape,
         color = backgroundColor,
     ) {
         TextField(
-            value = "",
-            onValueChange = { },
+            value = textData,
+            onValueChange = {
+                textData = it
+                onTextChange(it)
+            },
+            singleLine = true,
+            textStyle = TextStyle(
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.Medium,
+                fontStyle = FontStyle.Normal,
+                color = DarkBlue
+            ),
             label = { Text(text) },
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = backgroundColor,
@@ -243,6 +279,12 @@ fun TextFields(
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
             ),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                }
+            )
         )
     }
 }

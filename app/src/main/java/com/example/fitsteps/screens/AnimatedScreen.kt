@@ -27,6 +27,7 @@ import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.HOME_ROUTE
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
 import com.example.fitsteps.navigation.Screen
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
@@ -43,14 +44,27 @@ fun AnimatedSplashScreen(navController: NavHostController) {
     LaunchedEffect(key1 = true) {
         startAnimation = true
         delay(2000)
-        navController.navigate(
-            MAIN_SCREEN_ROUTE,
-            builder = {
-                popUpTo(route = Screen.SplashScreen.route) {
-                    inclusive = true
+        if(FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
+            navController.navigate(
+                MAIN_SCREEN_ROUTE,
+                builder = {
+                    popUpTo(route = Screen.SplashScreen.route) {
+                        inclusive = true
+                    }
                 }
-            }
-        )
+            )
+        }
+        else {
+            navController.navigate(
+                BOTTOM_NAVIGATION_ROUTE,
+                builder = {
+                    popUpTo(route = Screen.SplashScreen.route) {
+                        inclusive = true
+                    }
+                }
+            )
+        }
+
 
     }
     Splash(alpha = alphaAnim.value)

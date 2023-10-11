@@ -1,8 +1,12 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.authentication
 
+import android.app.DatePickerDialog
+import android.util.Log
+import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.foundation.layout.Box
@@ -38,12 +42,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -51,23 +57,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.Visibility
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.authentication.LoginViewModel
+import com.example.fitsteps.authentication.NewUserViewModel
+import com.example.fitsteps.authentication.User
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
 import com.example.fitsteps.navigation.RegisterNavGraph
 import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.screens.LoginButton
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
+import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun RegisterScreen(
     navController: NavHostController = rememberNavController(),
-    mainNavController: NavHostController) {
+    mainNavController: NavHostController,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -179,7 +191,17 @@ fun RegisterScreen(
 }
 
 @Composable
-fun RegisterScreen1(navController: NavHostController, mainNavController: NavHostController) {
+fun RegisterScreen1(
+    navController: NavHostController,
+    mainNavController: NavHostController,
+    viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    var name by remember {
+        mutableStateOf(viewModel.name)
+    }
+    var email by remember {
+        mutableStateOf(viewModel.email)
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -207,7 +229,10 @@ fun RegisterScreen1(navController: NavHostController, mainNavController: NavHost
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, bottom = 30.dp)
                 .height(70.dp),
-            text = "",
+            onTextChange = {
+               name = it
+            },
+            label = name,
         )
         Text(
             modifier = Modifier
@@ -228,7 +253,10 @@ fun RegisterScreen1(navController: NavHostController, mainNavController: NavHost
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
                 .height(70.dp),
-            text = "",
+            onTextChange = {
+                email = it
+            },
+            label = email,
         )
         ForwardBackButtons(
             onClickedBack = {
@@ -243,16 +271,28 @@ fun RegisterScreen1(navController: NavHostController, mainNavController: NavHost
                 )
             },
             onClickedForward = {
-                navController.navigate(
-                    Screen.RegisterScreen2.route,
-                )
+                viewModel.email = email
+                viewModel.name = name
+                Log.d("email", "email: ${viewModel.email}")
+                if(viewModel.email != "" && viewModel.name != "") {
+                    navController.navigate(
+                        Screen.RegisterScreen2.route,
+                    )
+                }
             }
         )
     }
 }
 
 @Composable
-fun RegisterScreen2(navController: NavHostController, mainNavController: NavHostController) {
+fun RegisterScreen2(
+    navController: NavHostController,
+    mainNavController: NavHostController,
+    viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    var gender by remember {
+        mutableStateOf(viewModel.gender)
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -276,6 +316,37 @@ fun RegisterScreen2(navController: NavHostController, mainNavController: NavHost
                 fontStyle = FontStyle.Normal,
             ),
         )
+        // Fetching the Local Context
+        val mContext = LocalContext.current
+
+        // Declaring integer values
+        // for year, month and day
+        val mYear: Int
+        val mMonth: Int
+        val mDay: Int
+
+        // Initializing a Calendar
+        val mCalendar = Calendar.getInstance()
+
+        // Fetching current year, month and day
+        mYear = mCalendar.get(Calendar.YEAR)
+        mMonth = mCalendar.get(Calendar.MONTH)
+        mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+        mCalendar.time = Date()
+
+        // Declaring a string value to
+        // store date in string format
+        val mDate = remember { mutableStateOf(viewModel.birthDate) }
+
+        // Declaring DatePickerDialog and setting
+        // initial values as current values (present year, month and day)
+        val mDatePickerDialog = DatePickerDialog(
+            mContext,
+            { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
+            }, mYear, mMonth, mDay
+        )
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -287,10 +358,13 @@ fun RegisterScreen2(navController: NavHostController, mainNavController: NavHost
             Box(
                 contentAlignment = Alignment.CenterStart,
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .clickable {
+                        mDatePickerDialog.show()
+                    },
             ) {
                 Text(
-                    text = "DD/MM/YYYY",
+                    text = mDate.value,
                     color = Blue,
                     fontSize = 20.sp,
                     modifier = Modifier
@@ -317,23 +391,41 @@ fun RegisterScreen2(navController: NavHostController, mainNavController: NavHost
                 fontStyle = FontStyle.Normal,
             ),
         )
-        RadioButtonGroup()
+        RadioButtonGroup(onChange =  { gender = it },
+            initialState = viewModel.gender
+        )
         Spacer(modifier = Modifier.height(20.dp))
         ForwardBackButtons(
             onClickedBack = {
                 navController.popBackStack()
             },
             onClickedForward = {
-                navController.navigate(
-                    Screen.RegisterScreen3.route,
-                )
+                Log.d("email", "email: ${viewModel.email}")
+                if(gender != "" && mDate.value != "") {
+                    viewModel.gender = gender
+                    viewModel.birthDate = mDate.value
+                    navController.navigate(
+                        Screen.RegisterScreen3.route,
+                    )
+                }
+
             }
         )
     }
 }
 
 @Composable
-fun RegisterScreen3(navController: NavHostController, mainNavController: NavHostController) {
+fun RegisterScreen3(
+    navController: NavHostController,
+    mainNavController: NavHostController,
+    viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    var weight by remember {
+        mutableStateOf(viewModel.weight.toString())
+    }
+    var height by remember {
+        mutableStateOf(viewModel.height.toString())
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -361,7 +453,14 @@ fun RegisterScreen3(navController: NavHostController, mainNavController: NavHost
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, bottom = 30.dp)
                 .height(70.dp),
-            text = "",
+            onTextChange = {
+               weight = it
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            label = if(viewModel.weight > 0) weight else "",
         )
         Text(
             modifier = Modifier
@@ -381,23 +480,46 @@ fun RegisterScreen3(navController: NavHostController, mainNavController: NavHost
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
                 .height(70.dp),
-            text = "",
+            onTextChange = {
+               height = it
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Done
+            ),
+            label = if(viewModel.height > 0) height else "",
         )
         ForwardBackButtons(
             onClickedBack = {
                 navController.popBackStack()
             },
             onClickedForward = {
-                navController.navigate(
-                    Screen.RegisterScreen4.route,
-                )
+                try{
+                    if(weight.toFloat() > 20 && height.toFloat() > 100) {
+                        viewModel.height = height.toFloat()
+                        viewModel.weight = weight.toFloat()
+                        navController.navigate(
+                            Screen.RegisterScreen4.route,
+                        )
+                    }
+                }catch (e: Exception) {
+                    Log.d("RegisterScreen3", "Error: ${e.message}")
+                }
+
             }
         )
     }
 }
 
 @Composable
-fun RegisterScreen4(navController: NavHostController, mainNavController: NavHostController) {
+fun RegisterScreen4(
+    navController: NavHostController,
+    mainNavController: NavHostController,
+    viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    var experience by remember {
+        mutableStateOf(viewModel.experience)
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -420,23 +542,39 @@ fun RegisterScreen4(navController: NavHostController, mainNavController: NavHost
                 fontStyle = FontStyle.Normal,
             ),
         )
-        ButtonsList()
+        ButtonsList(onChange = {experience = it},
+            initialState = viewModel.experience
+        )
         Spacer(modifier = Modifier.height(20.dp))
         ForwardBackButtons(
             onClickedBack = {
                 navController.popBackStack()
             },
             onClickedForward = {
-                navController.navigate(
-                    Screen.RegisterScreen5.route,
-                )
+                if(experience != "") {
+                    viewModel.experience = experience
+                    navController.navigate(
+                        Screen.RegisterScreen5.route,
+                    )
+                }
             }
         )
     }
 }
 
 @Composable
-fun RegisterScreen5(navController: NavHostController, mainNavController: NavHostController) {
+fun RegisterScreen5(
+    navController: NavHostController,
+    mainNavController: NavHostController,
+    viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    loginViewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    var passwd by remember {
+        mutableStateOf("")
+    }
+    var confirmPasswd by remember {
+        mutableStateOf("")
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -464,6 +602,9 @@ fun RegisterScreen5(navController: NavHostController, mainNavController: NavHost
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
                 .height(70.dp),
+            onPasswordChange = {
+               passwd = it
+            },
         )
         Text(
             modifier = Modifier
@@ -483,13 +624,36 @@ fun RegisterScreen5(navController: NavHostController, mainNavController: NavHost
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp, bottom = 50.dp)
                 .height(70.dp),
+            onPasswordChange = {
+               confirmPasswd = it
+            },
         )
         ForwardBackButtons(
             onClickedBack = {
                 navController.popBackStack()
             },
             onClickedForward = {
-                mainNavController.popBackStack()
+                Log.d("Data view model", "email = ${viewModel.email}")
+                Log.d("Data view model", "passwd = ${viewModel.password}")
+                Log.d("Data view model", "name = ${viewModel.name}")
+                Log.d("Data view model", "weight = ${viewModel.weight}")
+                if(passwd != "" && passwd == confirmPasswd) {
+                    viewModel.password = passwd
+                    loginViewModel.createUserWithEmailAndPassword(
+                        viewModel.email,
+                        viewModel.password,
+                        User(
+                            name = viewModel.name,
+                            birthDate = "",
+                            gender = viewModel.gender,
+                            weight = viewModel.weight,
+                            height = viewModel.height,
+                            experience = viewModel.experience,
+                            avatarUrl = "",
+                            userId = "",
+                        )
+                    ) { mainNavController.popBackStack() }
+                }
             },
             backButtonText = stringResource(id = R.string.back),
             forwardButtonText = stringResource(id = R.string.create_profile),
@@ -500,8 +664,11 @@ fun RegisterScreen5(navController: NavHostController, mainNavController: NavHost
 }
 
 @Composable
-fun ButtonsList() {
-    val selectedValue = remember { mutableStateOf("") }
+fun ButtonsList(
+    onChange: (String) -> Unit,
+    initialState: String = "",
+) {
+    val selectedValue = remember { mutableStateOf(initialState) }
     val items = listOf(
         stringResource(id = R.string.novice),
         stringResource(id = R.string.intermediate),
@@ -513,7 +680,10 @@ fun ButtonsList() {
                 modifier = Modifier
                     .selectable(
                         selected = (selectedValue.value == item),
-                        onClick = { selectedValue.value = item },
+                        onClick = {
+                            selectedValue.value = item
+                            onChange(item)
+                        },
                         role = Role.RadioButton
                     )
                     .padding(vertical = 10.dp),
@@ -548,6 +718,7 @@ fun PasswordField(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(20.dp),
     backgroundColor: Color = Color.White,
+    onPasswordChange: (String) -> Unit // Nueva función de callback
 ) {
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -564,9 +735,12 @@ fun PasswordField(
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
                 textColor = Blue,
-                ),
+            ),
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                onPasswordChange(it) // Llama al callback cuando cambia la contraseña
+            },
             singleLine = true,
             placeholder = { Text("************") },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -590,6 +764,7 @@ fun PasswordField(
         )
     }
 }
+
 @Composable
 fun ForwardBackButtons(
     onClickedBack: () -> Unit = {},
@@ -642,11 +817,17 @@ fun ForwardBackButtons(
     }
 }
 @Composable
-fun RadioButtonGroup() {
-    val selectedValue = remember { mutableStateOf("") }
+fun RadioButtonGroup(
+    onChange: (String) -> Unit,
+    initialState: String = "",
+) {
+    val selectedValue = remember { mutableStateOf(initialState) }
 
     val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
-    val onChangeState: (String) -> Unit = { selectedValue.value = it }
+    val onChangeState: (String) -> Unit = {
+        selectedValue.value = it
+        onChange(it)
+    }
 
     val items = listOf(
         stringResource(id = R.string.men),

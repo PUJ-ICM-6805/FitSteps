@@ -1,0 +1,80 @@
+package com.example.fitsteps.authentication
+
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import java.util.Date
+
+class LoginViewModel : ViewModel() {
+    private val auth: FirebaseAuth = Firebase.auth
+    private val _loading = MutableLiveData(false)
+
+    fun signInWithEmailAndPassword(email: String, password: String, home: ()-> Unit)
+    = viewModelScope.launch {
+        try {
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener {task ->
+                    if(task.isSuccessful) {
+                        Log.d("Autenticación", "logueado")
+                        home()
+                    }
+                    else {
+                        Log.d("Autenticación", "no logueado")
+                    }
+                }
+        }catch(ex: Exception) {
+            Log.d("Autenticacion", "fallo en logueo: ${ex.message}")
+        }
+    }
+
+    fun createUserWithEmailAndPassword(
+        email: String,
+        password: String,
+        userData: User,
+        home: () -> Unit,
+    ) {
+        if(_loading.value == false) {
+            _loading.value = true
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if(task.isSuccessful) {
+                        createUser(userData)
+                        home()
+                    }else {
+                        Log.d("Creacion de cuenta", "Error al crear usuario con email $email")
+                    }
+                    _loading.value = false
+                }
+        }
+    }
+
+    fun createUser(userData: User) {
+        val userId = auth.currentUser?.uid
+        if(userId != null) {
+            val user = User(
+                name = userData.name,
+                birthDate = userData.birthDate,
+                gender = userData.gender,
+                weight = userData.weight,
+                height = userData.height,
+                experience = userData.experience,
+                avatarUrl = userData.avatarUrl,
+                userId = userId,
+            )
+            FirebaseFirestore.getInstance().collection("users")
+                .add(user.toMap())
+                .addOnSuccessListener {
+                    Log.d("Creacion de cuenta", "exitosa, id: ${it.id}")
+                }
+                .addOnFailureListener {
+                    Log.d("Creacion de cuenta", "error: $it")
+                }
+        }
+    }
+}
