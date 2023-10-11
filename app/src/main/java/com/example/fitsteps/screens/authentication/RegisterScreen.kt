@@ -1,9 +1,12 @@
 package com.example.fitsteps.screens.authentication
 
+import android.app.DatePickerDialog
 import android.util.Log
+import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.foundation.layout.Box
@@ -39,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -68,6 +72,8 @@ import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
+import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun RegisterScreen(
@@ -191,10 +197,10 @@ fun RegisterScreen1(
     viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     var name by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.name)
     }
     var email by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.email)
     }
     Column(
         verticalArrangement = Arrangement.Top,
@@ -226,6 +232,7 @@ fun RegisterScreen1(
             onTextChange = {
                name = it
             },
+            label = name,
         )
         Text(
             modifier = Modifier
@@ -248,7 +255,8 @@ fun RegisterScreen1(
                 .height(70.dp),
             onTextChange = {
                 email = it
-            }
+            },
+            label = email,
         )
         ForwardBackButtons(
             onClickedBack = {
@@ -283,7 +291,7 @@ fun RegisterScreen2(
     viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     var gender by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.gender)
     }
     Column(
         verticalArrangement = Arrangement.Top,
@@ -308,6 +316,37 @@ fun RegisterScreen2(
                 fontStyle = FontStyle.Normal,
             ),
         )
+        // Fetching the Local Context
+        val mContext = LocalContext.current
+
+        // Declaring integer values
+        // for year, month and day
+        val mYear: Int
+        val mMonth: Int
+        val mDay: Int
+
+        // Initializing a Calendar
+        val mCalendar = Calendar.getInstance()
+
+        // Fetching current year, month and day
+        mYear = mCalendar.get(Calendar.YEAR)
+        mMonth = mCalendar.get(Calendar.MONTH)
+        mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+        mCalendar.time = Date()
+
+        // Declaring a string value to
+        // store date in string format
+        val mDate = remember { mutableStateOf(viewModel.birthDate) }
+
+        // Declaring DatePickerDialog and setting
+        // initial values as current values (present year, month and day)
+        val mDatePickerDialog = DatePickerDialog(
+            mContext,
+            { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
+            }, mYear, mMonth, mDay
+        )
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -319,10 +358,13 @@ fun RegisterScreen2(
             Box(
                 contentAlignment = Alignment.CenterStart,
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .clickable {
+                        mDatePickerDialog.show()
+                    },
             ) {
                 Text(
-                    text = "DD/MM/YYYY",
+                    text = mDate.value,
                     color = Blue,
                     fontSize = 20.sp,
                     modifier = Modifier
@@ -349,7 +391,9 @@ fun RegisterScreen2(
                 fontStyle = FontStyle.Normal,
             ),
         )
-        RadioButtonGroup { gender = it }
+        RadioButtonGroup(onChange =  { gender = it },
+            initialState = viewModel.gender
+        )
         Spacer(modifier = Modifier.height(20.dp))
         ForwardBackButtons(
             onClickedBack = {
@@ -357,8 +401,9 @@ fun RegisterScreen2(
             },
             onClickedForward = {
                 Log.d("email", "email: ${viewModel.email}")
-                if(gender != "") {
+                if(gender != "" && mDate.value != "") {
                     viewModel.gender = gender
+                    viewModel.birthDate = mDate.value
                     navController.navigate(
                         Screen.RegisterScreen3.route,
                     )
@@ -376,10 +421,10 @@ fun RegisterScreen3(
     viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     var weight by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.weight.toString())
     }
     var height by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.height.toString())
     }
     Column(
         verticalArrangement = Arrangement.Top,
@@ -415,6 +460,7 @@ fun RegisterScreen3(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
+            label = if(viewModel.weight > 0) weight else "",
         )
         Text(
             modifier = Modifier
@@ -441,19 +487,25 @@ fun RegisterScreen3(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done
             ),
+            label = if(viewModel.height > 0) height else "",
         )
         ForwardBackButtons(
             onClickedBack = {
                 navController.popBackStack()
             },
             onClickedForward = {
-                if(weight != "" && height != "") {
-                    viewModel.height = height.toFloat()
-                    viewModel.weight = weight.toFloat()
-                    navController.navigate(
-                        Screen.RegisterScreen4.route,
-                    )
+                try{
+                    if(weight.toFloat() > 20 && height.toFloat() > 100) {
+                        viewModel.height = height.toFloat()
+                        viewModel.weight = weight.toFloat()
+                        navController.navigate(
+                            Screen.RegisterScreen4.route,
+                        )
+                    }
+                }catch (e: Exception) {
+                    Log.d("RegisterScreen3", "Error: ${e.message}")
                 }
+
             }
         )
     }
@@ -466,7 +518,7 @@ fun RegisterScreen4(
     viewModel: NewUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     var experience by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.experience)
     }
     Column(
         verticalArrangement = Arrangement.Top,
@@ -490,7 +542,9 @@ fun RegisterScreen4(
                 fontStyle = FontStyle.Normal,
             ),
         )
-        ButtonsList {experience = it}
+        ButtonsList(onChange = {experience = it},
+            initialState = viewModel.experience
+        )
         Spacer(modifier = Modifier.height(20.dp))
         ForwardBackButtons(
             onClickedBack = {
@@ -611,9 +665,10 @@ fun RegisterScreen5(
 
 @Composable
 fun ButtonsList(
-    onChange: (String) -> Unit
+    onChange: (String) -> Unit,
+    initialState: String = "",
 ) {
-    val selectedValue = remember { mutableStateOf("") }
+    val selectedValue = remember { mutableStateOf(initialState) }
     val items = listOf(
         stringResource(id = R.string.novice),
         stringResource(id = R.string.intermediate),
@@ -763,9 +818,10 @@ fun ForwardBackButtons(
 }
 @Composable
 fun RadioButtonGroup(
-    onChange: (String) -> Unit
+    onChange: (String) -> Unit,
+    initialState: String = "",
 ) {
-    val selectedValue = remember { mutableStateOf("") }
+    val selectedValue = remember { mutableStateOf(initialState) }
 
     val isSelectedItem: (String) -> Boolean = { selectedValue.value == it }
     val onChangeState: (String) -> Unit = {

@@ -250,7 +250,7 @@ fun TextFields(
     ),
 ) {
     var textData by remember {
-        mutableStateOf("")
+        mutableStateOf(label)
     }
     val keyboardController = LocalSoftwareKeyboardController.current
     Surface(
