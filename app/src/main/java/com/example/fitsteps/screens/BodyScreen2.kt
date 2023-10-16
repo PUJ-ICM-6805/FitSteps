@@ -248,43 +248,19 @@ fun MeasuresTable(editable: Boolean){
             ),
     ) {
         Spacer(modifier = Modifier.height(2.dp))
-        LazyColumn() {
-            item {
-                TableColumns(stringResource(id = R.string.Deltoids), "--",editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.Chest), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.LeftForearm), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.RightForearm), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.LeftArm), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.RightArm), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.Waist), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.Hips), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.LeftLeg), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.RightLeg), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.LeftCalf), "--", editable)
-            }
-            item {
-                TableColumns(stringResource(id = R.string.RightCalf), "--", editable)
-            }
+        Column() {
+            TableColumns(stringResource(id = R.string.Deltoids), "--",editable)
+            TableColumns(stringResource(id = R.string.Chest), "--", editable)
+            TableColumns(stringResource(id = R.string.LeftForearm), "--", editable)
+            TableColumns(stringResource(id = R.string.RightForearm), "--", editable)
+            TableColumns(stringResource(id = R.string.LeftArm), "--", editable)
+            TableColumns(stringResource(id = R.string.RightArm), "--", editable)
+            TableColumns(stringResource(id = R.string.Waist), "--", editable)
+            TableColumns(stringResource(id = R.string.Hips), "--", editable)
+            TableColumns(stringResource(id = R.string.LeftLeg), "--", editable)
+            TableColumns(stringResource(id = R.string.RightLeg), "--", editable)
+            TableColumns(stringResource(id = R.string.LeftCalf), "--", editable)
+            TableColumns(stringResource(id = R.string.RightCalf), "--", editable)
         }
         Spacer(modifier = Modifier.height(2.dp))
     }
