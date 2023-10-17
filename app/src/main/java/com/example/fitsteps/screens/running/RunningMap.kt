@@ -32,12 +32,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -45,7 +43,6 @@ import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Red
 import com.google.accompanist.permissions.*
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -54,23 +51,26 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
-import com.google.maps.android.compose.currentCameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
 import java.util.*
+import kotlin.math.*
 
 @SuppressLint("PermissionLaunchedDuringComposition")
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun RunningMap(navController: NavHostController) {
-    val state: Boolean = true; //representa el estado de los dos últimos iconos
-    var isMenuOpen by remember { mutableStateOf(false) }
+    var running = remember { mutableStateOf(false) }
+    var finished by remember { mutableStateOf(false) }
+    var route = remember { mutableListOf<LatLng?>(null) }
+    var totalDistance by remember { mutableStateOf(0.0) }
+    var time by remember { mutableStateOf(0L) }
     var isMapLoaded by remember {
         mutableStateOf(false)
     }
@@ -99,6 +99,12 @@ fun RunningMap(navController: NavHostController) {
                     modifier = Modifier.fillMaxSize(),
                     onMapLoaded = {
                         isMapLoaded = true
+                    },
+                    running = running,
+                    finished = finished,
+                    distanceListener = {
+                        totalDistance = it
+                        Log.d("distance", it.toString())
                     }
                 )
                 if(!isMapLoaded) {
@@ -118,7 +124,17 @@ fun RunningMap(navController: NavHostController) {
                 Box(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
-                    SwipeableCardDemo(state = true)
+                    SwipeableCardDemo(
+                        state = !running.value,
+                        onStart = {
+                            running.value = it
+                        },
+                        onFinish = {
+                            finished = it
+                        },
+                        running = running,
+                        km = String.format("%.2f", totalDistance),
+                    )
                 }
             }
         }
@@ -139,18 +155,25 @@ fun SwipeableCardDemo(
     modifier: Modifier = Modifier,
     state: Boolean,
     km: String = "0,00",
-    time: String = "00:00:00",
     kcal: String = "0",
-    onStart: () -> Unit = {},
+    onStart: (Boolean) -> Unit,
+    onFinish: (Boolean) -> Unit,
+    time: (Long) -> Unit = {},
+    running: MutableState<Boolean>,
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    var elapsedTime by remember { mutableStateOf(0L) }
+    LaunchedEffect(key1 = elapsedTime, key2 = !running.value) {
+        while (running.value) {
+            delay(1000L)
+            elapsedTime++
+        }
+    }
     Card(
         modifier = modifier
             .padding(top = 5.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
-        elevation = 4.dp,
         shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
     ) {
         Column(
@@ -203,7 +226,7 @@ fun SwipeableCardDemo(
                             .padding(end = 20.dp)
                     ) {
                         Text(
-                            text = time,
+                            text = formatElapsedTime(elapsedTime),
                             style = TextStyle(
                                 fontSize = 30.sp,
                                 fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -248,8 +271,7 @@ fun SwipeableCardDemo(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                    ,
+                        .height(100.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     if (!state) {
@@ -259,7 +281,7 @@ fun SwipeableCardDemo(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .clickable {
-
+                                    onStart(false)
                                 },
                             contentScale = ContentScale.FillHeight
                         )
@@ -267,13 +289,22 @@ fun SwipeableCardDemo(
                         Image(
                             painter = painterResource(id = R.drawable.go),
                             contentDescription = "go",
-                            modifier = Modifier.fillMaxHeight(),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .clickable {
+                                    onStart(true)
+                                },
                             contentScale = ContentScale.FillHeight
                         )
                         Image(
                             painter = painterResource(id = R.drawable.definitivestop),
                             contentDescription = "pause",
-                            modifier = Modifier.fillMaxHeight(),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .clickable {
+                                    onFinish(true)
+                                }
+                            ,
                             contentScale = ContentScale.FillHeight
                         )
                     }
@@ -288,9 +319,13 @@ fun GoogleMapView(
     modifier: Modifier = Modifier,
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
+    running: MutableState<Boolean>,
+    finished: Boolean,
+    distanceListener: (Double) -> Unit = {},
 ) {
     val context = LocalContext.current
     val route = remember { mutableListOf<LatLng>() }
+    var totalDistance by remember { mutableStateOf(0.0) }
     var currentLocation by remember {
         mutableStateOf(LatLng(0.toDouble(), 0.toDouble()))
     }
@@ -304,15 +339,19 @@ fun GoogleMapView(
                 // Update UI with location data
                 currentLocation = LatLng(lo.latitude, lo.longitude)
                 cameraPositionState.move(CameraUpdateFactory.newLatLng(currentLocation))
-                route.add(currentLocation)
-                Log.d("ruta", route.toString())
+                if(running.value) {
+                    route.add(currentLocation)
+                    Log.d("ruta", route.toString())
+                    if (route.size >= 2) {
+                        totalDistance += haversineDistance(route[route.size - 2], currentLocation)
+                        distanceListener(totalDistance)
+                    }
+                    distanceListener(totalDistance)
+                }
             }
         }
     }
     startLocationUpdates(locationCallback, fusedLocationClient)
-
-
-    val bucharest = LatLng(44.43, 26.09)
     GoogleMap (
         modifier = modifier,
         onMapLoaded = onMapLoaded,
@@ -337,7 +376,7 @@ fun GoogleMapView(
 
 @SuppressLint("MissingPermission")
 private fun startLocationUpdates(locationCallback : LocationCallback, fusedLocationClient: FusedLocationProviderClient?) {
-    locationCallback?.let {
+    locationCallback.let {
         val locationRequest = LocationRequest.create().apply {
             interval = 10000
             fastestInterval = 5000
@@ -351,6 +390,27 @@ private fun startLocationUpdates(locationCallback : LocationCallback, fusedLocat
     }
 }
 
+private fun formatElapsedTime(time: Long): String {
+    val seconds = time % 60
+    val minutes = (time / 60) % 60
+    val hours = (time / 60 / 60)
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+fun haversineDistance(coord1: LatLng, coord2: LatLng): Double {
+    val earthRadius = 6371.0 // Radio de la Tierra en kilómetros
+
+    val dLat = Math.toRadians(coord2.latitude - coord1.latitude)
+    val dLon = Math.toRadians(coord2.longitude - coord1.longitude)
+
+    val lat1 = Math.toRadians(coord1.latitude)
+    val lat2 = Math.toRadians(coord2.latitude)
+
+    val a = sin(dLat / 2).pow(2) + sin(dLon / 2).pow(2) * cos(lat1) * cos(lat2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return earthRadius * c
+}
 
 
 @Composable
