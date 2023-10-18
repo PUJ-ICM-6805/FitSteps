@@ -47,12 +47,12 @@ import com.example.fitsteps.ui.theme.customFontFamily
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-val userid = Firebase.auth.currentUser?.uid
-val userEmail = Firebase.auth.currentUser?.email
+
 
 @Composable
 fun ProfileScreen(navController: NavHostController, rootNavController: NavHostController) {
-
+    val userid = Firebase.auth.currentUser?.uid
+    val userEmail = Firebase.auth.currentUser?.email
     val usuario = remember { mutableStateOf(User()) } //obligatorio
 
     LaunchedEffect(userid) {

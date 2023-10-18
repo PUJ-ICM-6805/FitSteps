@@ -54,10 +54,14 @@ import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 @Composable
 fun SummaryScreen(navController: NavHostController, rootNavController: NavHostController) {
+    val userid = Firebase.auth.currentUser?.uid
+    val userEmail = Firebase.auth.currentUser?.email
     val usuario = remember { mutableStateOf(User()) } //obligatorio
 
     LaunchedEffect(userid) {
