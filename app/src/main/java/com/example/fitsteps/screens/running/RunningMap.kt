@@ -2,10 +2,19 @@ package com.example.fitsteps.screens.running
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Build
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeOut
@@ -27,25 +36,28 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.Red
 import com.google.accompanist.permissions.*
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -54,23 +66,126 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
-import com.google.maps.android.compose.currentCameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
 import java.util.*
+import kotlin.math.*
 
+
+
+@Composable
+fun DoInLifeCycle(
+    lifecycleOwner : LifecycleOwner,
+    onCreate: () -> Unit = {},
+    onStart: () -> Unit = {},
+    onResume: () -> Unit = {},
+) {
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            when(event) {
+                Lifecycle.Event.ON_CREATE -> {
+                    Log.d("lifecycle", "ON_CREATE")
+                    onCreate()
+                }
+                Lifecycle.Event.ON_START -> {
+                    Log.d("lifecycle", "ON_START")
+                    onStart()
+                }
+                Lifecycle.Event.ON_STOP -> {
+                    Log.d("lifecycle", "ON_STOP")
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    Log.d("lifecycle", "ON_RESUME")
+                    onResume()
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    Log.d("lifecycle", "ON_PAUSE")
+                }
+                Lifecycle.Event.ON_DESTROY -> {
+                    Log.d("lifecycle", "ON_DESTROY")
+                }
+                Lifecycle.Event.ON_ANY -> {
+                    Log.d("lifecycle", "ON_ANY")
+                }
+                else -> {
+                    Log.i("OBSERVER", "Lifecycle: ${event.name}")
+                }
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        return@DisposableEffect onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+}
+
+
+class RunningMapViewModel: ViewModel() {
+    val visiblePermissionDialogQueue = mutableStateListOf<String>()
+
+    fun dismissDialog() {
+        visiblePermissionDialogQueue.removeFirst()
+    }
+
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean
+    ) {
+        if(!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
+            visiblePermissionDialogQueue.add(permission)
+        }
+    }
+}
+
+
+class MySensorEventListener(val onChange: (Int) -> Unit) : SensorEventListener {
+    override fun onSensorChanged(event: SensorEvent) {
+        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+            val steps = event.values[0].toInt()
+            onChange(steps)
+            Log.d("steps", steps.toString())
+
+        }
+    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    }
+}
+
+
+
+
+@RequiresApi(Build.VERSION_CODES.Q)
 @SuppressLint("PermissionLaunchedDuringComposition")
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
-fun RunningMap(navController: NavHostController) {
-    val state: Boolean = true; //representa el estado de los dos últimos iconos
-    var isMenuOpen by remember { mutableStateOf(false) }
+fun RunningMap(
+    navController: NavHostController,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+) {
+    var sensorManager = remember { mutableStateOf<SensorManager?>(null) }
+    val viewModel = viewModel<RunningMapViewModel>()
+    var totalSteps by remember { mutableStateOf(0) }
+    var previousSteps by remember { mutableStateOf(0) }
+    var currentSteps by remember { mutableStateOf(0) }
+    var running = remember { mutableStateOf(false) }
+    var paused = remember { mutableStateOf(true) }
+    var finished by remember { mutableStateOf(false) }
+    var route = remember { mutableListOf<LatLng?>(null) }
+    var stepsReaded by remember { mutableStateOf(false) }
+    var totalDistance by remember { mutableStateOf(0.0) }
+    var time by remember { mutableStateOf(0L) }
     var isMapLoaded by remember {
         mutableStateOf(false)
     }
@@ -81,6 +196,51 @@ fun RunningMap(navController: NavHostController) {
     val permissions = arrayOf(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    val activityPermissionResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = {isGranted ->
+            viewModel.onPermissionResult(
+                permission = Manifest.permission.ACTIVITY_RECOGNITION,
+                isGranted = isGranted
+            )
+        }
+    )
+    DoInLifeCycle(
+        lifecycleOwner = lifecycleOwner,
+        onCreate = {
+            sensorManager.value = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+            //previousSteps = loadData(context)
+            currentSteps = 0
+            //saveData(previousSteps, context)
+            //Log.d("previousSteps", previousSteps.toString())
+        },
+        onResume = {
+            activityPermissionResultLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
+            if (sensorManager.value != null) {
+                val stepSensor = sensorManager.value!!.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+                if (stepSensor == null) {
+                    Toast.makeText(context, "No step counter sensor available", Toast.LENGTH_SHORT).show()
+                } else {
+                    val sensorEventListener = MySensorEventListener(
+                        onChange = {
+                            totalSteps = it
+                            if(!stepsReaded){
+                                previousSteps = totalSteps
+                                stepsReaded = true
+                            }
+                            if(paused.value) {
+                                previousSteps = totalSteps
+                            }
+                            currentSteps += totalSteps - previousSteps
+                        }
+                    )
+                    sensorManager.value!!.registerListener(sensorEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI)
+                }
+            } else {
+                Toast.makeText(context, "SensorManager is null", Toast.LENGTH_SHORT).show()
+            }
+        },
     )
     if (permissions.all {
         ContextCompat.checkSelfPermission(
@@ -99,7 +259,13 @@ fun RunningMap(navController: NavHostController) {
                     modifier = Modifier.fillMaxSize(),
                     onMapLoaded = {
                         isMapLoaded = true
-                    }
+                    },
+                    finished = finished,
+                    distanceListener = {
+                        totalDistance = it
+                        Log.d("distance", it.toString())
+                    },
+                    paused = paused,
                 )
                 if(!isMapLoaded) {
                     AnimatedVisibility(
@@ -118,7 +284,30 @@ fun RunningMap(navController: NavHostController) {
                 Box(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
-                    SwipeableCardDemo(state = true)
+                    SwipeableCardDemo(
+                        state = paused.value,
+                        onStart = {
+                            running.value = it
+                            paused.value = !it
+                            previousSteps = totalSteps
+                        },
+                        onFinish = {
+                            finished = it
+                            running.value = !it
+                            paused.value = it
+                            previousSteps = totalSteps
+                            currentSteps = 0
+                            //saveData(previousSteps, context)
+                        },
+                        onPause = {
+                            paused.value = it
+                            previousSteps = totalSteps
+                        },
+                        paused = paused,
+                        running = running,
+                        km = String.format("%.2f", totalDistance),
+                        steps = currentSteps.toString(),
+                    )
                 }
             }
         }
@@ -133,24 +322,45 @@ fun RunningMap(navController: NavHostController) {
     }
 }
 
+private fun saveData(previousSteps: Int, context: Context) {
+    val sharedPreferences = context.getSharedPreferences("steps", Context.MODE_PRIVATE)
+    val editor = sharedPreferences.edit()
+    editor.putInt("previousSteps", previousSteps)
+    editor.apply()
+}
+
+private fun loadData(context: Context) : Int {
+    val sharedPreferences = context.getSharedPreferences("steps", Context.MODE_PRIVATE)
+    return sharedPreferences.getInt("previousSteps", 0)
+}
+
 
 @Composable
 fun SwipeableCardDemo(
     modifier: Modifier = Modifier,
     state: Boolean,
     km: String = "0,00",
-    time: String = "00:00:00",
-    kcal: String = "0",
-    onStart: () -> Unit = {},
+    steps: String = "0",
+    onStart: (Boolean) -> Unit,
+    onPause: (Boolean) -> Unit,
+    onFinish: (Boolean) -> Unit,
+    time: (Long) -> Unit = {},
+    running: MutableState<Boolean>,
+    paused: MutableState<Boolean>,
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    var elapsedTime by remember { mutableStateOf(0L) }
+    LaunchedEffect(key1 = elapsedTime, key2 = paused.value) {
+        while (!paused.value) {
+            delay(1000L)
+            elapsedTime++
+        }
+    }
     Card(
         modifier = modifier
             .padding(top = 5.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
-        elevation = 4.dp,
         shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
     ) {
         Column(
@@ -203,7 +413,7 @@ fun SwipeableCardDemo(
                             .padding(end = 20.dp)
                     ) {
                         Text(
-                            text = time,
+                            text = formatElapsedTime(elapsedTime),
                             style = TextStyle(
                                 fontSize = 30.sp,
                                 fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -226,7 +436,7 @@ fun SwipeableCardDemo(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            text = kcal,
+                            text = steps,
                             style = TextStyle(
                                 fontSize = 30.sp,
                                 fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -235,7 +445,7 @@ fun SwipeableCardDemo(
                             )
                         )
                         Text(
-                            text = stringResource(id = R.string.kcal),
+                            text = stringResource(id = R.string.steps),
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -248,8 +458,7 @@ fun SwipeableCardDemo(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                    ,
+                        .height(100.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     if (!state) {
@@ -259,7 +468,7 @@ fun SwipeableCardDemo(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .clickable {
-
+                                    onPause(true)
                                 },
                             contentScale = ContentScale.FillHeight
                         )
@@ -267,13 +476,22 @@ fun SwipeableCardDemo(
                         Image(
                             painter = painterResource(id = R.drawable.go),
                             contentDescription = "go",
-                            modifier = Modifier.fillMaxHeight(),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .clickable {
+                                    onStart(true)
+                                },
                             contentScale = ContentScale.FillHeight
                         )
                         Image(
                             painter = painterResource(id = R.drawable.definitivestop),
                             contentDescription = "pause",
-                            modifier = Modifier.fillMaxHeight(),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .clickable {
+                                    onFinish(true)
+                                }
+                            ,
                             contentScale = ContentScale.FillHeight
                         )
                     }
@@ -288,9 +506,13 @@ fun GoogleMapView(
     modifier: Modifier = Modifier,
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
+    paused: MutableState<Boolean>,
+    finished: Boolean,
+    distanceListener: (Double) -> Unit = {},
 ) {
     val context = LocalContext.current
     val route = remember { mutableListOf<LatLng>() }
+    var totalDistance by remember { mutableStateOf(0.0) }
     var currentLocation by remember {
         mutableStateOf(LatLng(0.toDouble(), 0.toDouble()))
     }
@@ -304,15 +526,19 @@ fun GoogleMapView(
                 // Update UI with location data
                 currentLocation = LatLng(lo.latitude, lo.longitude)
                 cameraPositionState.move(CameraUpdateFactory.newLatLng(currentLocation))
-                route.add(currentLocation)
-                Log.d("ruta", route.toString())
+                if(!paused.value) {
+                    route.add(currentLocation)
+                    Log.d("ruta", route.toString())
+                    if (route.size >= 2) {
+                        totalDistance += haversineDistance(route[route.size - 2], currentLocation)
+                        distanceListener(totalDistance)
+                    }
+                    distanceListener(totalDistance)
+                }
             }
         }
     }
     startLocationUpdates(locationCallback, fusedLocationClient)
-
-
-    val bucharest = LatLng(44.43, 26.09)
     GoogleMap (
         modifier = modifier,
         onMapLoaded = onMapLoaded,
@@ -337,7 +563,7 @@ fun GoogleMapView(
 
 @SuppressLint("MissingPermission")
 private fun startLocationUpdates(locationCallback : LocationCallback, fusedLocationClient: FusedLocationProviderClient?) {
-    locationCallback?.let {
+    locationCallback.let {
         val locationRequest = LocationRequest.create().apply {
             interval = 10000
             fastestInterval = 5000
@@ -351,8 +577,30 @@ private fun startLocationUpdates(locationCallback : LocationCallback, fusedLocat
     }
 }
 
+private fun formatElapsedTime(time: Long): String {
+    val seconds = time % 60
+    val minutes = (time / 60) % 60
+    val hours = (time / 60 / 60)
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+}
+
+fun haversineDistance(coord1: LatLng, coord2: LatLng): Double {
+    val earthRadius = 6371.0 // Radio de la Tierra en kilómetros
+
+    val dLat = Math.toRadians(coord2.latitude - coord1.latitude)
+    val dLon = Math.toRadians(coord2.longitude - coord1.longitude)
+
+    val lat1 = Math.toRadians(coord1.latitude)
+    val lat2 = Math.toRadians(coord2.latitude)
+
+    val a = sin(dLat / 2).pow(2) + sin(dLon / 2).pow(2) * cos(lat1) * cos(lat2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return earthRadius * c
+}
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 @Preview
 fun RunningMapPreview() {
