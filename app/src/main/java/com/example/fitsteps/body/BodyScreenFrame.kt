@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.body
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

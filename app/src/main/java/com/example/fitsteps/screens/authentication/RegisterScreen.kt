@@ -643,8 +643,8 @@ fun RegisterScreen5(
                         viewModel.email,
                         viewModel.password,
                         User(
-                            name = viewModel.name,
-                            birthDate = "",
+                            user_name = viewModel.name,
+                            user_birth_date = "",
                             gender = viewModel.gender,
                             weight = viewModel.weight,
                             height = viewModel.height,

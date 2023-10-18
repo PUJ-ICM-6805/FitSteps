@@ -59,8 +59,8 @@ class LoginViewModel : ViewModel() {
         val userId = auth.currentUser?.uid
         if(userId != null) {
             val user = User(
-                name = userData.name,
-                birthDate = userData.birthDate,
+                user_name = userData.user_name,
+                user_birth_date = userData.user_birth_date,
                 gender = userData.gender,
                 weight = userData.weight,
                 height = userData.height,

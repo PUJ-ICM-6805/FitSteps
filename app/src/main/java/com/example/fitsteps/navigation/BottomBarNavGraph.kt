@@ -1,12 +1,9 @@
 package com.example.fitsteps.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
-import com.example.fitsteps.screens.BodyScreen
 import com.example.fitsteps.screens.ExerciseScreen
 import com.example.fitsteps.screens.ProfileScreen
 import com.example.fitsteps.screens.SocialScreen
