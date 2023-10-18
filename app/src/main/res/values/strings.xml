@@ -246,4 +246,5 @@
     <string name="carga">Carga</string>
     <string name="rithm">Ritmo</string>
     <string name="heart_rate">Ritmo cardiáco</string>
+    <string name="steps">Pasos</string>
 </resources>
