@@ -37,15 +37,27 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
-fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHostController) {
+fun MyRoutesPartTwo(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    runningViewModel: RunningViewModel = RunningViewModel(),
+) {
+    val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("MMMM d, yyyy", Locale("es", "ES"))
+    val date = inputFormat.parse(runningViewModel.ActualRoute.date)
+    var formattedDate = outputFormat.format(date)
+    formattedDate = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1)
     LazyColumn(
     ) {
         item {
@@ -90,7 +102,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                     .padding(start = 20.dp)
             ) {
                 Text(
-                    text = "11/08/2023", //TODO: Change for the actual date
+                    text = runningViewModel.ActualRoute.date,
                     modifier = Modifier.padding(vertical = 0.dp),
                     style = TextStyle(
                         fontFamily = FontFamily(Font(R.font.poppinsregular)),
@@ -134,7 +146,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 .fillMaxWidth()
                         ) {
                             Text(
-                                text = "Agosto 30, 2023, 6:50 a. m.", //TODO: Change for the actual date
+                                text = "${formattedDate}, ${runningViewModel.ActualRoute.hour}",
                                 modifier = Modifier
                                     .padding(horizontal = 15.dp, vertical = 15.dp),
                                 style = TextStyle(
@@ -155,7 +167,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                             .fillMaxSize()
                     ) {
                         Text(
-                            text = "2,7 Km",
+                            text = "${runningViewModel.ActualRoute.distance} km",
                             style = TextStyle(
                                 fontSize = 45.sp,
                                 fontFamily = FontFamily(Font(R.font.poppinssemibold)),
@@ -200,7 +212,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                             Text(
-                                text = "00:08:48", //TODO: Change for the actual time
+                                text = runningViewModel.ActualRoute.time,
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -446,7 +458,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                             Text(
-                                text = "1,439 pasos", //TODO: Change for the actual score
+                                text = runningViewModel.ActualRoute.steps.toString(),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(R.font.poppinsmedium)),

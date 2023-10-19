@@ -55,6 +55,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.ui.theme.Red
 import com.google.accompanist.permissions.*
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -173,15 +174,17 @@ class MySensorEventListener(val onChange: (Int) -> Unit) : SensorEventListener {
 fun RunningMap(
     navController: NavHostController,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    routesViewModel: RunningViewModel = viewModel(),
 ) {
     var sensorManager = remember { mutableStateOf<SensorManager?>(null) }
     val viewModel = viewModel<RunningMapViewModel>()
+    var onceStarted by remember { mutableStateOf(false) }
     var totalSteps by remember { mutableStateOf(0) }
     var previousSteps by remember { mutableStateOf(0) }
     var currentSteps by remember { mutableStateOf(0) }
     var running = remember { mutableStateOf(false) }
     var paused = remember { mutableStateOf(true) }
-    var finished by remember { mutableStateOf(false) }
+    var finished = remember { mutableStateOf(false) }
     var route = remember { mutableListOf<LatLng?>(null) }
     var stepsReaded by remember { mutableStateOf(false) }
     var totalDistance by remember { mutableStateOf(0.0) }
@@ -190,6 +193,9 @@ fun RunningMap(
         mutableStateOf(false)
     }
     var showToast by remember {
+        mutableStateOf(true)
+    }
+    var showRouteInfoToast by remember {
         mutableStateOf(true)
     }
     val context = LocalContext.current
@@ -230,9 +236,9 @@ fun RunningMap(
                                 stepsReaded = true
                             }
                             if(paused.value) {
-                                previousSteps = totalSteps
+                                previousSteps = totalSteps - currentSteps
                             }
-                            currentSteps += totalSteps - previousSteps
+                            currentSteps = totalSteps - previousSteps
                         }
                     )
                     sensorManager.value!!.registerListener(sensorEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI)
@@ -266,6 +272,26 @@ fun RunningMap(
                         Log.d("distance", it.toString())
                     },
                     paused = paused,
+                    onFinish = {
+                        if(onceStarted) {
+                            route = it.toMutableList()
+                            Log.d("route", route.toString())
+                            if(route.size > 1) {
+                                routesViewModel.uploadRoute(
+                                    route.toList().filterNotNull(),
+                                    formatElapsedTime(time),
+                                    currentSteps,
+                                    String.format("%.2f", totalDistance),
+                                )
+                            } else {
+                                if(showRouteInfoToast) {
+                                    showRouteInfoToast = false
+                                    Toast.makeText(context, "No route information", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                            navController.popBackStack("running", false)
+                        }
+                    }
                 )
                 if(!isMapLoaded) {
                     AnimatedVisibility(
@@ -286,17 +312,25 @@ fun RunningMap(
                 ) {
                     SwipeableCardDemo(
                         state = paused.value,
+                        time = {
+                            time = it
+                        },
                         onStart = {
                             running.value = it
+                            onceStarted = true
                             paused.value = !it
                             previousSteps = totalSteps
                         },
-                        onFinish = {
-                            finished = it
-                            running.value = !it
-                            paused.value = it
-                            previousSteps = totalSteps
-                            currentSteps = 0
+                        onFinish = { it ->
+                            if(onceStarted) {
+                                finished.value = it
+                                running.value = !it
+                                paused.value = it
+                                previousSteps = totalSteps
+                                currentSteps = 0
+                                Log.d("OnFinish", "pressed and once started")
+                            }
+                            Log.d("OnFinish", "pressed")
                             //saveData(previousSteps, context)
                         },
                         onPause = {
@@ -311,7 +345,6 @@ fun RunningMap(
                 }
             }
         }
-
     } else {
         navController.popBackStack("summary", false)
         if(showToast) {
@@ -354,6 +387,7 @@ fun SwipeableCardDemo(
         while (!paused.value) {
             delay(1000L)
             elapsedTime++
+            time(elapsedTime)
         }
     }
     Card(
@@ -507,12 +541,14 @@ fun GoogleMapView(
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
     paused: MutableState<Boolean>,
-    finished: Boolean,
+    finished: MutableState<Boolean>,
+    onFinish: (List<LatLng>) -> Unit = {},
     distanceListener: (Double) -> Unit = {},
 ) {
     val context = LocalContext.current
     val route = remember { mutableListOf<LatLng>() }
     var totalDistance by remember { mutableStateOf(0.0) }
+    var routeUpdated by remember { mutableStateOf(false) }
     var currentLocation by remember {
         mutableStateOf(LatLng(0.toDouble(), 0.toDouble()))
     }
@@ -520,25 +556,41 @@ fun GoogleMapView(
         position = CameraPosition.fromLatLngZoom(currentLocation, 17f)
     }
     var fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    var locationCallback = object : LocationCallback() {
-        override fun onLocationResult(p0: LocationResult) {
-            for (lo in p0.locations) {
-                // Update UI with location data
-                currentLocation = LatLng(lo.latitude, lo.longitude)
-                cameraPositionState.move(CameraUpdateFactory.newLatLng(currentLocation))
-                if(!paused.value) {
-                    route.add(currentLocation)
-                    Log.d("ruta", route.toString())
-                    if (route.size >= 2) {
-                        totalDistance += haversineDistance(route[route.size - 2], currentLocation)
-                        distanceListener(totalDistance)
+    var locationCallback: LocationCallback? by remember { mutableStateOf(null) }
+    if(finished.value && !routeUpdated) {
+        onFinish(route.toList())
+        routeUpdated = true
+    }
+    DisposableEffect(finished.value) {
+        if (!finished.value) {
+            locationCallback = object : LocationCallback() {
+                override fun onLocationResult(p0: LocationResult) {
+                    for (lo in p0.locations) {
+                        // Update UI with location data
+                        currentLocation = LatLng(lo.latitude, lo.longitude)
+                        cameraPositionState.move(CameraUpdateFactory.newLatLng(currentLocation))
+                        if(!paused.value && !finished.value) {
+                            route.add(currentLocation)
+                            Log.d("ruta", route.toString())
+                            if (route.size >= 2) {
+                                totalDistance += haversineDistance(route[route.size - 2], currentLocation)
+                                distanceListener(totalDistance)
+                            }
+                            distanceListener(totalDistance)
+                        }
                     }
-                    distanceListener(totalDistance)
                 }
+            }
+            startLocationUpdates(locationCallback!!, fusedLocationClient)
+        }
+
+        onDispose {
+            // Al salir del efecto, desvincula el callback para detener las actualizaciones de ubicación.
+            locationCallback?.let {
+                fusedLocationClient.removeLocationUpdates(it)
             }
         }
     }
-    startLocationUpdates(locationCallback, fusedLocationClient)
     GoogleMap (
         modifier = modifier,
         onMapLoaded = onMapLoaded,
@@ -569,6 +621,7 @@ private fun startLocationUpdates(locationCallback : LocationCallback, fusedLocat
             fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
+        locationRequest.setSmallestDisplacement(3f)
         fusedLocationClient?.requestLocationUpdates(
             locationRequest,
             it,

@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.ui.theme.Blue
@@ -39,7 +40,11 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun MyRoutesPartOne(navController: NavHostController, rootNavController: NavHostController) {
+fun MyRoutesPartOne(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    runningViewModel: RunningViewModel = RunningViewModel(),
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -88,7 +93,7 @@ fun MyRoutesPartOne(navController: NavHostController, rootNavController: NavHost
                     .padding(start = 20.dp)
             ) {
                 Text(
-                    text = "11/08/2023", //TODO: Change for the actual date
+                    text = runningViewModel.ActualRoute.date,
                     modifier = Modifier.padding(vertical = 0.dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,
