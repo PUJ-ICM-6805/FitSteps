@@ -9,6 +9,7 @@ data class Route(
     val distance: String = "",
     val steps: Int = 0,
     val hour: String = "",
+    val timestamp: Long = 0,
 ) {
     fun toMap(): MutableMap<String, Any> {
         return mutableMapOf(
@@ -17,7 +18,8 @@ data class Route(
             "distance" to this.distance,
             "route" to this.route,
             "steps" to this.steps,
-            "hour" to this.hour
+            "hour" to this.hour,
+            "timestamp" to this.timestamp,
         )
     }
 }

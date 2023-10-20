@@ -62,6 +62,9 @@ fun MainRunning(
     val listOfRoutes = remember { mutableStateListOf<Route>() }
     DoInLifeCycle(
         lifecycleOwner = lifecycleOwner,
+        onCreate = {
+           runningViewModel.uploadUserData()
+        },
         onResume = {
             val auth = runningViewModel.auth
             val userId = auth.currentUser?.uid
@@ -71,22 +74,32 @@ fun MainRunning(
                     .get()
                     .addOnSuccessListener { result ->
                         for (document in result) {
-                            val route = document.data["route"] as List<LatLng>
+                            var routelng = mutableListOf<LatLng>()
+                            val route = document.data["route"] as List<*>
                             val time = document.data["time"] as String
                             val steps = document.data["steps"] as Long
                             val distance = document.data["distance"] as String
                             val date = document.data["date"] as String
                             val hour = document.data["hour"] as String
-                            listOfRoutes += Route(date, route, time, distance, steps.toInt(), hour)
+                            val timestamp = document.data["timestamp"] as Long
+                            for(item in route) {
+                                val hashMap = item as HashMap<*, *>
+                                val lat = hashMap["latitude"] as Double
+                                val lng = hashMap["longitude"] as Double
+                                routelng.add(LatLng(lat, lng))
+                            }
+                            Log.d("Rutas", "routelng: $routelng")
+                            listOfRoutes += Route(date, routelng, time, distance, steps.toInt(), hour, timestamp)
                             Log.d("Rutas", "${document.id} => ${document.data}")
                             Log.d("Rutas lista", listOfRoutes.toString())
                         }
+                        listOfRoutes.sortByDescending { it.timestamp }
                     }
                     .addOnFailureListener { exception ->
                         Log.d("Error", "Error getting documents: ", exception)
                     }
             }
-        }
+        },
     )
     LazyColumn(
     ) {
@@ -236,7 +249,7 @@ fun ImageCard(
             .fillMaxWidth()
             .clickable {
                 navController.navigate(Screen.RunningRouteDetails.route)
-                runningViewModel.ActualRoute = route
+                runningViewModel.actualRoute = route
             },
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
