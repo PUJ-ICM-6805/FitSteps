@@ -1,4 +1,4 @@
-package com.example.fitsteps.body
+package com.example.fitsteps.screens.body
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,13 +26,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.screens.LargeButtons
+import com.example.fitsteps.screens.body.firebaseMeasuresData.MeasuresViewModel
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
-fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHostController) {
+fun BodyScreen2Edit(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    measuresViewModel: MeasuresViewModel = MeasuresViewModel()
+) {
+    val userid = Firebase.auth.currentUser?.uid
     LazyColumn (
         modifier = Modifier
             .fillMaxSize()
@@ -129,7 +137,7 @@ fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHost
                     .height(500.dp),
                 contentAlignment = Alignment.TopStart,
             ) {
-                MeasuresTable(true)
+                MeasuresTable(true, measuresViewModel)
             }
         }
         item{

@@ -4,9 +4,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.fitsteps.body.BodyScreen
-import com.example.fitsteps.body.BodyScreen2
-import com.example.fitsteps.body.BodyScreen2Edit
+import com.example.fitsteps.screens.body.BodyScreen
+import com.example.fitsteps.screens.body.BodyScreen2
+import com.example.fitsteps.screens.body.BodyScreen2Edit
 
 fun NavGraphBuilder.bodyNavGraph(
     navController: NavHostController,
