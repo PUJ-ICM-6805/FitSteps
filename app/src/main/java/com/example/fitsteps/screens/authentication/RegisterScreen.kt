@@ -649,7 +649,7 @@ fun RegisterScreen5(
                             weight = viewModel.weight,
                             height = viewModel.height,
                             experience = viewModel.experience,
-                            avatarUrl = "",
+                            avatar = "",
                             userId = "",
                         )
                     ) { mainNavController.popBackStack() }

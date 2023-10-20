@@ -7,8 +7,9 @@ data class User(
     var weight: Float,
     var height: Float,
     var experience: String,
-    var avatarUrl: String = "",
+    var avatar: String = "",
     var userId: String,
+    var document: String = ""
 ) {
     constructor(): this(
         user_name = "",
@@ -17,11 +18,9 @@ data class User(
         weight = 0.0f,
         height = 0.0f,
         experience = "",
-        avatarUrl = "",
+        avatar = "",
         userId = ""
     )
-
-
 
     fun toMap(): MutableMap<String, Any> {
         return mutableMapOf(
@@ -31,7 +30,7 @@ data class User(
             "weight" to this.weight,
             "height" to this.height,
             "experience" to this.experience,
-            "avatar" to this.avatarUrl,
+            "avatar" to this.avatar,
             "userId" to this.userId
         )
     }

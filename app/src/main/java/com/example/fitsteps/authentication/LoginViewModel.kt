@@ -65,7 +65,7 @@ class LoginViewModel : ViewModel() {
                 weight = userData.weight,
                 height = userData.height,
                 experience = userData.experience,
-                avatarUrl = userData.avatarUrl,
+                avatar = userData.avatar,
                 userId = userId,
             )
             FirebaseFirestore.getInstance().collection("users")
