@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens.running
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +18,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -33,19 +37,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
-fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHostController) {
+fun MyRoutesPartTwo(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    runningViewModel: RunningViewModel = RunningViewModel(),
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+) {
+    val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("MMMM d, yyyy", Locale("es", "ES"))
+    var routeDate = remember { mutableStateOf("") }
+    DoInLifeCycle(
+        lifecycleOwner = lifecycleOwner,
+        onCreate = {
+            var date = inputFormat.parse(runningViewModel.actualRoute.date)
+            var formattedDate = outputFormat.format(date)
+            date = inputFormat.parse(runningViewModel.actualRoute.date)!!
+            formattedDate = outputFormat.format(date)
+            routeDate.value = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1)
+        }
+    )
+    //val date = inputFormat.parse(runningViewModel.ActualRoute.date)
+    //var formattedDate = outputFormat.format(date)
+
     LazyColumn(
     ) {
         item {
@@ -90,7 +119,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                     .padding(start = 20.dp)
             ) {
                 Text(
-                    text = "11/08/2023", //TODO: Change for the actual date
+                    text = runningViewModel.actualRoute.date,
                     modifier = Modifier.padding(vertical = 0.dp),
                     style = TextStyle(
                         fontFamily = FontFamily(Font(R.font.poppinsregular)),
@@ -134,7 +163,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 .fillMaxWidth()
                         ) {
                             Text(
-                                text = "Agosto 30, 2023, 6:50 a. m.", //TODO: Change for the actual date
+                                text = "${routeDate.value}, ${runningViewModel.actualRoute.hour}",
                                 modifier = Modifier
                                     .padding(horizontal = 15.dp, vertical = 15.dp),
                                 style = TextStyle(
@@ -155,7 +184,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                             .fillMaxSize()
                     ) {
                         Text(
-                            text = "2,7 Km",
+                            text = "${runningViewModel.actualRoute.distance} km",
                             style = TextStyle(
                                 fontSize = 45.sp,
                                 fontFamily = FontFamily(Font(R.font.poppinssemibold)),
@@ -200,7 +229,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                             Text(
-                                text = "00:08:48", //TODO: Change for the actual time
+                                text = runningViewModel.actualRoute.time,
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -238,170 +267,13 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                             Text(
-                                text = "151 kcal",
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = DarkBlue,
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.clockone), // Reemplaza con tu recurso de icono
-                            contentDescription = "Reloj",
-                            modifier = Modifier
-                                .padding(0.05.dp)
-                                .width(20.dp)
-                                .height(22.6087.dp)
-                                .align(CenterVertically), // Ajusta el tamaño del icono según tus necesidades
-                            tint = Color.Unspecified // Ajusta el color del icono
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 32.dp)
-                                .weight(1f) // Use weight to distribute s space evenly
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.ritmo),
-                                style = TextStyle(
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color(0xFF51778A),
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                            Text(
-                                text = "4’23’ /km", //TODO: Change for the actual score
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = DarkBlue,
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                        }
-                        Icon(
-                            painter = painterResource(id = R.drawable.clocktwo), // Reemplaza con tu recurso de icono
-                            contentDescription = "Reloj",
-                            modifier = Modifier
-                                .padding(0.05.dp)
-                                .width(20.dp)
-                                .height(22.6087.dp)
-                                .align(CenterVertically), // Ajusta el tamaño del icono según tus necesidades
-                            tint = Color.Unspecified // Ajusta el color del icono
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 32.dp)
-                                .weight(1f) // Use weight to distribute senly
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.speed),
-                                style = TextStyle(
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color(0xFF51778A),
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                            Text(
-                                text = "13,70 km/h",
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = DarkBlue,
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.steps), // Reemplaza con tu recurso de icono
-                            contentDescription = "Pasos",
-                            modifier = Modifier
-                                .padding(0.05.dp)
-                                .width(20.dp)
-                                .height(22.6087.dp)
-                                .align(CenterVertically), // Ajusta el tamaño del icono según tus necesidades
-                            tint = Color.Unspecified // Ajusta el color del icono
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 32.dp)
-                                .weight(1f) // Use weight to distribute sribute space evenly
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.cadencia),
-                                style = TextStyle(
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color(0xFF51778A),
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                            Text(
-                                text = "161 pasos/min", //TODO: Change for the actual time
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = DarkBlue,
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                        }
-                        Icon(
-                            painter = painterResource(id = R.drawable.steps), // Reemplaza con tu recurso de icono
-                            contentDescription = "Pasos",
-                            modifier = Modifier
-                                .padding(0.05.dp)
-                                .width(20.dp)
-                                .height(22.6087.dp)
-                                .align(CenterVertically), // Ajusta el tamaño del icono según tus necesidades
-                            tint = Color.Unspecified // Ajusta el color del icono
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 32.dp)
-                                .weight(1f) // Use weight to distribute s
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.zancada),
-                                style = TextStyle(
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color(0xFF51778A),
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                            Text(
-                                text = "172 cm",
+                                text = ((if(calcularVelocidad(
+                                                runningViewModel.actualRoute.distance.toDouble(),
+                                                runningViewModel.actualRoute.time)!! < 6f
+                                            ) 0.73 else 1.03) *
+                                        runningViewModel.user.weight *
+                                        runningViewModel.actualRoute.distance.toDouble()
+                                        ).toInt().toString(),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -446,7 +318,7 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                             Text(
-                                text = "1,439 pasos", //TODO: Change for the actual score
+                                text = runningViewModel.actualRoute.steps.toString(),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(R.font.poppinsmedium)),
@@ -456,6 +328,55 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                         }
+                        Icon(
+                            painter = painterResource(id = R.drawable.clocktwo), // Reemplaza con tu recurso de icono
+                            contentDescription = "Reloj",
+                            modifier = Modifier
+                                .padding(0.05.dp)
+                                .width(20.dp)
+                                .height(22.6087.dp)
+                                .align(CenterVertically), // Ajusta el tamaño del icono según tus necesidades
+                            tint = Color.Unspecified // Ajusta el color del icono
+                        )
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier
+                                .padding(start = 16.dp, end = 32.dp)
+                                .weight(1f) // Use weight to distribute senly
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.speed),
+                                style = TextStyle(
+                                    fontSize = 11.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
+                                    fontWeight = FontWeight(500),
+                                    color = Color(0xFF51778A),
+                                    textAlign = TextAlign.Start
+                                )
+                            )
+                            Text(
+                                text = String.format("%.2f", (calcularVelocidad(
+                                    runningViewModel.actualRoute.distance.toDouble(),
+                                    runningViewModel.actualRoute.time)!!)),
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
+                                    fontWeight = FontWeight(500),
+                                    color = DarkBlue,
+                                    textAlign = TextAlign.Start
+                                )
+                            )
+                        }
+                    }
+
+
+                    /*Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
                         Icon(
                             painter = painterResource(id = R.drawable.heart), // Reemplaza con tu recurso de icono
                             contentDescription = "Corazon",
@@ -493,83 +414,8 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
                                 )
                             )
                         }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.mountain), // Reemplaza con tu recurso de icono
-                            contentDescription = "Montaña",
-                            modifier = Modifier
-                                .padding(0.05.dp)
-                                .width(20.dp)
-                                .height(22.6087.dp)
-                                .align(CenterVertically), // Ajusta el tamaño del icono según tus necesidades
-                            tint = Color.Unspecified // Ajusta el color del icono
-                        )
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 32.dp)
-                                .weight(1f) // Use weight to distribute space evenly
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.inclinacion),
-                                style = TextStyle(
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color(0xFF51778A),
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                            Text(
-                                text = "1,8 m",
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = DarkBlue,
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                        }
-                        Column(
-                            horizontalAlignment = Alignment.Start,
-                            modifier = Modifier
-                                .padding(end = 32.dp)
-                                .weight(1f) // Use weight to distribute space evenly
-                        ) {
-                            Text(
-                                text = "",
-                                style = TextStyle(
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color(0xFF51778A),
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                            Text(
-                                text = "",
-                                style = TextStyle(
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.poppinsmedium)),
-                                    fontWeight = FontWeight(500),
-                                    color = DarkBlue,
-                                    textAlign = TextAlign.Start
-                                )
-                            )
-                        }
-                    }
-                    Row(
-
-                    ) {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
+                    }*/
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
 
             }
@@ -580,6 +426,25 @@ fun MyRoutesPartTwo(navController: NavHostController, rootNavController: NavHost
     }
 
 
+}
+
+fun calcularVelocidad(distanciaKm: Double, tiempoStr: String): Double? {
+    // Paso 1: Convierte el tiempo a horas
+    val tiempoPartes = tiempoStr.split(":")
+    if (tiempoPartes.size != 3) {
+        return 0.0
+    }
+    val horas = tiempoPartes[0].toDouble()
+    val minutos = tiempoPartes[1].toDouble()
+    val segundos = tiempoPartes[2].toDouble()
+    val tiempoEnHoras = horas + minutos / 60 + segundos / 3600
+    if (tiempoEnHoras > 0) {
+        Log.d("Tiempo en horas", tiempoEnHoras.toString())
+        Log.d("Distancia en km", distanciaKm.toString())
+        return distanciaKm / tiempoEnHoras
+    } else {
+        return 0.0
+    }
 }
 
 
