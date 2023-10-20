@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,6 +30,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -293,124 +295,134 @@ fun RegisterScreen2(
     var gender by remember {
         mutableStateOf(viewModel.gender)
     }
-    Column(
-        verticalArrangement = Arrangement.Top,
+    LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
+            .wrapContentHeight()
+            .fillMaxWidth(),
     ) {
-        RoundedLinearProgressIndicator(
-            progress = 0.25f,
-            modifier = Modifier.padding(start = 20.dp, bottom = 40.dp, end = 20.dp, top = 5.dp)
-        )
-        Text(
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 50.dp, bottom = 10.dp),
-            text = stringResource(id = R.string.birth_date),
-            color = DarkBlue,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            style = TextStyle(
-                fontFamily = customFontFamily,
-                fontWeight = FontWeight.SemiBold,
-                fontStyle = FontStyle.Normal,
-            ),
-        )
-        // Fetching the Local Context
-        val mContext = LocalContext.current
-
-        // Declaring integer values
-        // for year, month and day
-        val mYear: Int
-        val mMonth: Int
-        val mDay: Int
-
-        // Initializing a Calendar
-        val mCalendar = Calendar.getInstance()
-
-        // Fetching current year, month and day
-        mYear = mCalendar.get(Calendar.YEAR)
-        mMonth = mCalendar.get(Calendar.MONTH)
-        mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
-
-        mCalendar.time = Date()
-
-        // Declaring a string value to
-        // store date in string format
-        val mDate = remember { mutableStateOf(viewModel.birthDate) }
-
-        // Declaring DatePickerDialog and setting
-        // initial values as current values (present year, month and day)
-        val mDatePickerDialog = DatePickerDialog(
-            mContext,
-            { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-                mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
-            }, mYear, mMonth, mDay
-        )
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 40.dp, end = 40.dp, bottom = 30.dp)
-                .height(70.dp),
-            shape = RoundedCornerShape(20.dp),
-            color = Color.White,
-        ) {
-            Box(
-                contentAlignment = Alignment.CenterStart,
+        item {
+            Column(
+                verticalArrangement = Arrangement.Top,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .clickable {
-                        mDatePickerDialog.show()
-                    },
+                    .fillMaxWidth()
             ) {
+                RoundedLinearProgressIndicator(
+                    progress = 0.25f,
+                    modifier = Modifier.padding(start = 20.dp, bottom = 40.dp, end = 20.dp, top = 5.dp)
+                )
                 Text(
-                    text = mDate.value,
-                    color = Blue,
-                    fontSize = 20.sp,
                     modifier = Modifier
-                        .padding(start = 20.dp),
+                        .align(Alignment.Start)
+                        .padding(start = 50.dp, bottom = 10.dp),
+                    text = stringResource(id = R.string.birth_date),
+                    color = DarkBlue,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
                     style = TextStyle(
                         fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Light,
-                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.SemiBold,
+                        fontStyle = FontStyle.Normal,
                     ),
                 )
+                // Fetching the Local Context
+                val mContext = LocalContext.current
+
+                // Declaring integer values
+                // for year, month and day
+                val mYear: Int
+                val mMonth: Int
+                val mDay: Int
+
+                // Initializing a Calendar
+                val mCalendar = Calendar.getInstance()
+
+                // Fetching current year, month and day
+                mYear = mCalendar.get(Calendar.YEAR)
+                mMonth = mCalendar.get(Calendar.MONTH)
+                mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+                mCalendar.time = Date()
+
+                // Declaring a string value to
+                // store date in string format
+                val mDate = remember { mutableStateOf(viewModel.birthDate) }
+
+                // Declaring DatePickerDialog and setting
+                // initial values as current values (present year, month and day)
+                val mDatePickerDialog = DatePickerDialog(
+                    mContext,
+                    { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                        mDate.value = "$mDayOfMonth/${mMonth + 1}/$mYear"
+                    }, mYear, mMonth, mDay
+                )
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 40.dp, end = 40.dp, bottom = 30.dp)
+                        .height(70.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color.White,
+                ) {
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable {
+                                mDatePickerDialog.show()
+                            },
+                    ) {
+                        Text(
+                            text = mDate.value,
+                            color = Blue,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .padding(start = 20.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Light,
+                                fontStyle = FontStyle.Italic,
+                            ),
+                        )
+                    }
+                }
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 50.dp, bottom = 10.dp),
+                    text = stringResource(id = R.string.gender),
+                    color = DarkBlue,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontStyle = FontStyle.Normal,
+                    ),
+                )
+                RadioButtonGroup(
+                    onChange = { gender = it },
+                    initialState = viewModel.gender
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                ForwardBackButtons(
+                    onClickedBack = {
+                        navController.popBackStack()
+                    },
+                    onClickedForward = {
+                        Log.d("email", "email: ${viewModel.email}")
+                        if (gender != "" && mDate.value != "") {
+                            viewModel.gender = gender
+                            viewModel.birthDate = mDate.value
+                            navController.navigate(
+                                Screen.RegisterScreen3.route,
+                            )
+                        }
+
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
-        Text(
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 50.dp, bottom = 10.dp),
-            text = stringResource(id = R.string.gender),
-            color = DarkBlue,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            style = TextStyle(
-                fontFamily = customFontFamily,
-                fontWeight = FontWeight.SemiBold,
-                fontStyle = FontStyle.Normal,
-            ),
-        )
-        RadioButtonGroup(onChange =  { gender = it },
-            initialState = viewModel.gender
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        ForwardBackButtons(
-            onClickedBack = {
-                navController.popBackStack()
-            },
-            onClickedForward = {
-                Log.d("email", "email: ${viewModel.email}")
-                if(gender != "" && mDate.value != "") {
-                    viewModel.gender = gender
-                    viewModel.birthDate = mDate.value
-                    navController.navigate(
-                        Screen.RegisterScreen3.route,
-                    )
-                }
-
-            }
-        )
     }
 }
 
