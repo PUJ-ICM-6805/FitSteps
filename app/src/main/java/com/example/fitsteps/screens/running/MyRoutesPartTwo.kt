@@ -42,7 +42,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.firebaseRunningData.RunningViewModel
+import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue

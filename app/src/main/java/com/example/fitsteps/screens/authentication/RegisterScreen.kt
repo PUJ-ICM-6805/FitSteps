@@ -655,13 +655,13 @@ fun RegisterScreen5(
                         viewModel.email,
                         viewModel.password,
                         User(
-                            name = viewModel.name,
-                            birthDate = viewModel.birthDate,
+                            user_name = viewModel.name,
+                            user_birth_date = viewModel.birthDate,
                             gender = viewModel.gender,
                             weight = viewModel.weight,
                             height = viewModel.height,
                             experience = viewModel.experience,
-                            avatarUrl = "",
+                            avatar = "",
                             userId = "",
                         )
                     ) { mainNavController.popBackStack() }

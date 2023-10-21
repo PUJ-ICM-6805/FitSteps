@@ -41,8 +41,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.firebaseRunningData.Route
-import com.example.fitsteps.firebaseRunningData.RunningViewModel
+import com.example.fitsteps.firebaseData.firebaseRunningData.Route
+import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.screens.LargeButtons
@@ -66,6 +66,7 @@ fun MainRunning(
            runningViewModel.uploadUserData()
         },
         onResume = {
+            listOfRoutes.clear()
             val auth = runningViewModel.auth
             val userId = auth.currentUser?.uid
             if(userId != null) {

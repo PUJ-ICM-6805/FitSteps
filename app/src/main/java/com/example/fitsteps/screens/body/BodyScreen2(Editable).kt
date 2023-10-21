@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.body
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,13 +24,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
+import com.example.fitsteps.screens.HamburgersDropList
+import com.example.fitsteps.screens.LargeButtons
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
-fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHostController) {
+fun BodyScreen2Edit(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    measuresViewModel: MeasuresViewModel = MeasuresViewModel()
+) {
+    val userid = Firebase.auth.currentUser?.uid
     LazyColumn (
         modifier = Modifier
             .fillMaxSize()
@@ -79,7 +89,10 @@ fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHost
                 androidx.compose.material3.Text(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .clickable { navController.popBackStack() },
+                        .clickable {
+                            navController.popBackStack()
+                            measuresViewModel.uploadMeasure()
+                        },
                     text = stringResource(id = R.string.save),
                     style = TextStyle(
                         fontFamily = customFontFamily,
@@ -123,11 +136,10 @@ fun BodyScreen2Edit(navController: NavHostController, rootNavController: NavHost
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
-                    .height(500.dp),
+                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp),
                 contentAlignment = Alignment.TopStart,
             ) {
-                MeasuresTable(true)
+                MeasuresTable(true, measuresViewModel)
             }
         }
         item{

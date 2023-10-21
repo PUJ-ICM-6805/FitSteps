@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.fitsteps.firebaseRunningData.RunningViewModel
+import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.screens.ExerciseScreen
 import com.example.fitsteps.screens.ProfileScreen
 import com.example.fitsteps.screens.SocialScreen

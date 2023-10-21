@@ -57,7 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.firebaseRunningData.RunningViewModel
+import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.ui.theme.Red
 import com.google.accompanist.permissions.*
 import com.google.android.gms.location.FusedLocationProviderClient

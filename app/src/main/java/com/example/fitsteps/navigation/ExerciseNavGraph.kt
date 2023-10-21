@@ -1,21 +1,12 @@
 package com.example.fitsteps.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringArrayResource
-import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.fitsteps.R
 import com.example.fitsteps.screens.AddExerciseScreen
-import com.example.fitsteps.screens.AutoRoutineMainScreen
 import com.example.fitsteps.screens.BarbelBenchScreen
-import com.example.fitsteps.screens.BodyScreen2Edit
 import com.example.fitsteps.screens.CreateRoutineScreen
-import com.example.fitsteps.screens.CustomRoutineScreen
-import com.example.fitsteps.screens.CustomRoutineScreenSteps
 import com.example.fitsteps.screens.ExercisesPerMuscleScreen
 import com.example.fitsteps.screens.PrepareScreen1
 import com.example.fitsteps.screens.PrepareScreen2
