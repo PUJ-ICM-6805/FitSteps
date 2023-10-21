@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.screens.LargeButtons
-import com.example.fitsteps.screens.body.firebaseMeasuresData.MeasuresViewModel
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
@@ -89,7 +89,10 @@ fun BodyScreen2Edit(
                 androidx.compose.material3.Text(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .clickable { navController.popBackStack() },
+                        .clickable {
+                            navController.popBackStack()
+                            measuresViewModel.uploadMeasure()
+                        },
                     text = stringResource(id = R.string.save),
                     style = TextStyle(
                         fontFamily = customFontFamily,
@@ -133,8 +136,7 @@ fun BodyScreen2Edit(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
-                    .height(500.dp),
+                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp),
                 contentAlignment = Alignment.TopStart,
             ) {
                 MeasuresTable(true, measuresViewModel)

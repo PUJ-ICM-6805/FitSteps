@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.ui.theme.Blue
@@ -48,7 +49,11 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun BodyScreen(navController: NavHostController, rootNavController: NavHostController) {
+fun BodyScreen(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    measuresViewModel: MeasuresViewModel = MeasuresViewModel(),
+) {
     var showBodyFrame by remember {
         mutableStateOf(false)
     }

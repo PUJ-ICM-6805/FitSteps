@@ -4,7 +4,7 @@ import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.MutableState
-import com.example.fitsteps.screens.body.firebaseMeasuresData.Measure
+import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.Measures
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
@@ -31,16 +31,16 @@ class DatabaseUtils {
         return user
     }
 
-    suspend fun getMeasureDataByUID(uid: String): Measure? {
+    suspend fun getMeasureDataByUID(uid: String): Measures? {
         val database = FirebaseFirestore.getInstance()
         val measuresRef = database.collection("users").document(uid).collection("measures")
-        var measure: Measure? = null
+        var measure: Measures? = null
 
         try {
             val querySnapshot = measuresRef.get().await()
             if (!querySnapshot.isEmpty) {
                 for (document in querySnapshot.documents) {
-                    measure = document.toObject(Measure::class.java)
+                    measure = document.toObject(Measures::class.java)
                     measure?.document = document.id
                     break
                 }

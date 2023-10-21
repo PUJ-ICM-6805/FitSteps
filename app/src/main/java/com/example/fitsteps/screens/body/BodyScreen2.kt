@@ -15,27 +15,35 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,10 +51,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.Measures
+import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
-import com.example.fitsteps.screens.body.firebaseMeasuresData.Measure
-import com.example.fitsteps.screens.body.firebaseMeasuresData.MeasuresViewModel
 import com.example.fitsteps.screens.userProfileAvatar
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -62,11 +70,14 @@ import com.google.firebase.ktx.Firebase
 fun BodyScreen2(
     navController: NavHostController,
     rootNavController: NavHostController,
-    measuresViewModel: MeasuresViewModel = MeasuresViewModel()
+    measuresViewModel: MeasuresViewModel = remember {
+        MeasuresViewModel()
+    }
 ) {
     val userid = Firebase.auth.currentUser?.uid
-    val listOfMeasures = remember { mutableStateListOf<Measure>() }
+    val listOfMeasures = remember { mutableStateListOf<Measures>() }
     if (userid != null) {
+        listOfMeasures.clear()
         FirebaseFirestore.getInstance().collection("users_body_measures")
             .whereEqualTo("uid", userid)
             .get()
@@ -74,39 +85,42 @@ fun BodyScreen2(
                 for (document in result) {
                     val fecha = document.data["fecha"] as String
                     val foto = document.data["foto"] as String
-                    val hombros = document.data["hombros"] as Int
-                    val pecho = document.data["pecho"] as Int
-                    val antebrazoIzq = document.data["antebrazoIzq"] as Int
-                    val antebrazoDer = document.data["antebrazoDer"] as Int
-                    val brazoIzq = document.data["brazoIzq"] as Int
-                    val brazoDer = document.data["brazoDer"] as Int
-                    val cintura = document.data["cintura"] as Int
-                    val cadera = document.data["cadera"] as Int
-                    val piernaDer = document.data["piernaDer"] as Int
-                    val piernaIzq = document.data["piernaIzq"] as Int
-                    val pantorrillaDer = document.data["pantorrillaDer"] as Int
-                    val pantorillaIzq = document.data["pantorillaIzq"] as Int
-                    val doc = document.id
-                    listOfMeasures += Measure(
+                    val hombros = document.data["hombros"] as Long
+                    val pecho = document.data["pecho"] as Long
+                    val antebrazoIzq = document.data["antebrazoIzq"] as Long
+                    val antebrazoDer = document.data["antebrazoDer"] as Long
+                    val brazoIzq = document.data["brazoIzq"] as Long
+                    val brazoDer = document.data["brazoDer"] as Long
+                    val cintura = document.data["cintura"] as Long
+                    val cadera = document.data["cadera"] as Long
+                    val piernaDer = document.data["piernaDer"] as Long
+                    val piernaIzq = document.data["piernaIzq"] as Long
+                    val pantorrillaDer = document.data["pantorrillaDer"] as Long
+                    val pantorrillaIzq = document.data["pantorrillaIzq"] as Long
+                    val timestamp = document.data["timestamp"] as Long
+                    val doc = document.id as String
+                    listOfMeasures += Measures(
                         fecha,
                         foto,
-                        hombros,
-                        pecho,
-                        antebrazoIzq,
-                        antebrazoDer,
-                        brazoIzq,
-                        brazoDer,
-                        cintura,
-                        cadera,
-                        piernaDer,
-                        piernaIzq,
-                        pantorrillaDer,
-                        pantorillaIzq,
-                        doc
+                        hombros.toInt(),
+                        pecho.toInt(),
+                        antebrazoIzq.toInt(),
+                        antebrazoDer.toInt(),
+                        brazoIzq.toInt(),
+                        brazoDer.toInt(),
+                        cintura.toInt(),
+                        cadera.toInt(),
+                        piernaDer.toInt(),
+                        piernaIzq.toInt(),
+                        pantorrillaDer.toInt(),
+                        pantorrillaIzq.toInt(),
+                        document = doc,
+                        timestamp = timestamp,
                     )
                     Log.d("Medidas", "${document.id} => ${document.data}")
                     Log.d("Medidas lista", listOfMeasures.toString())
                 }
+                listOfMeasures.sortByDescending { it.timestamp }
             }
             .addOnFailureListener { exception ->
                 Log.d("Error", "Error getting documents: ", exception)
@@ -204,8 +218,7 @@ fun BodyScreen2(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)
-                    .height(500.dp),
+                    .padding(top = 2.dp, start = 20.dp, end = 20.dp, bottom = 10.dp),
                 contentAlignment = Alignment.TopStart,
             ) {
                 MeasuresTable(editable = false, measuresViewModel)
@@ -245,7 +258,13 @@ fun BodyScreen2(
                                 .height(175.dp),
                             navController = navController,
                             measure = measure,
-                            measuresViewModel = measuresViewModel
+                            measuresViewModel = measuresViewModel,
+                            onClick = {
+                                measuresViewModel.selectedMeasure.value = measure
+                                measuresViewModel.actualMeasure.value = measure
+                                navController.popBackStack()
+                                navController.navigate(Screen.BodyScreen2.route)
+                            }
                         )
                     }
                 }
@@ -324,22 +343,23 @@ fun MeasuresTable(editable: Boolean, viewModel: MeasuresViewModel) {
     ) {
         Spacer(modifier = Modifier.height(2.dp))
         Column() {
-            TableColumns(stringResource(id = R.string.Deltoids), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.Chest), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.LeftForearm), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.RightForearm), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.LeftArm), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.RightArm), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.Waist), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.Hips), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.LeftLeg), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.RightLeg), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.LeftCalf), "--", editable, viewModel)
-            TableColumns(stringResource(id = R.string.RightCalf), "--", editable, viewModel)
+            TableColumns(stringResource(id = R.string.Deltoids), viewModel.selectedMeasure.value.hombros.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.Chest), viewModel.selectedMeasure.value.pecho.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.LeftForearm), viewModel.selectedMeasure.value.antebrazoIzq.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.RightForearm), viewModel.selectedMeasure.value.antebrazoDer.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.LeftArm), viewModel.selectedMeasure.value.brazoIzq.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.RightArm), viewModel.selectedMeasure.value.brazoDer.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.Waist), viewModel.selectedMeasure.value.cintura.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.Hips), viewModel.selectedMeasure.value.cadera.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.LeftLeg), viewModel.selectedMeasure.value.piernaIzq.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.RightLeg), viewModel.selectedMeasure.value.piernaDer.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.LeftCalf), viewModel.selectedMeasure.value.pantorrillaIzq.toString(), editable, viewModel)
+            TableColumns(stringResource(id = R.string.RightCalf), viewModel.selectedMeasure.value.pantorrillaDer.toString(), editable, viewModel)
         }
         Spacer(modifier = Modifier.height(2.dp))
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TableColumns(item1: String, item2: String, editable: Boolean, viewModel: MeasuresViewModel) {
     Row(
@@ -348,6 +368,9 @@ fun TableColumns(item1: String, item2: String, editable: Boolean, viewModel: Mea
             .padding(9.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        var text by remember {
+            mutableStateOf("")
+        }
         Text(
             text = item1,
             style = TextStyle(
@@ -361,20 +384,52 @@ fun TableColumns(item1: String, item2: String, editable: Boolean, viewModel: Mea
         if (editable) {
             Box(
                 modifier = Modifier
-                    .size(75.dp, 30.dp)
+                    .wrapContentSize()
                     .background(Blue, RoundedCornerShape(5.dp)),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Text(
-                    modifier = Modifier.padding(end = 7.dp),
-                    text = "$item2 cm",
-                    style = TextStyle(
-                        fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 15.sp,
-                        fontStyle = FontStyle.Normal,
-                        color = LightBlue,
-                    )
+                TextField(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(70.dp),
+                    value = text,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    onValueChange = {
+                        Log.d("Texto", it)
+                        Log.d("Medidas", item1)
+                        text = it
+                        try {
+                            text.toInt()
+                            when (item1) {
+                                "Hombros" -> viewModel.actualMeasure.value.hombros = text.toInt()
+                                "Pecho" -> viewModel.actualMeasure.value.pecho = text.toInt()
+                                "Antebrazo izquierdo" -> viewModel.actualMeasure.value.antebrazoIzq =
+                                    text.toInt()
+
+                                "Antebrazo derecho" -> viewModel.actualMeasure.value.antebrazoDer =
+                                    text.toInt()
+
+                                "Brazo izquierdo" -> viewModel.actualMeasure.value.brazoIzq = text.toInt()
+                                "Brazo derecho" -> viewModel.actualMeasure.value.brazoDer = text.toInt()
+                                "Cintura" -> viewModel.actualMeasure.value.cintura = text.toInt()
+                                "Cadera" -> viewModel.actualMeasure.value.cadera = text.toInt()
+                                "Pierna izquierda" -> viewModel.actualMeasure.value.piernaIzq =
+                                    text.toInt()
+
+                                "Pierna derecha" -> viewModel.actualMeasure.value.piernaDer = text.toInt()
+                                "Pantorrilla izquierda" -> viewModel.actualMeasure.value.pantorrillaIzq =
+                                    text.toInt()
+
+                                "Pantorrilla derecha" -> viewModel.actualMeasure.value.pantorrillaDer =
+                                    text.toInt()
+                            }
+                        } catch (e: Exception) {
+                            text = ""
+                        }
+                    },
                 )
             }
         } else {
@@ -413,7 +468,8 @@ fun GalleryCard(
     modifier: Modifier,
     navController: NavHostController,
     measuresViewModel: MeasuresViewModel,
-    measure: Measure
+    measure: Measures,
+    onClick: () -> Unit = {},
 ) {
     Card(
         modifier = Modifier
@@ -421,7 +477,7 @@ fun GalleryCard(
             .width(300.dp)
             .padding(end = 20.dp)
             .clickable {
-                //actualizar la tabla MeasuresTable con la lista de datos de la card seleccionada
+                onClick()
             },
         shape = RoundedCornerShape(20.dp),
         backgroundColor = Color.White,
