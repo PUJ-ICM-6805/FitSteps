@@ -50,6 +50,7 @@ import androidx.navigation.NavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.authentication.RoundedLinearProgressIndicator
+import com.example.fitsteps.screens.training.LargeButtons
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue

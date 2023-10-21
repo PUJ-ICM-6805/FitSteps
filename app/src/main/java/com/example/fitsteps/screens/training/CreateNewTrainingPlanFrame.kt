@@ -1,5 +1,6 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -330,7 +331,24 @@ fun CreateNewTrainingPlanFrame(
                                     .fillMaxSize()
                                     .weight(1f)
                                     .background(Color.White)
-                                    .clickable { setShow(false, true) },
+                                    .clickable {
+                                        setShow(false, true)
+                                        val ownTraningProgram =
+                                            TrainingProgram(input_desc,input_name,"TODO")
+                                        val viewModel = TrainingProgramViewModel()
+                                        viewModel.saveTrainingProgram(ownTraningProgram,
+                                            onSuccess = {
+                                                // La operación se completó con éxito, aquí puedes realizar acciones específicas
+                                                // como mostrar un mensaje de confirmación al usuario.
+                                                Log.d("Guardar Programa", "Éxito al guardar programa:")
+                                            },
+                                            onFailure = { exception ->
+                                                // Se produjo un error durante la operación, aquí puedes manejar el error.
+                                                // Por ejemplo, mostrar un mensaje de error o registrar el error.
+                                                Log.e("Guardar Programa", "Error al guardar programa: ${exception.message}")
+                                            }
+                                        )
+                                               },
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(

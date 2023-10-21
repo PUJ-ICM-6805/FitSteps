@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitsteps.R
+import com.example.fitsteps.screens.exercise.ExercisesList
+import com.example.fitsteps.screens.exercise.IconAndText
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White

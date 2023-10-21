@@ -1,5 +1,6 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.exercise
 
+import ExerciseViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,16 +39,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
+
 @Composable
 fun ExercisesPerMuscleScreen(
-    navController: NavHostController,
+    navController: NavHostController
 ) {
+    val viewModel = ExerciseViewModel()
+    val exerciseListState = viewModel.exerciseList.observeAsState(initial = emptyList())
+    val exerciseList = exerciseListState.value
+
+
     var showExerciseFrame by remember {
         mutableStateOf(false)
     }
@@ -55,7 +64,7 @@ fun ExercisesPerMuscleScreen(
             navController = navController,
             setShow = { showFrame ->
                 showExerciseFrame = showFrame
-            }
+            },exerciseList
         )
     }
     Column(
@@ -92,9 +101,7 @@ fun ExercisesPerMuscleScreen(
                 ),
             contentAlignment = Alignment.CenterStart,
         ) {
-            Row(
-
-            ){
+            Row {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_search_icon),
                     contentDescription = "Search icon",
@@ -123,7 +130,7 @@ fun ExercisesPerMuscleScreen(
             ExercisesCardList(
                 onClick = {
                     showExerciseFrame = it
-                }
+                }, viewModel = ExerciseViewModel()
             )
         }
 
@@ -134,14 +141,17 @@ fun ExercisesPerMuscleScreen(
 }
 @Composable
 fun ExercisesCardList(
-    onClick: (Boolean) -> Unit = {}
+    onClick: (Boolean) -> Unit = {},    viewModel: ExerciseViewModel
 ){
+    val exerciseListState = viewModel.exerciseList.observeAsState(initial = emptyList())
+    val exerciseList = exerciseListState.value
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
             .padding(top = 20.dp)
     ){
-        items(8){item->
+        items(exerciseList.size){item->
             Box(
                 modifier = Modifier
                     .padding(10.dp)
@@ -150,9 +160,11 @@ fun ExercisesCardList(
                     }
             ) {
                 ExercisesCard(
-                    painter = painterResource(id = R.drawable.benchpress),
-                    contentDescription = "a",
-                    title = "Nombre ejercicio"
+                    painter = rememberAsyncImagePainter(
+                        model = exerciseList[item].image
+                    ),
+                    contentDescription = "Exercise Image and name",
+                    title = exerciseList[item].name
                 )
             }
         }
@@ -219,6 +231,7 @@ fun ExercisesCard(
         }
     }
 }
+
 @Composable
 @Preview
 fun ExercisesPerMuscleScreenPreview() {

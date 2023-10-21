@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace = "com.example.fitsteps"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.fitsteps"
-        minSdk = 28
+        minSdk = 29
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -65,6 +65,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
     implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.firebase:firebase-database:20.3.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -77,8 +78,9 @@ dependencies {
     implementation ("com.google.maps.android:maps-compose:2.15.0")
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
     implementation ("com.google.android.gms:play-services-maps:18.1.0")
-
-
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.5")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
 
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")

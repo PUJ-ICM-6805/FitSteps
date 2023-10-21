@@ -1,6 +1,9 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.exercise
 
-import androidx.compose.foundation.Image
+import android.net.Uri
+import android.util.Log
+import android.widget.MediaController
+import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -41,6 +46,8 @@ import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
@@ -52,8 +59,9 @@ import com.example.fitsteps.ui.theme.DarkBlue
 @Composable
 fun DetailsPerExerciseScreen(
     navController: NavHostController,
-    setShow: (Boolean) -> Unit = {},
+    setShow: (Boolean) -> Unit = {}, exerciseList: List<Exercise>
 ){
+    Log.d("EX SIZE", exerciseList.size.toString())
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -89,7 +97,7 @@ fun DetailsPerExerciseScreen(
                         .padding(top = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    androidx.compose.material3.Text(
+                   Text(
                         text = stringResource(id = R.string.backlc),
                         modifier = Modifier
                             .padding(horizontal = 10.dp, vertical = 0.dp)
@@ -104,7 +112,7 @@ fun DetailsPerExerciseScreen(
                             color = Blue,
                         )
                     )
-                    androidx.compose.material3.Text(
+                    Text(
                         text = stringResource(id = R.string.save),
                         modifier = Modifier
                             .padding(horizontal = 10.dp, vertical = 0.dp)
@@ -122,11 +130,9 @@ fun DetailsPerExerciseScreen(
                     )
 
                 }
-                Box(
-
-                ) {
+                Box {
                     androidx.compose.material3.Text(
-                        text = stringResource(id = R.string.Barbell_bp),
+                        text = exerciseList[0].name,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
                         style = TextStyle(
                             fontFamily = customFontFamily,
@@ -141,28 +147,27 @@ fun DetailsPerExerciseScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
-                        //.padding(horizontal = 20.dp)
                         .background(Color.White, RoundedCornerShape(16.dp))
                 ) {
-                    Image(
+                    VideoPlayer(
+                        videoUri= Uri.parse(exerciseList[0].video)
+                    )
+                   /* Image(
                         contentDescription = "Run Button",
                         modifier = Modifier
                             .align(Alignment.Center)
                             .fillMaxSize(0.25f),
                         painter = painterResource(id = R.drawable.ic_play_whitebg),
-                    )
+                    )*/
                 }
                 TextAndFrame(
-                    text = "Repeticiones",
-                    field = "-  1  +"
+                    text = "Repeticiones"
                 )
                 TextAndFrame(
-                    text = "Número de Series",
-                    field = "-  3  +"
+                    text = "Número de Series"
                 )
                 TextAndFrame(
-                    text = "Descanso entre series",
-                    field = "-  0  +"
+                    text = "Descanso entre series"
                 )
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -170,7 +175,7 @@ fun DetailsPerExerciseScreen(
                         .fillMaxWidth()
                         .padding(10.dp),
                 ) {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = stringResource(id = R.string.series),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
                         style = TextStyle(
@@ -181,7 +186,7 @@ fun DetailsPerExerciseScreen(
                             color = DarkBlue,
                         )
                     )
-                    androidx.compose.material3.Text(
+                    Text(
                         text = stringResource(id = R.string.carga),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
                         style = TextStyle(
@@ -192,7 +197,7 @@ fun DetailsPerExerciseScreen(
                             color = DarkBlue,
                         )
                     )
-                    androidx.compose.material3.Text(
+                    Text(
                         text = stringResource(id = R.string.repetitions),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
                         style = TextStyle(
@@ -226,7 +231,7 @@ fun DetailsPerExerciseScreen(
     }
 }
 @Composable
-fun TextAndFrame(text: String, field: String){
+fun TextAndFrame(text: String){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,11 +243,11 @@ fun TextAndFrame(text: String, field: String){
                 .size(150.dp, 30.dp),
             contentAlignment = Alignment.BottomStart
         ){
-            androidx.compose.material3.Text(
+            Text(
                 text = text,
                 modifier = Modifier
                     .padding(horizontal = 5.dp, vertical = 0.dp)
-                    .offset(y = -7.dp),
+                    .offset(y = (-7).dp),
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.SemiBold,
@@ -255,24 +260,79 @@ fun TextAndFrame(text: String, field: String){
 
         Box(
             modifier = Modifier
-                .size(75.dp, 30.dp)
+                .size(180.dp, 30.dp)
                 .background(Blue, RoundedCornerShape(5.dp)),
             contentAlignment = Alignment.Center
         ){
-            androidx.compose.material3.Text(
-                text = field,
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp),
+            numberButton()
+        }
+    }
+
+}
+
+@Composable
+fun numberButton(){
+    var number by remember {
+        mutableStateOf(0)
+    }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            Button(
+             modifier =Modifier.weight(0.3f),
+             colors = ButtonDefaults.buttonColors(
+                 backgroundColor = Blue,
+                 contentColor = LightBlue),
+                onClick = { if(number>0){ number-- } })
+            {
+                Text(
+                    text = "-",
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 10.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = LightBlue,
+                    ),
+                    )
+            }
+            Text(
+                modifier =Modifier.weight(0.3f),
+                textAlign = TextAlign.Center,
+                text = "$number",
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Light,
-                    fontSize = 20.sp,
+                    fontSize = 10.sp,
                     fontStyle = FontStyle.Normal,
                     color = LightBlue,
-                )
-            )
+                ),
 
+                )
+
+            Button(
+                modifier =Modifier.weight(0.3f),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Blue,
+                    contentColor = LightBlue),
+                onClick = { number++ },)
+            {
+                Text(
+                    text = "+",
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 10.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = LightBlue,
+                    ),
+
+                    )
+            }
         }
-    }
 
 }
 
@@ -295,7 +355,7 @@ fun DetailsPerSet(
                 .padding(vertical = 5.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            androidx.compose.material3.Text(
+            Text(
                 text = "$setNumber",
                 modifier = Modifier.padding(start = 10.dp),
                 style = TextStyle(
@@ -306,7 +366,7 @@ fun DetailsPerSet(
                     color = DarkBlue,
                 )
             )
-            androidx.compose.material3.Text(
+            Text(
                 text = "$weight",
                 style = TextStyle(
                     fontFamily = customFontFamily,
@@ -316,7 +376,7 @@ fun DetailsPerSet(
                     color = DarkBlue,
                 )
             )
-            androidx.compose.material3.Text(
+            Text(
                 text = "$repetitions",
                 modifier = Modifier.padding(end = 10.dp),
                 style = TextStyle(
@@ -353,7 +413,7 @@ fun WeightSelectionButtons(){
                 .clickable { selectedWeight = true },
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = stringResource(id = R.string.kg),
                 style = TextStyle(
                     fontFamily = customFontFamily,
@@ -376,7 +436,7 @@ fun WeightSelectionButtons(){
             contentAlignment = Alignment.Center
 
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = stringResource(id = R.string.lbs),
                 style = TextStyle(
                     fontFamily = customFontFamily,
@@ -390,10 +450,33 @@ fun WeightSelectionButtons(){
         }
     }
 }
+@Composable
+fun VideoPlayer(
+    videoUri: Uri
+) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        factory = { context ->
+            VideoView(context).apply {
+                setVideoURI(videoUri)
 
+                val mediaController = MediaController(context)
+                mediaController.setAnchorView(this)
 
+                setMediaController(mediaController)
+
+                setOnPreparedListener {
+                    start()
+                }
+            }
+        })
+
+}
 @Composable
 @Preview
 fun DetailsPeraExercisePreview(){
-    DetailsPerExerciseScreen(navController = rememberNavController())
+    DetailsPerExerciseScreen(navController = rememberNavController(), setShow = {}, exerciseList = emptyList())
 }
