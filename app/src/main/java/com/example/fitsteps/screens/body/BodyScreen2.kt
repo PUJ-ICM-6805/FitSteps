@@ -77,8 +77,9 @@ fun BodyScreen2(
 ) {
     val userid = Firebase.auth.currentUser?.uid
     val listOfMeasures = remember { mutableStateListOf<Measures>() }
+    listOfMeasures.clear()
     if (userid != null) {
-        listOfMeasures.clear()
+
         FirebaseFirestore.getInstance().collection("users_body_measures")
             .whereEqualTo("uid", userid)
             .get()
