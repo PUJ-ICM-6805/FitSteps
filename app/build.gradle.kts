@@ -84,7 +84,7 @@ dependencies {
     implementation ("com.firebaseui:firebase-ui-storage:7.2.0")
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.github.rosariopfernandes:firecoil:0.2.0")
-
+    implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
 
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")

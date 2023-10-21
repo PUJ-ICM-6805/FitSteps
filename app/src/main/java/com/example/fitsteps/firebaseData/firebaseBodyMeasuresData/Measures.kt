@@ -2,7 +2,7 @@ package com.example.fitsteps.firebaseData.firebaseBodyMeasuresData
 
 data class Measures(
     val fecha: String = "",
-    val foto: String = "",
+    var foto: String = "",
     var hombros: Int = 0,
     var pecho: Int = 0,
     var antebrazoIzq: Int = 0,

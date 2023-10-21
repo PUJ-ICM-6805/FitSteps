@@ -50,12 +50,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
 import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.Measures
 import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
-import com.example.fitsteps.screens.userProfileAvatar
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -249,7 +250,7 @@ fun BodyScreen2(
                     Log.d("Rutas row", listOfMeasures.toString())
                     itemsIndexed(listOfMeasures) { index, measure ->
                         GalleryCard(
-                            painter = userProfileAvatar(measure.foto),
+                            painter = ImageFromContentUri(measure.foto),
                             contentDescription = "",
                             title = measure.fecha,
                             modifier = Modifier
@@ -486,12 +487,12 @@ fun GalleryCard(
         Box(
             modifier = Modifier
                 .fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
             Image(
                 painter = painter,
                 contentDescription = contentDescription,
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.BottomCenter,
+                contentScale = ContentScale.Crop
             )
             Text(
                 modifier = Modifier
@@ -503,7 +504,7 @@ fun GalleryCard(
                     fontWeight = FontWeight.Normal,
                     fontSize = 20.sp,
                     fontStyle = FontStyle.Italic,
-                    color = White,
+                    color = Blue,
                 )
             )
         }
@@ -524,6 +525,18 @@ fun Text(stringId: Int, weight: FontWeight, size: Int, color: Color) {
     )
 }
 
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+fun ImageFromContentUri(uri: String) : Painter {
+    val defaultImage =
+        "https://firebasestorage.googleapis.com/v0/b/fitsteps-eb0ef.appspot.com/o/images%2Fdefault.jpg?alt=media&token=bdbbac1d-2340-4bc9-81ea-52af9878318d&_gl=1*hzwwna*_ga*MTIyNDA3MTA2NS4xNjk2MzkxMDc3*_ga_CW55HF8NVT*MTY5NzgwNTM2Mi44LjEuMTY5NzgwNTM4Ny4zNS4wLjA."
+    if (uri.isBlank() || uri.isEmpty() || uri == "null") {
+        return rememberAsyncImagePainter(defaultImage)
+    }
+    Log.d("Ruta", uri)
+    Log.d("Estado: ", rememberAsyncImagePainter(uri).state.toString())
+    return rememberAsyncImagePainter(uri)
+}
 @Composable
 @Preview
 fun BodyScreen2Preview() {
