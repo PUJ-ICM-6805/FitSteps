@@ -6,8 +6,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.fitsteps.screens.exercise.AddExerciseScreen
 import com.example.fitsteps.screens.exercise.BarbelBenchScreen
+import com.example.fitsteps.screens.AddExerciseScreen
+import com.example.fitsteps.screens.BarbelBenchScreen
 import com.example.fitsteps.screens.CreateRoutineScreen
 import com.example.fitsteps.screens.exercise.ExercisesPerMuscleScreen
+import com.example.fitsteps.screens.ExercisesPerMuscleScreen
 import com.example.fitsteps.screens.PrepareScreen1
 import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3

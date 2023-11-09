@@ -1,12 +1,13 @@
 package com.example.fitsteps.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.fitsteps.screens.training.ExerciseScreen
+import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
+import com.example.fitsteps.screens.ExerciseScreen
 import com.example.fitsteps.screens.ProfileScreen
 import com.example.fitsteps.screens.SocialScreen
 import com.example.fitsteps.screens.SummaryScreen
@@ -15,11 +16,12 @@ import com.example.fitsteps.screens.running.MyRoutesPartOne
 import com.example.fitsteps.screens.running.MyRoutesPartTwo
 import com.example.fitsteps.screens.running.RunningMap
 
-@RequiresApi(Build.VERSION_CODES.Q)//Line 51 requires API 29
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun BottomBarNavGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
+    runningViewModel: RunningViewModel = RunningViewModel(),
 ){
     NavHost(
         navController = navController,
@@ -30,7 +32,11 @@ fun BottomBarNavGraph(
             SummaryScreen(navController = navController, rootNavController = rootNavController)
         }
         composable(route = BottomBarScreen.Running.route) {
-            MainRunning(navController = navController, rootNavController = rootNavController)
+            MainRunning(
+                navController = navController,
+                rootNavController = rootNavController,
+                runningViewModel = runningViewModel
+            )
         }
         composable(route = BottomBarScreen.Exercise.route) {
             ExerciseScreen(navController = navController, rootNavController = rootNavController)
@@ -53,12 +59,20 @@ fun BottomBarNavGraph(
         composable(
             route = Screen.RunningRouteDetails.route
         ) {
-            MyRoutesPartOne(navController = navController, rootNavController = rootNavController)
+            MyRoutesPartOne(
+                navController = navController,
+                rootNavController = rootNavController,
+                runningViewModel = runningViewModel
+            )
         }
         composable(
             route = Screen.RunningRouteDetails2.route
         ) {
-            MyRoutesPartTwo(navController = navController, rootNavController = rootNavController)
+            MyRoutesPartTwo(
+                navController = navController,
+                rootNavController = rootNavController,
+                runningViewModel = runningViewModel
+            )
         }
     }
 }

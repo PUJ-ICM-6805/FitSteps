@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens.running
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,15 +14,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -32,18 +37,71 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseRunningData.Route
+import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.screens.training.LargeButtons
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.customFontFamily
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun MainRunning(navController: NavHostController, rootNavController: NavHostController) {
+fun MainRunning(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    runningViewModel: RunningViewModel = RunningViewModel()
+) {
     val painterMap = painterResource(id = R.drawable.map)
+    val listOfRoutes = remember { mutableStateListOf<Route>() }
+    DoInLifeCycle(
+        lifecycleOwner = lifecycleOwner,
+        onCreate = {
+           runningViewModel.uploadUserData()
+        },
+        onResume = {
+            listOfRoutes.clear()
+            val auth = runningViewModel.auth
+            val userId = auth.currentUser?.uid
+            if(userId != null) {
+                FirebaseFirestore.getInstance().collection("users_routes")
+                    .whereEqualTo("uid", userId)
+                    .get()
+                    .addOnSuccessListener { result ->
+                        for (document in result) {
+                            var routelng = mutableListOf<LatLng>()
+                            val route = document.data["route"] as List<*>
+                            val time = document.data["time"] as String
+                            val steps = document.data["steps"] as Long
+                            val distance = document.data["distance"] as String
+                            val date = document.data["date"] as String
+                            val hour = document.data["hour"] as String
+                            val timestamp = document.data["timestamp"] as Long
+                            for(item in route) {
+                                val hashMap = item as HashMap<*, *>
+                                val lat = hashMap["latitude"] as Double
+                                val lng = hashMap["longitude"] as Double
+                                routelng.add(LatLng(lat, lng))
+                            }
+                            Log.d("Rutas", "routelng: $routelng")
+                            listOfRoutes += Route(date, routelng, time, distance, steps.toInt(), hour, timestamp)
+                            Log.d("Rutas", "${document.id} => ${document.data}")
+                            Log.d("Rutas lista", listOfRoutes.toString())
+                        }
+                        listOfRoutes.sortByDescending { it.timestamp }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("Error", "Error getting documents: ", exception)
+                    }
+            }
+        },
+    )
     LazyColumn(
     ) {
         item {
@@ -153,16 +211,19 @@ fun MainRunning(navController: NavHostController, rootNavController: NavHostCont
                     .fillMaxWidth()
                     .padding(start = 20.dp)
             ) {
-                items(3) {//TODO: Change for the actual routes
+                Log.d("Rutas row", listOfRoutes.toString())
+                itemsIndexed(listOfRoutes) { index, route ->
                     ImageCard(
                         painter = painterResource(id = R.drawable.map),
                         contentDescription = "",
-                        title = "11/08/2023", //TODO: Change for the actual date
+                        title = route.date,
                         modifier = Modifier
                             .padding(end = 16.dp)
                             .width(300.dp)
                             .height(175.dp),
-                        navController = navController
+                        navController = navController,
+                        route = route,
+                        runningViewModel = runningViewModel
                     )
                 }
             }
@@ -181,12 +242,15 @@ fun ImageCard(
     title: String,
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    route: Route,
+    runningViewModel: RunningViewModel,
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
                 navController.navigate(Screen.RunningRouteDetails.route)
+                runningViewModel.actualRoute = route
             },
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp

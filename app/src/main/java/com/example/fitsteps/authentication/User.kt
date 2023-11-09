@@ -1,26 +1,36 @@
 package com.example.fitsteps.authentication
 
-import java.util.Date
-
 data class User(
-    val name: String,
-    val birthDate: String,
-    val gender: String,
-    val weight: Float,
-    val height: Float,
-    val experience: String,
-    val avatarUrl: String = "",
-    val userId: String,
+    var user_name: String,
+    var user_birth_date: String,
+    var gender: String,
+    var weight: Float,
+    var height: Float,
+    var experience: String,
+    var avatar: String = "",
+    var userId: String,
+    var document: String = ""
 ) {
+    constructor(): this(
+        user_name = "",
+        user_birth_date = "",
+        gender = "",
+        weight = 0.0f,
+        height = 0.0f,
+        experience = "",
+        avatar = "",
+        userId = ""
+    )
+
     fun toMap(): MutableMap<String, Any> {
         return mutableMapOf(
-            "user_name" to this.name,
-            "user_birth_date" to this.birthDate,
+            "user_name" to this.user_name,
+            "user_birth_date" to this.user_birth_date,
             "gender" to this.gender,
             "weight" to this.weight,
             "height" to this.height,
             "experience" to this.experience,
-            "avatar" to this.avatarUrl,
+            "avatar" to this.avatar,
             "userId" to this.userId
         )
     }

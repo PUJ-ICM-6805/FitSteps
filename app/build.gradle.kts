@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
     id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -21,7 +22,9 @@ android {
             useSupportLibrary = true
         }
     }
-
+    buildFeatures {
+        buildConfig = true
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -66,6 +69,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.android.datatransport:transport-runtime:3.1.9")
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -81,6 +86,10 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.0.5")
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    implementation ("com.firebaseui:firebase-ui-storage:7.2.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation ("com.github.rosariopfernandes:firecoil:0.2.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
 
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
