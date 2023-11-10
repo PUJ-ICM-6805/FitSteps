@@ -52,6 +52,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.firebaseData.firebaseExerciseData.Exercise
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.DarkBlue
 

@@ -1,6 +1,6 @@
 package com.example.fitsteps.screens.exercise
 
-import ExerciseViewModel
+import com.example.fitsteps.firebaseData.firebaseExerciseData.ExerciseViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

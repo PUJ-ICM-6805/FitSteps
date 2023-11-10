@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens.training
+package com.example.fitsteps.screens.training.trainingMainScreen
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -37,12 +37,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -57,6 +58,7 @@ fun CreateNewTrainingPlanFrame(
         color = Color.White,
         textAlign = TextAlign.Center,
     ),
+    trainingProgramViewModel: TrainingProgramViewModel,
     show: Boolean,
     setShow: (Boolean, Boolean) -> Unit,
 ){
@@ -125,15 +127,6 @@ fun CreateNewTrainingPlanFrame(
                             Text(
                                 text = stringResource(id = R.string.create_new_plan),
                                 softWrap = false,
-                                /*onTextLayout = {
-                                        result ->
-                                    if(result.didOverflowWidth) {
-                                        resizedTextStyle = resizedTextStyle.copy(
-                                            fontSize = resizedTextStyle.fontSize * 0.95f,
-                                        )
-                                    }
-                                },
-                                style = resizedTextStyle,*/
                                 style = TextStyle(
                                     fontFamily = customFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -146,10 +139,6 @@ fun CreateNewTrainingPlanFrame(
                             )
                             Text(
                                 text = stringResource(id = R.string.create_new_plan_description),
-                                /*style = resizedTextStyle.copy(
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = resizedTextStyle.fontSize * 0.7f,
-                                ),*/
                                 style = TextStyle(
                                     fontFamily = customFontFamily,
                                     fontWeight = FontWeight.Normal,
@@ -335,17 +324,12 @@ fun CreateNewTrainingPlanFrame(
                                         setShow(false, true)
                                         val ownTraningProgram =
                                             TrainingProgram(input_desc,input_name,"TODO")
-                                        val viewModel = TrainingProgramViewModel()
-                                        viewModel.saveTrainingProgram(ownTraningProgram,
+                                        trainingProgramViewModel.saveTrainingProgram(ownTraningProgram,
                                             onSuccess = {
-                                                // La operación se completó con éxito, aquí puedes realizar acciones específicas
-                                                // como mostrar un mensaje de confirmación al usuario.
-                                                Log.d("Guardar Programa", "Éxito al guardar programa:")
+                                                Log.d("Save program", "Save program success")
                                             },
                                             onFailure = { exception ->
-                                                // Se produjo un error durante la operación, aquí puedes manejar el error.
-                                                // Por ejemplo, mostrar un mensaje de error o registrar el error.
-                                                Log.e("Guardar Programa", "Error al guardar programa: ${exception.message}")
+                                                Log.e("Save program", "Error saving program ${exception.message}")
                                             }
                                         )
                                                },
@@ -369,10 +353,4 @@ fun CreateNewTrainingPlanFrame(
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun CreateNewTrainingFramePreview(){
-    CreateNewTrainingPlanFrame(show = true, setShow = {_, _ -> })
 }

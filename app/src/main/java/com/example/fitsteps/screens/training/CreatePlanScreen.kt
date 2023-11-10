@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,14 +31,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseExerciseData.Exercise
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.Screen
-import com.example.fitsteps.screens.training.LargeButtons
+import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -48,16 +48,16 @@ import com.example.fitsteps.ui.theme.customFontFamily
 @Composable
 fun CreateRoutineScreen(
     navController: NavHostController,
+    trainingProgramViewModel: TrainingProgramViewModel
 ) {
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
-    var showExercises by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
         CreateNewRoutineFrame(
             show = showCreateRoutineFrame,
             setShow = { showFrame, showExercise ->
                 showCreateRoutineFrame = showFrame
-                showExercises = showExercise
-            }
+            },
+            trainingProgramViewModel = trainingProgramViewModel,
         )
     }
     LazyColumn(
@@ -103,7 +103,7 @@ fun CreateRoutineScreen(
             }
         }
         item {
-            if (!showExercises) { //TODO Change true for if there are no routines
+            if (trainingProgramViewModel.getSelectedProgramRoutines().isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -171,15 +171,14 @@ fun CreateRoutineScreen(
                 }
             }
         }
-        //TODO for each routine create an item
-        item{
-            if(showExercises)
-                RoutineCardExercises(
-                    "Lunes | Miércoles | Viernes",
-                    "Abdomen",
-                    "0 ejercicios | 0 min | 0 kcal",
-                    navController
-                )
+        items(trainingProgramViewModel.getSelectedProgramRoutines().size){item->
+            val auxTrainingProgram = trainingProgramViewModel.getSelectedProgramRoutines()[item]
+            RoutineCardExercises(days =auxTrainingProgram.days ,
+                name =auxTrainingProgram.name ,
+                exercises = auxTrainingProgram.exercises,
+                time = auxTrainingProgram.time,
+                kcal = auxTrainingProgram.kcal,
+                navController =navController)
         }
         item {
             Spacer(modifier = Modifier.height(80.dp))
@@ -191,7 +190,9 @@ fun CreateRoutineScreen(
 fun RoutineCardExercises(
     days: String,
     name: String,
-    description: String,
+    exercises : List<Exercise>,
+    time : String,
+    kcal : String,
     navController: NavHostController,
 ){
     Card(
@@ -230,7 +231,7 @@ fun RoutineCardExercises(
                 )
             )
             Text(
-                text = description,
+                text = "${exercises.size} ejercicios | $time min | $kcal kcal",
                 style = TextStyle(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,
@@ -241,15 +242,4 @@ fun RoutineCardExercises(
             )
         }
     }
-}
-
-@Composable
-@Preview
-fun CreateRoutineScreenPreview() {
-    RoutineCardExercises(
-        "Lunes | Miércoles | Viernes",
-        "Abdomen",
-        "0 ejercicios | 0 min | 0 kcal",
-        navController = rememberNavController()
-    )
 }

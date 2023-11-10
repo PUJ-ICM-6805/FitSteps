@@ -1,5 +1,6 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,7 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.fitsteps.R
-import com.example.fitsteps.screens.training.WeekButtonsRow
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.Routine
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.screens.training.trainingMainScreen.WeekButtonsRow
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -57,6 +60,7 @@ fun CreateNewRoutineFrame(
         color = Color.White,
         textAlign = TextAlign.Center,
     ),
+    trainingProgramViewModel: TrainingProgramViewModel,
     show: Boolean,
     setShow: (Boolean, Boolean) -> Unit,
 ){
@@ -64,9 +68,8 @@ fun CreateNewRoutineFrame(
     var input_name by remember {
         mutableStateOf("")
     }
-    var input_desc by remember {
-        mutableStateOf("")
-    }
+    var selectedDays by remember { mutableStateOf<List<String>>(emptyList()) }
+
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -229,6 +232,7 @@ fun CreateNewRoutineFrame(
                             )
                             WeekButtonsRow(
                                 multipleItems = true,
+                                onSelectionChanged = { selectedDays = it },
                             )
                         }
                     }
@@ -256,7 +260,6 @@ fun CreateNewRoutineFrame(
                                     .clickable { setShow(false, false) },
                                 contentAlignment = Alignment.Center,
                             ) {
-
                                 Text(
                                     text = stringResource(id = R.string.cancel),
                                     style = TextStyle(
@@ -277,7 +280,24 @@ fun CreateNewRoutineFrame(
                                     .fillMaxSize()
                                     .weight(1f)
                                     .background(Color.White)
-                                    .clickable { setShow(false, true) },
+                                    .clickable {
+                                        setShow(false, true)
+                                        val days = selectedDays.joinToString(separator = "|")
+                                            val routine = Routine(
+                                                name = input_name,
+                                                days = days,
+                                                exercises = emptyList(),
+                                                time = "time",
+                                                kcal = "kcal",)
+                                               trainingProgramViewModel.addRoutineToActualProgram(routine = routine,
+                                                   onSuccess = {
+                                                               Log.d("Routine", "Routine added to program")
+                                                   },
+                                                   onFailure = {exception->
+                                                                Log.e("Routine", "Routine not added to program: $exception")
+                                                   })
+                                               },
+
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
@@ -298,10 +318,4 @@ fun CreateNewRoutineFrame(
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun CreateNewRoutineFramePreview(){
-    CreateNewRoutineFrame(show = true, setShow = { _, _ -> })
 }

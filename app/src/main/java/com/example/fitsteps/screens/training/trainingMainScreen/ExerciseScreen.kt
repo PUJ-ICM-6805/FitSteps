@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens.training
+package com.example.fitsteps.screens.training.trainingMainScreen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -47,12 +47,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
 import com.example.fitsteps.navigation.PLAN_ROUTE
 import com.example.fitsteps.screens.HamburgersDropList
@@ -64,22 +64,18 @@ import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController) {
-    val viewModel = TrainingProgramViewModel()
-    val ownTrainingProgramsListState = viewModel.ownProgramList.observeAsState(initial = emptyList())
+fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController, trainingProgramViewModel: TrainingProgramViewModel) {
+    val ownTrainingProgramsListState = trainingProgramViewModel.ownProgramList.observeAsState(initial = emptyList())
     val ownTrainingProgramsList = ownTrainingProgramsListState.value
 
-    var havePlans by remember {
-        mutableStateOf(false)
-    }
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
         CreateNewTrainingPlanFrame(
             show = showCreateRoutineFrame,
             setShow = { showFrame, showExercise ->
                 showCreateRoutineFrame = showFrame
-                havePlans = showExercise
-            }
+            },
+            trainingProgramViewModel = trainingProgramViewModel,
         )
     }
     LazyColumn(
@@ -130,10 +126,11 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
             )
         }
         item {
-            WeekButtonsRow()
+            WeekButtonsRow(
+                onSelectionChanged = {}
+            )
         }
         item {
-            if(havePlans) {
                 Text(
                     text = stringResource(id = R.string.my_collection),
                     modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
@@ -145,19 +142,16 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                         color = DarkBlue,
                     )
                 )
-            }
         }
         item {
-            if (havePlans) {
                 LazyRow(
                     modifier = Modifier
                         .padding(15.dp)
                 ) {
                     items(ownTrainingProgramsList.size){item->
-                        RoutineCard(navController = navController, ownTrainingProgramsList[item])
+                        RoutineCard(navController = navController, ownTrainingProgramsList[item], trainingProgramViewModel)
                     }
                 }
-            }
         }
         item {
             Text(
@@ -178,10 +172,10 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                     .padding(15.dp)
             ) {
                 item {
-                    RoutineCard(navController = navController,null)//TODO: Fitsteps Routines
+                    RoutineCard(navController = navController,null, TrainingProgramViewModel())//TODO: Fitsteps Routines
                 }
                 item {
-                    RoutineCard(navController = navController,null)
+                    RoutineCard(navController = navController,null, TrainingProgramViewModel())
                 }
             }
         }
@@ -218,7 +212,7 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
 }
 
 @Composable
-fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgram?) {
+fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgram?, viewModel: TrainingProgramViewModel) {
     if(trainingProgram != null) {
         Card(
             modifier = Modifier
@@ -226,6 +220,7 @@ fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgr
                 .width(300.dp)
                 .padding(end = 20.dp)
                 .clickable {
+                    viewModel.setSelectedProgram(trainingProgram)
                     navController.navigate(PLAN_ROUTE)
                 },
             shape = RoundedCornerShape(20.dp),
@@ -315,6 +310,7 @@ fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgr
 @Composable
 fun WeekButtonsRow(
     multipleItems: Boolean = false,
+    onSelectionChanged: (List<String>) -> Unit,
 ) {
     val selectedValue = remember { mutableStateOf("") }
     val selectedValues = remember { mutableStateListOf<String>() }
@@ -349,6 +345,7 @@ fun WeekButtonsRow(
                                 } else {
                                     selectedValue.value = item
                                 }
+                                onSelectionChanged(selectedValues.toList())
                             },
                             role = Role.RadioButton
                         )
@@ -462,10 +459,4 @@ fun LargeButtons(
             )
         }
     }
-}
-
-@Composable
-@Preview
-fun ExerciseScreenPreview() {
-    ExerciseScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }

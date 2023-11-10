@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens.body
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -38,10 +39,9 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.screens.training.LargeButtons
+import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
 import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
 import com.example.fitsteps.screens.HamburgersDropList
-import com.example.fitsteps.screens.LargeButtons
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
@@ -204,13 +204,13 @@ fun BodyScreen2Edit(
                     onClick = {
                         val permissionCheckResult = ContextCompat.checkSelfPermission(
                             context,
-                            android.Manifest.permission.CAMERA
+                            Manifest.permission.CAMERA
                         )
                         if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
                             cameraLauncher.launch(uri)
                         } else {
                             Log.d("Permission", "Denied")
-                            permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                            permissionLauncher.launch(Manifest.permission.CAMERA)
                         }
                         if (capturedImageUri != Uri.EMPTY) {
                             if (capturedImageUri.path?.isNotEmpty() == true){

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.example.fitsteps.R
 import com.example.fitsteps.screens.exercise.ExercisesList
 import com.example.fitsteps.screens.exercise.IconAndText
+import com.example.fitsteps.screens.training.trainingMainScreen.WeekButtonsRow
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
@@ -80,7 +81,7 @@ fun TrainingsPerDayScreen() {
             )
 
 
-            WeekButtonsRow()
+            WeekButtonsRow(onSelectionChanged = {})
 
             Box(
                 modifier = Modifier.fillMaxSize()

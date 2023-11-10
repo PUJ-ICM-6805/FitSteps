@@ -4,13 +4,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.screens.exercise.AddExerciseScreen
 import com.example.fitsteps.screens.exercise.BarbelBenchScreen
-import com.example.fitsteps.screens.AddExerciseScreen
-import com.example.fitsteps.screens.BarbelBenchScreen
-import com.example.fitsteps.screens.CreateRoutineScreen
+import com.example.fitsteps.screens.training.CreateRoutineScreen
 import com.example.fitsteps.screens.exercise.ExercisesPerMuscleScreen
-import com.example.fitsteps.screens.ExercisesPerMuscleScreen
 import com.example.fitsteps.screens.PrepareScreen1
 import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3
@@ -20,6 +18,7 @@ import com.example.fitsteps.screens.exercise.RoutinePreviewScreen2
 
 fun NavGraphBuilder.exerciseNavGraph(
     navController: NavHostController,
+    trainingProgramViewModel: TrainingProgramViewModel
 ){
     navigation(
         startDestination = Screen.PlanScreen.route,
@@ -28,7 +27,7 @@ fun NavGraphBuilder.exerciseNavGraph(
         composable(
             route = Screen.PlanScreen.route
         ) {
-            CreateRoutineScreen(navController = navController)
+            CreateRoutineScreen(navController = navController, trainingProgramViewModel = trainingProgramViewModel)
         }
         composable(
             route = Screen.AddExerciseScreen.route
