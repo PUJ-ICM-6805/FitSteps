@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,6 +51,9 @@ fun CreateRoutineScreen(
     navController: NavHostController,
     trainingProgramViewModel: TrainingProgramViewModel
 ) {
+    val selectedProgramState = trainingProgramViewModel.selectedProgram.observeAsState()
+    val selectedProgram = selectedProgramState.value
+
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
         CreateNewRoutineFrame(
@@ -60,128 +64,134 @@ fun CreateRoutineScreen(
             trainingProgramViewModel = trainingProgramViewModel,
         )
     }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-    ){
-        item {
-            Spacer(modifier = Modifier.height(40.dp))
-        }
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.my_plan_ex), // TODO Change for the actual name
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = customFontFamily,
-                        fontStyle = FontStyle.Normal,
-                        color = DarkBlue,
-                    )
-                )
-                Text(
-                    text = stringResource(id = R.string.description),
-                    style = TextStyle(
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Normal,
-                        fontFamily = customFontFamily,
-                        fontStyle = FontStyle.Normal,
-                        color = Blue,
-                    )
-                )
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(LightBlue)
-                    .padding(vertical = 20.dp)
-                )
+    if(selectedProgram != null) {
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(40.dp))
             }
-        }
-        item {
-            if (trainingProgramViewModel.getSelectedProgramRoutines().isEmpty()) {
+            item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                        .padding(20.dp)
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_calendar_2),
-                        contentDescription = "Icon",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .padding(20.dp),
-                        tint = Blue,
-                    )
                     Text(
-                        text = stringResource(id = R.string.description_routine_creation),
+                        text = selectedProgram.name,
                         style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            fontFamily = customFontFamily,
-                            fontStyle = FontStyle.Normal,
-                            color = Blue,
-                        ),
-                        textAlign = TextAlign.Center,
-                    )
-                    LargeButtons(
-                        text = stringResource(id = R.string.create_routine),
-                        onClick = { showCreateRoutineFrame = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 20.dp),
-                    )
-                }
-            }else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ){
-                    Text(
-                        text = stringResource(id = R.string.routines),
-                        style = TextStyle(
-                            fontSize = 20.sp,
+                            fontSize = 30.sp,
                             fontWeight = FontWeight.SemiBold,
                             fontFamily = customFontFamily,
                             fontStyle = FontStyle.Normal,
                             color = DarkBlue,
-                        ),
+                        )
                     )
                     Text(
-                        text = stringResource(id = R.string.add),
+                        text = selectedProgram.description,
                         style = TextStyle(
-                            fontSize = 14.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Normal,
                             fontFamily = customFontFamily,
                             fontStyle = FontStyle.Normal,
-                            color = Red,
-                        ),
+                            color = Blue,
+                        )
+                    )
+                    Spacer(
                         modifier = Modifier
-                            .clickable { showCreateRoutineFrame = true }
-                            .padding(end = 20.dp),
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(LightBlue)
+                            .padding(vertical = 20.dp)
                     )
                 }
             }
-        }
-        items(trainingProgramViewModel.getSelectedProgramRoutines().size){item->
-            val auxTrainingProgram = trainingProgramViewModel.getSelectedProgramRoutines()[item]
-            RoutineCardExercises(days =auxTrainingProgram.days ,
-                name =auxTrainingProgram.name ,
-                exercises = auxTrainingProgram.exercises,
-                time = auxTrainingProgram.time,
-                kcal = auxTrainingProgram.kcal,
-                navController =navController)
-        }
-        item {
-            Spacer(modifier = Modifier.height(80.dp))
+            item {
+                if (selectedProgram.routines.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_calendar_2),
+                            contentDescription = "Icon",
+                            modifier = Modifier
+                                .size(150.dp)
+                                .padding(20.dp),
+                            tint = Blue,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.description_routine_creation),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = customFontFamily,
+                                fontStyle = FontStyle.Normal,
+                                color = Blue,
+                            ),
+                            textAlign = TextAlign.Center,
+                        )
+                        LargeButtons(
+                            text = stringResource(id = R.string.create_routine),
+                            onClick = { showCreateRoutineFrame = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 20.dp),
+                        )
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.routines),
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = customFontFamily,
+                                fontStyle = FontStyle.Normal,
+                                color = DarkBlue,
+                            ),
+                        )
+                        Text(
+                            text = stringResource(id = R.string.add),
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = customFontFamily,
+                                fontStyle = FontStyle.Normal,
+                                color = Red,
+                            ),
+                            modifier = Modifier
+                                .clickable { showCreateRoutineFrame = true }
+                                .padding(end = 20.dp),
+                        )
+                    }
+                }
+            }
+            items(selectedProgram.routines.size) { item ->
+                val auxTrainingProgram = selectedProgram.routines[item]
+                RoutineCardExercises(
+                    days = auxTrainingProgram.days,
+                    name = auxTrainingProgram.name,
+                    exercises = auxTrainingProgram.exercises,
+                    time = auxTrainingProgram.time,
+                    kcal = auxTrainingProgram.kcal,
+                    navController = navController
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
+            }
         }
     }
 }

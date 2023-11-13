@@ -315,7 +315,7 @@ fun WeekButtonsRow(
     val selectedValue = remember { mutableStateOf("") }
     val selectedValues = remember { mutableStateListOf<String>() }
     val items = listOf(
-        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+        "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
     )
     Row(
         modifier = Modifier
@@ -356,22 +356,22 @@ fun WeekButtonsRow(
                 ) {
                     Text(
                         text = when(item) {
-                            "monday" -> {
+                            "Lunes" -> {
                                 stringResource(id = R.string.monday_letter)
                             }
-                            "tuesday" -> {
+                            "Martes" -> {
                                 stringResource(id = R.string.tuesday_letter)
                             }
-                            "wednesday" -> {
+                            "Miércoles" -> {
                                 stringResource(id = R.string.wednesday_letter)
                             }
-                            "thursday" -> {
+                            "Jueves" -> {
                                 stringResource(id = R.string.thursday_letter)
                             }
-                            "friday" -> {
+                            "Viernes" -> {
                                 stringResource(id = R.string.friday_letter)
                             }
-                            "saturday" -> {
+                            "Sábado" -> {
                                 stringResource(id = R.string.saturday_letter)
                             }
                             else -> {

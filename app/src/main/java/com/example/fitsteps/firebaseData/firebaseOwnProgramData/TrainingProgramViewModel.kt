@@ -22,7 +22,11 @@ class TrainingProgramViewModel {
     private val _ownProgramList = MutableLiveData<List<TrainingProgram>>()
 
     //Shared data
-    private val selectedProgram = MutableLiveData<TrainingProgram>()
+    private val _selectedProgram = MutableLiveData<TrainingProgram>()
+
+    val selectedProgram: LiveData<TrainingProgram>
+        get() = _selectedProgram
+
 
     val ownProgramList: LiveData<List<TrainingProgram>>
         get() = _ownProgramList
@@ -39,12 +43,8 @@ class TrainingProgramViewModel {
         loadAllOwnPrograms()
     }
     fun setSelectedProgram(trainingProgram: TrainingProgram) {
-        selectedProgram.value = trainingProgram
-        Log.d("DATA CHANGED", "Training program changed to${selectedProgram.value}")
-    }
-
-    fun getSelectedProgramRoutines(): List<Routine> {
-        return selectedProgram.value?.routines ?: emptyList()
+        _selectedProgram.value = trainingProgram
+        Log.d("DATA CHANGED", "Training program changed to${_selectedProgram.value}")
     }
 
     private fun loadAllOwnPrograms() {
@@ -53,9 +53,30 @@ class TrainingProgramViewModel {
                 val programs = ArrayList<TrainingProgram>()
                 for (document in querySnapshot) {
                     val trainingProgram = document.toObject(TrainingProgram::class.java)
-                    programs.add(trainingProgram)
+
+                    //Accessing the subcolelction "routines"
+                    programsCollection.document(document.id)
+                        .collection("routines")
+                        .get()
+                        .addOnSuccessListener { queryRoutineSnapshot  ->
+                            val routines = ArrayList<Routine>()
+                            for (routineDocument in queryRoutineSnapshot) {
+                                val routine = routineDocument.toObject(Routine::class.java)
+                                routines.add(routine)
+                            }
+                            trainingProgram.routines = routines
+
+                            programs.add(trainingProgram)
+
+                            _ownProgramList.value = programs
+                        }
+                        .addOnFailureListener{
+                            Log.e("LoadRoutines", "Error loading routines", it)
+                        }
                 }
-                _ownProgramList.value = programs
+            }
+            .addOnFailureListener{
+                Log.e("LoadPrograms", "Error loading programs", it)
             }
     }
     fun saveTrainingProgram(trainingProgram: TrainingProgram, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
@@ -82,9 +103,8 @@ class TrainingProgramViewModel {
 
     }
     fun addRoutineToActualProgram(routine: Routine,onSuccess: () -> Unit,onFailure: (Exception) -> Unit){
-        Log.d("uid",userid.toString())
-        Log.d("name",selectedProgram.value?.name.toString())
-        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",selectedProgram.value?.name)
+        _selectedProgram.value?.addRoutine(routine)
+        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
             .get()
             .addOnSuccessListener {result ->
                 for(document in result){
