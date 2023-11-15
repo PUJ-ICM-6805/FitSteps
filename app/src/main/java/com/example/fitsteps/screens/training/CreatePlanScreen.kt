@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.fitsteps.R
-import com.example.fitsteps.firebaseData.firebaseExerciseData.Exercise
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.Routine
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
@@ -65,7 +65,6 @@ fun CreateRoutineScreen(
         )
     }
     if(selectedProgram != null) {
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
@@ -173,20 +172,18 @@ fun CreateRoutineScreen(
                             ),
                             modifier = Modifier
                                 .clickable { showCreateRoutineFrame = true }
-                                .padding(end = 20.dp),
+                                .padding(end = 10.dp),
                         )
                     }
+
                 }
             }
             items(selectedProgram.routines.size) { item ->
                 val auxTrainingProgram = selectedProgram.routines[item]
                 RoutineCardExercises(
-                    days = auxTrainingProgram.days,
-                    name = auxTrainingProgram.name,
-                    exercises = auxTrainingProgram.exercises,
-                    time = auxTrainingProgram.time,
-                    kcal = auxTrainingProgram.kcal,
-                    navController = navController
+                    routine = auxTrainingProgram,
+                    navController = navController,
+                    trainingProgramViewModel = trainingProgramViewModel,
                 )
             }
             item {
@@ -198,19 +195,19 @@ fun CreateRoutineScreen(
 
 @Composable
 fun RoutineCardExercises(
-    days: String,
-    name: String,
-    exercises : List<Exercise>,
-    time : String,
-    kcal : String,
+  routine: Routine,
     navController: NavHostController,
+    trainingProgramViewModel: TrainingProgramViewModel
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(20.dp)
-            .clickable { navController.navigate(Screen.RoutineScreen.route) },
+            .clickable {
+                trainingProgramViewModel.setSelectedRoutine(routine)
+                navController.navigate(Screen.RoutineScreen.route)
+                       },
         colors = CardDefaults.cardColors(
             containerColor = Color.White,
         ),
@@ -221,7 +218,7 @@ fun RoutineCardExercises(
                 .padding(20.dp),
         ) {
             Text(
-                text = days,
+                text = routine.days,
                 style = TextStyle(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
@@ -231,7 +228,7 @@ fun RoutineCardExercises(
                 )
             )
             Text(
-                text = name,
+                text = routine.name,
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -241,7 +238,7 @@ fun RoutineCardExercises(
                 )
             )
             Text(
-                text = "${exercises.size} ejercicios | $time min | $kcal kcal",
+                text = "${routine.exercises.size} ejercicios | ${routine.time} min | ${routine.kcal} kcal",
                 style = TextStyle(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,

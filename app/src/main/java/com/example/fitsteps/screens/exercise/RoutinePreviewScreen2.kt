@@ -24,11 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
@@ -244,9 +242,4 @@ fun IconAndText(iconId: Int, contentDescription : String, text: String){
             )
         )
     }
-}
-@Composable
-@Preview
-fun RoutinePreviewScreen2Preview() {
-    RoutinePreviewScreen2(navController = rememberNavController())
 }

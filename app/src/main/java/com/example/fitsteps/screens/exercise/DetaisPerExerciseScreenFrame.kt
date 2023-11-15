@@ -1,7 +1,6 @@
 package com.example.fitsteps.screens.exercise
 
 import android.net.Uri
-import android.util.Log
 import android.widget.MediaController
 import android.widget.VideoView
 import androidx.compose.foundation.background
@@ -26,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +36,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitsteps.R
@@ -51,7 +50,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.firebaseData.firebaseExerciseData.Exercise
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.DarkBlue
@@ -60,9 +58,8 @@ import com.example.fitsteps.ui.theme.DarkBlue
 @Composable
 fun DetailsPerExerciseScreen(
     navController: NavHostController,
-    setShow: (Boolean) -> Unit = {}, exerciseList: List<Exercise>
+    setShow: (Boolean) -> Unit = {}, exercise: Exercise
 ){
-    Log.d("EX SIZE", exerciseList.size.toString())
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -132,8 +129,8 @@ fun DetailsPerExerciseScreen(
 
                 }
                 Box {
-                    androidx.compose.material3.Text(
-                        text = exerciseList[0].name,
+                        Text(
+                        text = exercise.name,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
                         style = TextStyle(
                             fontFamily = customFontFamily,
@@ -151,15 +148,8 @@ fun DetailsPerExerciseScreen(
                         .background(Color.White, RoundedCornerShape(16.dp))
                 ) {
                     VideoPlayer(
-                        videoUri= Uri.parse(exerciseList[0].video)
+                        videoUri= Uri.parse(exercise.video)
                     )
-                   /* Image(
-                        contentDescription = "Run Button",
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxSize(0.25f),
-                        painter = painterResource(id = R.drawable.ic_play_whitebg),
-                    )*/
                 }
                 TextAndFrame(
                     text = "Repeticiones"
@@ -265,16 +255,16 @@ fun TextAndFrame(text: String){
                 .background(Blue, RoundedCornerShape(5.dp)),
             contentAlignment = Alignment.Center
         ){
-            numberButton()
+            NumberButton()
         }
     }
 
 }
 
 @Composable
-fun numberButton(){
+fun NumberButton(){
     var number by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
 
         Row(
@@ -476,8 +466,4 @@ fun VideoPlayer(
         })
 
 }
-@Composable
-@Preview
-fun DetailsPeraExercisePreview(){
-    DetailsPerExerciseScreen(navController = rememberNavController(), setShow = {}, exerciseList = emptyList())
-}
+

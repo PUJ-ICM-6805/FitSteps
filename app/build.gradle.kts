@@ -65,7 +65,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     implementation("com.google.firebase:firebase-auth-ktx:22.2.0")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.9.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")//Con esta version funciona .whereArrayContains, la  24.9.1 no
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.android.datatransport:transport-runtime:3.2.0")

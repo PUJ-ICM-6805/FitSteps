@@ -1,7 +1,6 @@
 package com.example.fitsteps.screens.exercise
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,16 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitsteps.R
 import androidx.compose.material3.Text
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
 import com.example.fitsteps.ui.theme.Blue
@@ -43,102 +42,116 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun RoutinePreviewScreen(navController: NavHostController) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White),
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(40.dp))
-        }
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(20.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.abs),
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = customFontFamily,
-                        fontStyle = FontStyle.Normal,
-                        color = DarkBlue,
-                    )
-                )
+fun RoutinePreviewScreen(
+    navController: NavHostController,
+    trainingProgramViewModel: TrainingProgramViewModel
+){
+    val selectedRoutineState = trainingProgramViewModel.selectedRoutine.observeAsState()
+    val selectedRoutine = selectedRoutineState.value
+    if(selectedRoutine != null) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White),
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(40.dp))
             }
-        }
-        item {
-            Box(
-                Modifier.fillMaxWidth()
-            ) {
-                RoutineDetails("0", "0", "0")
-            }
-        }
-        item {
-            LargeButtons(text = stringResource(id = R.string.startRoutine),
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp),
-                color = LightBlue,
-                textColor = Blue
-                )
-            }
-        item{
-             Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .height(1.dp)
-                    .background(LightBlue)
-                )
-            }
-        item {
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-        item{
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
-                horizontalArrangement= Arrangement.SpaceBetween,
-            ){
-                Text(
-                    text = stringResource(id = R.string.Exercises),
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = customFontFamily,
-                        fontStyle = FontStyle.Normal,
-                        color = DarkBlue,
-                    )
-                )
-                Text(
-                    text = stringResource(id = R.string.add),
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Normal,
-                        fontFamily = customFontFamily,
-                        fontStyle = FontStyle.Normal,
-                        color = Red,
-                    ),
+            item {
+                Column(
                     modifier = Modifier
-                        .clickable { navController.navigate(Screen.AddExerciseScreen.route) }
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(20.dp)
+                ) {
+                    Text(
+                        text = selectedRoutine.name,
+                        style = TextStyle(
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = customFontFamily,
+                            fontStyle = FontStyle.Normal,
+                            color = DarkBlue,
+                        )
+                    )
+                }
+            }
+            item {
+                Box(
+                    Modifier.fillMaxWidth()
+                ) {
+                    RoutineDetails(selectedRoutine.time,
+                        selectedRoutine.exercises.size.toString(),
+                        selectedRoutine.kcal)
+                }
+            }
+            item {
+                if(selectedRoutine.exercises.isEmpty()){
+                    LargeButtons(
+                        text = stringResource(id = R.string.startRoutine),
+                        onClick = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(25.dp),
+                        color = LightBlue,
+                        textColor = Blue
+                    )
+                }else{
+                    LargeButtons(
+                        text = stringResource(id = R.string.startRoutine),
+                        onClick = {
+                            navController.navigate(Screen.DemoPrepareScreen1.route) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(25.dp),
+                        color = Red,
+                        textColor = Blue
+                    )
+                }
+
+            }
+            item {
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .height(1.dp)
+                        .background(LightBlue)
                 )
             }
-        }
-        item{
-            NoExercisesYet()
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.Exercises),
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = customFontFamily,
+                            fontStyle = FontStyle.Normal,
+                            color = DarkBlue,
+                        )
+                    )
+                }
+            }
+            item {
+                if(selectedRoutine.exercises.isEmpty())
+                    NoExercisesYet(navController)
+                else
+                    ExercisesList()
+            }
         }
     }
-
 }
 @Composable
-fun NoExercisesYet(){
+fun NoExercisesYet(navController: NavHostController){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -189,7 +202,7 @@ fun NoExercisesYet(){
         }
         LargeButtons(
             text = stringResource(id =R.string.addExercise),
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigate(Screen.AddExerciseScreen.route)},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(25.dp),
@@ -236,9 +249,4 @@ fun RoutineDetails(minutes: String, numExercises: String, kcal: String) {
             )
         )
     }
-}
-@Composable
-@Preview
-fun RoutinePreviewScreenPreview() {
-    RoutinePreviewScreen(navController = rememberNavController())
 }

@@ -23,10 +23,13 @@ class TrainingProgramViewModel {
 
     //Shared data
     private val _selectedProgram = MutableLiveData<TrainingProgram>()
+    private val _selectedRoutine = MutableLiveData<Routine>()
 
     val selectedProgram: LiveData<TrainingProgram>
         get() = _selectedProgram
 
+    val selectedRoutine: LiveData<Routine>
+        get() = _selectedRoutine
 
     val ownProgramList: LiveData<List<TrainingProgram>>
         get() = _ownProgramList
@@ -45,6 +48,10 @@ class TrainingProgramViewModel {
     fun setSelectedProgram(trainingProgram: TrainingProgram) {
         _selectedProgram.value = trainingProgram
         Log.d("DATA CHANGED", "Training program changed to${_selectedProgram.value}")
+    }
+    fun setSelectedRoutine(routine: Routine) {
+        _selectedRoutine.value = routine
+        Log.d("DATA CHANGED", "Routine changed to${_selectedRoutine.value}")
     }
 
     private fun loadAllOwnPrograms() {

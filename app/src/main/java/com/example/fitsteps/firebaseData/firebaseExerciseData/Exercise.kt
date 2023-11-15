@@ -5,5 +5,7 @@ data class Exercise(
     val description: String ="",
     val image: String ="",
     val video: String ="",
-    val muscleGroups: String ="",
+    val muscleGroups: ArrayList<String> = arrayListOf(),
 )
+
+

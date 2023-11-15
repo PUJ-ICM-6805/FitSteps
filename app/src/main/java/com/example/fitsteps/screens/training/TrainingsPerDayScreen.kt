@@ -96,7 +96,6 @@ fun TrainingsPerDayScreen() {
 }
 @Composable
 fun TrainingCard(){
-
         Column {
             Box(
                 modifier = Modifier
