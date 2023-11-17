@@ -51,6 +51,11 @@ class TrainingProgramViewModel {
     }
     fun setSelectedRoutine(routine: Routine) {
         _selectedRoutine.value = routine
+        loadExercisesFromActualRoutine({
+            Log.d("EXERCISES","Exercises loaded")
+        },{
+            Log.e("EXERCISES","Error loading exercises",it)
+        })
         Log.d("DATA CHANGED", "Routine changed to${_selectedRoutine.value}")
     }
 
@@ -111,13 +116,17 @@ class TrainingProgramViewModel {
     }
     fun addRoutineToActualProgram(routine: Routine,onSuccess: () -> Unit,onFailure: (Exception) -> Unit){
         _selectedProgram.value?.addRoutine(routine)
+        val add = HashMap<String,Any>()
         programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
             .get()
             .addOnSuccessListener {result ->
                 for(document in result){
                     val auxRef = programsCollection.document(document.id)
+                    add["name"] = routine.name
+                    add["days"] = routine.days
+                    add["time"] = routine.time
                     auxRef.collection("routines")
-                        .add(routine)
+                        .add(add)
                         .addOnSuccessListener {
                             Log.d("Routine","Routine added with ID: ${it.id}")
                             onSuccess()
@@ -125,6 +134,89 @@ class TrainingProgramViewModel {
                         .addOnFailureListener { e ->
                             Log.e("Routine", "Error adding routine", e)
                             onFailure(e)
+                        }
+                }
+            }
+    }
+    private fun loadExercisesFromActualRoutine(onSuccess: () -> Unit, onFailure: (Exception) -> Unit){
+        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+            .get()
+            .addOnSuccessListener {result ->
+                for(document in result){
+                    val auxRef = programsCollection.document(document.id)
+                    auxRef.collection("routines").whereEqualTo("name",_selectedRoutine.value?.name)
+                        .get()
+                        .addOnSuccessListener {routineResult ->
+                            for(routineDocument in routineResult){
+                                val auxRoutineRef = auxRef.collection("routines").document(routineDocument.id)
+                                auxRoutineRef.collection("exercises")
+                                    .get()
+                                    .addOnSuccessListener {exerciseResult ->
+                                        val exercises = ArrayList<ExerciseRecord>()
+                                        for(exerciseDocument in exerciseResult){
+                                            val exercise = exerciseDocument.toObject(ExerciseRecord::class.java)
+                                            exercises.add(exercise)
+                                        }
+                                        _selectedRoutine.value?.exercises = exercises
+                                        updateTimeFromActualRoutine()
+                                        onSuccess()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Exercise", "Error loading exercises", e)
+                                        onFailure(e)
+                                    }
+                            }
+                        }
+                }
+            }
+    }
+    private fun updateTimeFromActualRoutine(){
+        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+            .get()
+            .addOnSuccessListener {result ->
+                for(document in result){
+                    val auxRef = programsCollection.document(document.id)
+                    auxRef.collection("routines").whereEqualTo("name",_selectedRoutine.value?.name)
+                        .get()
+                        .addOnSuccessListener {routineResult ->
+                            for(routineDocument in routineResult){
+                                val auxRoutineRef = auxRef.collection("routines").document(routineDocument.id)
+                                _selectedRoutine.value?.calculateTime()
+                                auxRoutineRef.update("time",_selectedRoutine.value?.time)
+                                    .addOnSuccessListener {
+                                        Log.d("Routine","Routine updated")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Routine", "Error updating routine", e)
+                                    }
+                            }
+                        }
+                }
+            }
+    }
+    fun addExerciseToActualRoutine(exercise: ExerciseRecord,onSuccess: () -> Unit,onFailure: (Exception) -> Unit){
+        _selectedRoutine.value?.addExercise(exercise)
+        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+            .get()
+            .addOnSuccessListener {result ->
+                for(document in result){
+                    val auxRef = programsCollection.document(document.id)
+                    auxRef.collection("routines").whereEqualTo("name",_selectedRoutine.value?.name)
+                        .get()
+                        .addOnSuccessListener {routineResult ->
+                            for(routineDocument in routineResult){
+                                val auxRoutineRef = auxRef.collection("routines").document(routineDocument.id)
+                                auxRoutineRef.collection("exercises")
+                                    .add(exercise)
+                                    .addOnSuccessListener {
+                                        Log.d("Exercise","Exercise added with ID: ${it.id}")
+                                        onSuccess()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Exercise", "Error adding exercise", e)
+                                        onFailure(e)
+                                    }
+                            }
                         }
                 }
             }

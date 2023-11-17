@@ -60,10 +60,8 @@ fun CreateNewRoutineFrame(
         textAlign = TextAlign.Center,
     ),
     trainingProgramViewModel: TrainingProgramViewModel,
-    show: Boolean,
     setShow: (Boolean, Boolean) -> Unit,
 ){
-    var resizedTextStyle by remember { mutableStateOf(style) }
     var input_name by remember {
         mutableStateOf("")
     }
@@ -276,9 +274,8 @@ fun CreateNewRoutineFrame(
                                             val routine = Routine(
                                                 name = input_name,
                                                 days = days,
-                                                exercises = emptyList(),
-                                                time = "time",
-                                                kcal = "kcal",)
+                                                exercises = arrayListOf(),
+                                                )
                                         trainingProgramViewModel.addRoutineToActualProgram(routine = routine,
                                             onSuccess = {
                                                 Log.d("Routine", "Routine added to program")

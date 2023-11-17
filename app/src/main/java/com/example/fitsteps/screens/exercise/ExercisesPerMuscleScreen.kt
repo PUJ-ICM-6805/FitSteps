@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.White
@@ -46,7 +47,8 @@ import com.example.fitsteps.ui.theme.customFontFamily
 @Composable
 fun ExercisesPerMuscleScreen(
     navController: NavHostController,
-    exerciseViewModel: ExerciseViewModel
+    exerciseViewModel: ExerciseViewModel,
+    trainingProgramViewModel: TrainingProgramViewModel
 ) {
     val exerciseListState = exerciseViewModel.exerciseList.observeAsState(initial = emptyList())
     val exerciseList = exerciseListState.value
@@ -65,7 +67,9 @@ fun ExercisesPerMuscleScreen(
             navController = navController,
             setShow = { showFrame ->
                 showExerciseFrame = showFrame
-            }, selectedExercise
+            }, selectedExercise,
+            trainingProgramViewModel = trainingProgramViewModel
+
         )
     }
     if(selectedMuscle!= null) {

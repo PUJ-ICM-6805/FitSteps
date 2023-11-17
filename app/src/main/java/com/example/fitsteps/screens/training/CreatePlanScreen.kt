@@ -57,7 +57,6 @@ fun CreateRoutineScreen(
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
         CreateNewRoutineFrame(
-            show = showCreateRoutineFrame,
             setShow = { showFrame, showExercise ->
                 showCreateRoutineFrame = showFrame
             },
@@ -238,7 +237,7 @@ fun RoutineCardExercises(
                 )
             )
             Text(
-                text = "${routine.exercises.size} ejercicios | ${routine.time} min | ${routine.kcal} kcal",
+                text = "${routine.exercises.size} ejercicios | ${routine.time} min ",
                 style = TextStyle(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Light,

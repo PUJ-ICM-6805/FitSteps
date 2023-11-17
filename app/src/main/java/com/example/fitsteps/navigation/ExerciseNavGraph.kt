@@ -15,7 +15,6 @@ import com.example.fitsteps.screens.PrepareScreen2
 import com.example.fitsteps.screens.PrepareScreen3
 import com.example.fitsteps.screens.PrepareScreen4
 import com.example.fitsteps.screens.exercise.RoutinePreviewScreen
-import com.example.fitsteps.screens.exercise.RoutinePreviewScreen2
 
 fun NavGraphBuilder.exerciseNavGraph(
     navController: NavHostController,
@@ -39,7 +38,7 @@ fun NavGraphBuilder.exerciseNavGraph(
         composable(
             route = Screen.AddSpecificExerciseScreen.route
         ) {
-            ExercisesPerMuscleScreen(navController = navController, exerciseViewModel = exerciseViewModel)
+            ExercisesPerMuscleScreen(navController = navController, exerciseViewModel = exerciseViewModel, trainingProgramViewModel = trainingProgramViewModel)
         }
         composable(
             route = Screen.RoutineScreen.route
@@ -70,11 +69,6 @@ fun NavGraphBuilder.exerciseNavGraph(
             route = Screen.DemoPrepareScreen4.route
         ) {
             PrepareScreen4(navController = navController)
-        }
-        composable(
-            route = Screen.RoutineScreen2.route
-        ) {
-            RoutinePreviewScreen2(navController = navController)
         }
     }
 }

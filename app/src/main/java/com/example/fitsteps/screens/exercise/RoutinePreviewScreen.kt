@@ -1,6 +1,8 @@
 package com.example.fitsteps.screens.exercise
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -28,9 +31,13 @@ import com.example.fitsteps.R
 import androidx.compose.material3.Text
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.ExerciseRecord
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
@@ -80,9 +87,9 @@ fun RoutinePreviewScreen(
                 Box(
                     Modifier.fillMaxWidth()
                 ) {
-                    RoutineDetails(selectedRoutine.time,
+                    RoutineDetails(selectedRoutine.time.toString(),
                         selectedRoutine.exercises.size.toString(),
-                        selectedRoutine.kcal)
+                        )
                 }
             }
             item {
@@ -105,7 +112,7 @@ fun RoutinePreviewScreen(
                             .fillMaxWidth()
                             .padding(25.dp),
                         color = Red,
-                        textColor = Blue
+                        textColor = Color.White
                     )
                 }
 
@@ -126,26 +133,45 @@ fun RoutinePreviewScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 40.dp),
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = stringResource(id = R.string.Exercises),
+                        text = stringResource(id = R.string.routines),
                         style = TextStyle(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.SemiBold,
                             fontFamily = customFontFamily,
                             fontStyle = FontStyle.Normal,
                             color = DarkBlue,
-                        )
+                        ),
+                    )
+                    Text(
+                        text = stringResource(id = R.string.add),
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = customFontFamily,
+                            fontStyle = FontStyle.Normal,
+                            color = Red,
+                        ),
+                        modifier = Modifier
+                            .clickable { navController.navigate(Screen.AddExerciseScreen.route) }
+                            .padding(end = 10.dp),
                     )
                 }
             }
-            item {
-                if(selectedRoutine.exercises.isEmpty())
+            if(selectedRoutine.exercises.isEmpty()){
+                item {
                     NoExercisesYet(navController)
-                else
-                    ExercisesList()
+                }
+            }else{
+                items(selectedRoutine.exercises.size) {exercises->
+                    Exercise(selectedRoutine.exercises[exercises])
+                }
+            }
+            item{
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }
@@ -212,7 +238,7 @@ fun NoExercisesYet(navController: NavHostController){
     }
 }
 @Composable
-fun RoutineDetails(minutes: String, numExercises: String, kcal: String) {
+fun RoutineDetails(minutes: String, numExercises: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -238,15 +264,97 @@ fun RoutineDetails(minutes: String, numExercises: String, kcal: String) {
                 color = Blue,
             )
         )
-        Text(
-            text = kcal+" "+stringResource(id = R.string.kcal),
-            style = TextStyle(
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Normal,
-                fontFamily = customFontFamily,
-                fontStyle = FontStyle.Normal,
-                color = Blue,
+    }
+}
+@Composable
+fun Exercise(exerciseR: ExerciseRecord,
+             isRepsxSeries: Boolean = false,//TODO: Cambiar a true cuando se implemente
+             isTime:Boolean=false) {//TODO: Cambiar a true cuando se implemente
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 25.dp)
+            .background(Color.White, shape = RoundedCornerShape(10.dp))
+
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopEnd,
+
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(top = 5.dp, end = 10.dp, bottom = 0.dp, start = 0.dp)
+                    .clickable {
+                        //TODO: Editar ejercicio
+                    },
+                text = stringResource(id = R.string.edit),
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 13.sp,
+                    fontStyle = FontStyle.Normal,
+                    color = Blue,
+                )
             )
-        )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(start = 25.dp, end = 0.dp, top = 0.dp, bottom = 12.dp)
+                    //.background(shape = RoundedCornerShape(10.dp))
+                    .weight(0.3f)
+            ) {
+                Image(
+                    modifier =Modifier.fillMaxSize(),
+                    painter = rememberAsyncImagePainter(
+                        model = exerciseR.exercise.image,
+                    ),
+                    contentDescription = "Exercise Image",
+                    contentScale = ContentScale.FillBounds
+                )
+                Image(
+                    contentDescription = "Run Button",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxSize(0.3f),
+                    painter = painterResource(id = R.drawable.ic_play_whitebg),
+                )
+            }
+            Column(
+                Modifier
+                    .weight(0.6f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                    text = exerciseR.exercise.name,
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                    text = exerciseR.records.last().sets.size.toString() +" "+ stringResource(id = R.string.series),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.ExtraLight,
+                        fontSize = 15.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+            }
+        }
+        Spacer(Modifier.height(12.dp))
     }
 }

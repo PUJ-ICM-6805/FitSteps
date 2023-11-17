@@ -1,6 +1,7 @@
 package com.example.fitsteps.screens.exercise
 
 import android.net.Uri
+import android.util.Log
 import android.widget.MediaController
 import android.widget.VideoView
 import androidx.compose.foundation.background
@@ -17,7 +18,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.Card
@@ -45,12 +50,17 @@ import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.fitsteps.firebaseData.firebaseExerciseData.Exercise
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.ExerciseRecord
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.ExerciseSet
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.Record
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.DarkBlue
 
@@ -58,8 +68,19 @@ import com.example.fitsteps.ui.theme.DarkBlue
 @Composable
 fun DetailsPerExerciseScreen(
     navController: NavHostController,
-    setShow: (Boolean) -> Unit = {}, exercise: Exercise
+    setShow: (Boolean) -> Unit = {}, exercise: Exercise,
+    trainingProgramViewModel: TrainingProgramViewModel
 ){
+
+    var setNumber by remember {
+        mutableIntStateOf(0)
+    }
+    var restNumber by remember {
+        mutableIntStateOf(0)
+    }
+    val sets : MutableList<ExerciseSet> = mutableListOf()
+
+
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -82,191 +103,257 @@ fun DetailsPerExerciseScreen(
                 defaultElevation = 3.dp
             ),
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .height(620.dp)
                     .fillMaxWidth()
                     .background(White, RoundedCornerShape(10.dp))
                     .padding(horizontal = 20.dp, vertical = 10.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                   Text(
-                        text = stringResource(id = R.string.backlc),
+                item{
+                    Row(
                         modifier = Modifier
-                            .padding(horizontal = 10.dp, vertical = 0.dp)
-                            .clickable {
-                                setShow(false)
-                            },
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 10.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = Blue,
-                        )
-                    )
-                    Text(
-                        text = stringResource(id = R.string.save),
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp, vertical = 0.dp)
-                            .clickable {
-                                setShow(false)
-                                navController.navigate(Screen.RoutineScreen2.route)
-                            },
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 10.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = Red,
-                        )
-                    )
-
-                }
-                Box {
+                            .fillMaxWidth()
+                            .padding(top = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                        text = exercise.name,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 20.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = DarkBlue,
+                            text = stringResource(id = R.string.backlc),
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp, vertical = 0.dp)
+                                .clickable {
+                                    setShow(false)
+                                },
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Light,
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = Blue,
+                            )
                         )
-                    )
+                        Text(
+                            text = stringResource(id = R.string.save),
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp, vertical = 0.dp)
+                                .clickable {
+                                    val newExerciseRecord = ExerciseRecord(exercise)
+                                    val record = Record(rest = restNumber, sets = ArrayList(sets))
+                                    newExerciseRecord.addRecord(record)
+                                    trainingProgramViewModel.addExerciseToActualRoutine(
+                                        newExerciseRecord,
+                                        onSuccess = {
+                                            Log.d(
+                                                "Exercise added",
+                                                "Exercise $exercise added to routine"
+                                            )
+                                            Log.d(
+                                                "Record added"
+                                                , "Record $record added to exercise $exercise"
+                                            )
+                                        },
+                                        onFailure = {
+                                            Log.e(
+                                                "Exercise not added",
+                                                "Exercise $exercise not added to routine $it"
+                                            )
+                                        })
+                                    setShow(false)
+                                    navController.navigate(Screen.RoutineScreen.route)
+                                },
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Light,
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = Red,
+                            )
+                        )
+
+                    }
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .background(Color.White, RoundedCornerShape(16.dp))
-                ) {
-                    VideoPlayer(
-                        videoUri= Uri.parse(exercise.video)
-                    )
+                item {
+                    Box {
+                        Text(
+                            text = exercise.name,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 20.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = DarkBlue,
+                            )
+                        )
+                    }
                 }
-                TextAndFrame(
-                    text = "Repeticiones"
-                )
-                TextAndFrame(
-                    text = "Número de Series"
-                )
-                TextAndFrame(
-                    text = "Descanso entre series"
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.series),
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 10.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = DarkBlue,
+                item{
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .background(Color.White, RoundedCornerShape(16.dp))
+                    ) {
+                        VideoPlayer(
+                            videoUri= Uri.parse(exercise.video)
                         )
-                    )
-                    Text(
-                        text = stringResource(id = R.string.carga),
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 10.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = DarkBlue,
-                        )
-                    )
-                    Text(
-                        text = stringResource(id = R.string.repetitions),
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
-                        style = TextStyle(
-                            fontFamily = customFontFamily,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 10.sp,
-                            fontStyle = FontStyle.Normal,
-                            color = DarkBlue,
-                        )
-                    )
+                    }
                 }
-                DetailsPerSet(
-                    setNumber = 1,
-                    repetitions = 10,
-                    weight = 10f,
-                )
-                DetailsPerSet(
-                    setNumber = 2,
-                    repetitions = 10,
-                    weight = 10f,
-                )
-                DetailsPerSet(
-                    setNumber = 3,
-                    repetitions = 10,
-                    weight = 10f,
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                WeightSelectionButtons()
+                item{
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextAndFrame(
+                            text = "Número de Series",false,""
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(180.dp, 30.dp)
+                                .background(Blue, RoundedCornerShape(5.dp)),
+                            contentAlignment = Alignment.Center
+                        ){
+                            NumberButton(setNumber, onNumberChange = {setNumber = it})
+                        }
+                    }
+                }
+                item{
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextAndFrame(
+                            text = "Descanso entre series",true,"Segundos"
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(180.dp, 30.dp)
+                                .background(Blue, RoundedCornerShape(5.dp)),
+                            contentAlignment = Alignment.Center
+                        ){
+                            NumberButton(restNumber, onNumberChange = {restNumber = it},true)
+                        }
+                    }
+                }
+                item{
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.series),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = DarkBlue,
+                            )
+                        )
+                        Text(
+                            text = stringResource(id = R.string.carga),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = DarkBlue,
+                            )
+                        )
+                        Text(
+                            text = stringResource(id = R.string.repetitions),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 10.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = DarkBlue,
+                            )
+                        )
+                    }
+                }
+                items((1..setNumber).toList()){ currentSetNumber->
+                    if(currentSetNumber>0) {
+                        DetailsPerSet(
+                            setNumber = currentSetNumber,
+                            set = ExerciseSet(),
+                            onSetChange = {
+                                if(currentSetNumber>sets.size) {
+                                    Log.d("Set added", "Set $it added")
+                                    sets.add(it)
+                                }
+                                else {
+                                    Log.d("Set changed", "Set $it changed")
+                                    sets[currentSetNumber - 1] = it}
+                           }
+                        )
+                    }
+                }
+                item{
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                item{
+                    WeightSelectionButtons()
+                }
             }
         }
     }
 }
 @Composable
-fun TextAndFrame(text: String){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+fun TextAndFrame(text: String, hasSubText: Boolean , subText: String){
         Box(
             modifier = Modifier
-                .size(150.dp, 30.dp),
+                .size(150.dp, 34.dp),
             contentAlignment = Alignment.BottomStart
         ){
-            Text(
-                text = text,
-                modifier = Modifier
-                    .padding(horizontal = 5.dp, vertical = 0.dp)
-                    .offset(y = (-7).dp),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 11.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
+            Column {
+                Text(
+                    text = text,
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp, vertical = 0.dp)
+                        .offset(y = (-7).dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 11.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
                 )
-            )
+                if(hasSubText) {
+                    Text(
+                        text = subText,
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp, vertical = 0.dp)
+                            .offset(y = (-12).dp),
+                        style = TextStyle(
+                            fontFamily = customFontFamily,
+                            fontWeight = FontWeight.Light,
+                            fontSize = 10.sp,
+                            fontStyle = FontStyle.Italic,
+                            color = DarkBlue,
+                        )
+                    )
+                }
+            }
         }
-
-        Box(
-            modifier = Modifier
-                .size(180.dp, 30.dp)
-                .background(Blue, RoundedCornerShape(5.dp)),
-            contentAlignment = Alignment.Center
-        ){
-            NumberButton()
-        }
-    }
-
 }
 
 @Composable
-fun NumberButton(){
-    var number by remember {
-        mutableIntStateOf(0)
-    }
-
+fun NumberButton(
+  number: Int = 0,
+  onNumberChange : (Int) -> Unit = {},
+  isSecs: Boolean = false,
+){
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -277,17 +364,25 @@ fun NumberButton(){
              colors = ButtonDefaults.buttonColors(
                  backgroundColor = Blue,
                  contentColor = LightBlue),
-                onClick = { if(number>0){ number-- } })
-            {
+                 onClick = {
+                     if(number>0){
+                        if(isSecs){
+                            onNumberChange(number-10)
+                        }else
+                            onNumberChange(number-1)
+                     }
+                }
+            ){
                 Text(
                     text = "-",
+                    modifier = Modifier.offset(y= (-5).dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Light,
-                        fontSize = 10.sp,
+                        fontSize = 15.sp,
                         fontStyle = FontStyle.Normal,
                         color = LightBlue,
-                    ),
+                        ),
                     )
             }
             Text(
@@ -297,30 +392,34 @@ fun NumberButton(){
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Light,
-                    fontSize = 10.sp,
+                    fontSize = 15.sp,
                     fontStyle = FontStyle.Normal,
                     color = LightBlue,
                 ),
-
                 )
-
             Button(
                 modifier =Modifier.weight(0.3f),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Blue,
                     contentColor = LightBlue),
-                onClick = { number++ },)
+                onClick = {
+                        if(isSecs){
+                            onNumberChange(number+10)
+                        }else
+                            onNumberChange(number+1)
+                          },
+                )
             {
                 Text(
                     text = "+",
+                    modifier = Modifier.offset(y= (-5).dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Light,
-                        fontSize = 10.sp,
+                        fontSize = 15.sp,
                         fontStyle = FontStyle.Normal,
                         color = LightBlue,
                     ),
-
                     )
             }
         }
@@ -330,9 +429,12 @@ fun NumberButton(){
 @Composable
 fun DetailsPerSet(
     setNumber: Int,
-    repetitions: Int,
-    weight: Float,
+    set: ExerciseSet,
+    onSetChange: (ExerciseSet) -> Unit,
 ) {
+    var weightText by remember { mutableStateOf(set.weight.toString()) }
+    var repsText by remember { mutableStateOf(set.reps.toString()) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -348,7 +450,7 @@ fun DetailsPerSet(
         ){
             Text(
                 text = "$setNumber",
-                modifier = Modifier.padding(start = 10.dp),
+                modifier = Modifier.padding(start = 10.dp).weight(1f),
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
@@ -357,28 +459,66 @@ fun DetailsPerSet(
                     color = DarkBlue,
                 )
             )
-            Text(
-                text = "$weight",
-                style = TextStyle(
+            BasicTextField(
+                value = if(weightText=="0.0") "" else weightText,
+                onValueChange = {
+                    weightText = it
+                    if (it.isFloat()) {
+                        set.weight = it.toFloat()
+                        onSetChange(set)
+                        Log.d("Weight added", weightText)
+                    }
+                },
+                textStyle = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     fontStyle = FontStyle.Normal,
                     color = DarkBlue,
-                )
+                ),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                modifier = Modifier.padding(start = 10.dp).weight(1f),
             )
-            Text(
-                text = "$repetitions",
-                modifier = Modifier.padding(end = 10.dp),
-                style = TextStyle(
+            BasicTextField(
+                value = if(repsText=="0") "" else repsText,
+                onValueChange = {
+                    repsText = it
+                    if (it.isInt()) {
+                        set.reps = it.toInt()
+                        onSetChange(set)
+                        Log.d("Reps added", repsText)
+                    }
+                },
+                textStyle = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     fontStyle = FontStyle.Normal,
                     color = DarkBlue,
-                )
+                ),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.padding(start = 10.dp).weight(1f),
             )
         }
+    }
+}
+
+private fun String.isFloat(): Boolean {
+    return try {
+        this.toFloat()
+        true
+    } catch (e: NumberFormatException) {
+        false
+    }
+}
+private fun String.isInt(): Boolean {
+    return try {
+        this.toInt()
+        true
+    } catch (e: NumberFormatException) {
+        false
     }
 }
 
@@ -464,6 +604,4 @@ fun VideoPlayer(
                 }
             }
         })
-
 }
-
