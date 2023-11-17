@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens.training
+package com.example.fitsteps.screens.training.trainingPlanScreen
 
 import android.util.Log
 import androidx.compose.foundation.Image

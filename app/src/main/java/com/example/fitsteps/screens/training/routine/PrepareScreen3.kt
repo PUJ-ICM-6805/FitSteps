@@ -1,14 +1,11 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.routine
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,24 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -47,18 +33,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.navigation.AUTHENTICATION_ROUTE
-import com.example.fitsteps.navigation.REGISTER_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
-import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun PrepareScreen2(navController: NavHostController) {
+fun PrepareScreen3(navController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -73,7 +56,7 @@ fun PrepareScreen2(navController: NavHostController) {
             Text(
                 modifier = Modifier
                     .align(Alignment.Center),
-                text = stringResource(id = R.string.walking),
+                text = stringResource(id = R.string.plank),
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.SemiBold,
@@ -100,7 +83,7 @@ fun PrepareScreen2(navController: NavHostController) {
                     .width(335.dp)
                     .height(175.dp)
                     .fillMaxWidth(),
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.Center
 
                 ) {
                 Image(
@@ -116,82 +99,71 @@ fun PrepareScreen2(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp)
+                .padding(top = 10.dp)
                 .padding(horizontal = 30.dp),
             contentAlignment = Alignment.CenterStart,
 
             ){
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.goal),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .width(23.dp)
-                        .height(23.dp),
-                )
+            Column() {
                 Text(
                     modifier = Modifier
                         .padding(8.dp), // Ajusta el valor según el espaciado deseado
-                    text = stringResource(id = R.string.goal),
-                    color = Color.Black,
+                    text = "Series",
+                    color = DarkBlue,
                     fontSize = 18.sp,
                     style = TextStyle(
                         fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         fontStyle = FontStyle.Normal,
                     ),
                 )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart,
+                ){
+                    Sets()
+                }
+
             }
+
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 25.dp, bottom = 0.dp),
+                .padding(top = 0.dp, bottom = 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally // Centrar el contenido verticalmente
 
         ) {
-            Row(){
-                Text(
-                    text = stringResource(id = R.string.preparesegs),
-                    color = Blue,
-                    fontSize = 70.sp,
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier
-                        .height(90.dp)
-                        .padding(bottom = 0.dp) // Espaciado entre los textos
-                )
-                Text(
-                    text = "s",
-                    color = Blue,
-                    fontSize = 70.sp,
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier
-                        .height(90.dp)
-                        .padding(bottom = 0.dp) // Espaciado entre los textos
-                )
-            }
-
+            Text(
+                text = stringResource(id = R.string.preparesegs),
+                color = Blue,
+                fontSize = 70.sp,
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .height(90.dp)
+                    .padding(bottom = 0.dp) // Espaciado entre los textos
+            )
 
             Text(
-                text = stringResource(id = R.string.goon),
+                text = stringResource(id = R.string.prepare),
                 fontFamily = customFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 color = Blue,
                 fontSize = 25.sp
             )
         }
-        DataRoutine2(navController = navController)
+        DataRoutine3(navController = navController)
+
+
 
     }
 
 }
 
 @Composable
-fun DataRoutine2(navController: NavHostController){
+fun DataRoutine3(navController: NavHostController){
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -237,7 +209,7 @@ fun DataRoutine2(navController: NavHostController){
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding( horizontal = 20.dp),
+                    .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterStart,
 
                 ){
@@ -248,7 +220,7 @@ fun DataRoutine2(navController: NavHostController){
                         modifier = Modifier
                             .padding(8.dp), // Ajusta el valor según el espaciado deseado
                         text = stringResource(id = R.string.plank),
-                        color = Color.Black,
+                        color = DarkBlue,
                         fontSize = 24.sp,
                         style = TextStyle(
                             fontFamily = customFontFamily,
@@ -281,13 +253,15 @@ fun DataRoutine2(navController: NavHostController){
                 ){
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 25.dp)
+                    modifier = Modifier
+                        .padding(bottom = 25.dp)
                 ) {
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
-                            .background(color = LightBlue,shape = RoundedCornerShape(10.dp))
+                            .background(color = LightBlue, shape = RoundedCornerShape(10.dp))
                             .clickable { navController.popBackStack() }
+
                     ){
                         Text(
                             modifier = Modifier
@@ -326,7 +300,7 @@ fun DataRoutine2(navController: NavHostController){
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
                             .background(color = LightBlue, shape = RoundedCornerShape(10.dp))
-                            .clickable { navController.navigate(Screen.DemoPrepareScreen3.route) }
+                            .clickable { navController.navigate(Screen.DemoPrepareScreen4.route) }
                     ){
                         Text(
                             modifier = Modifier
@@ -352,9 +326,71 @@ fun DataRoutine2(navController: NavHostController){
 
 }
 
+@Composable
+fun Sets(){
+    Row(
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(8.dp))
+            .width(150.dp)
+            .height(35.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    shape = RoundedCornerShape(10.dp)
+                    clip = true
+                }
+                .fillMaxSize()
+                .background(Blue)
+                .weight(1f)
+                .clip(shape = RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center
+
+        ) {
+            Text(
+                text = "1",
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                    fontStyle = FontStyle.Normal,
+                    color = White,
+                )
+            )
+        }
+        Spacer(modifier = Modifier.width(20.dp)) // Agregar un espacio entre los cuadros
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    shape = RoundedCornerShape(10.dp)
+                    clip = true
+                }
+                .fillMaxSize()
+                .weight(1f)
+                .background(color = LightBlue)
+                .clip(shape = RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center
+
+        ) {
+            Text(
+                text = "2",
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                    fontStyle = FontStyle.Normal,
+                    color = Blue,
+                )
+            )
+
+        }
+    }
+
+}
+
 
 @Composable
 @Preview
-fun PrepareScreen2Preview() {
-    PrepareScreen2(navController = rememberNavController())
+fun PrepareScreen3Preview() {
+    PrepareScreen3(navController = rememberNavController())
 }

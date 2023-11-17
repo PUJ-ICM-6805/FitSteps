@@ -6,15 +6,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.fitsteps.firebaseData.firebaseExerciseData.ExerciseViewModel
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
-import com.example.fitsteps.screens.exercise.AddExerciseScreen
-import com.example.fitsteps.screens.exercise.BarbelBenchScreen
-import com.example.fitsteps.screens.training.CreateRoutineScreen
-import com.example.fitsteps.screens.exercise.ExercisesPerMuscleScreen
-import com.example.fitsteps.screens.PrepareScreen1
-import com.example.fitsteps.screens.PrepareScreen2
-import com.example.fitsteps.screens.PrepareScreen3
-import com.example.fitsteps.screens.PrepareScreen4
-import com.example.fitsteps.screens.exercise.RoutinePreviewScreen
+import com.example.fitsteps.screens.training.exercise.AddExerciseScreen
+import com.example.fitsteps.screens.training.routine.BarbelBenchScreen
+import com.example.fitsteps.screens.training.trainingPlanScreen.CreateRoutineScreen
+import com.example.fitsteps.screens.training.exercise.ExercisesPerMuscleScreen
+import com.example.fitsteps.screens.training.routine.PrepareScreen1
+import com.example.fitsteps.screens.training.routine.PrepareScreen2
+import com.example.fitsteps.screens.training.routine.PrepareScreen3
+import com.example.fitsteps.screens.training.routine.PrepareScreen4
+import com.example.fitsteps.screens.training.exercise.RoutinePreviewScreen
 
 fun NavGraphBuilder.exerciseNavGraph(
     navController: NavHostController,

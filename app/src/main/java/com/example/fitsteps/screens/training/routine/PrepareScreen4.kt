@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.routine
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,7 +41,7 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun PrepareScreen3(navController: NavHostController) {
+fun PrepareScreen4(navController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +85,7 @@ fun PrepareScreen3(navController: NavHostController) {
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
 
-                ) {
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.play),
                     contentDescription = "",
@@ -123,7 +122,7 @@ fun PrepareScreen3(navController: NavHostController) {
                         .fillMaxWidth(),
                     contentAlignment = Alignment.CenterStart,
                 ){
-                    Sets()
+                    Sets2()
                 }
 
             }
@@ -148,23 +147,19 @@ fun PrepareScreen3(navController: NavHostController) {
             )
 
             Text(
-                text = stringResource(id = R.string.prepare),
+                text = stringResource(id = R.string.finish),
                 fontFamily = customFontFamily,
                 fontWeight = FontWeight.SemiBold,
                 color = Blue,
                 fontSize = 25.sp
             )
         }
-        DataRoutine3(navController = navController)
-
-
-
+        DataRoutine4(navController = navController)
     }
-
 }
 
 @Composable
-fun DataRoutine3(navController: NavHostController){
+fun DataRoutine4(navController: NavHostController){
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -260,9 +255,8 @@ fun DataRoutine3(navController: NavHostController){
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
-                            .background(color = LightBlue, shape = RoundedCornerShape(10.dp))
+                            .background(color = LightBlue,shape = RoundedCornerShape(10.dp))
                             .clickable { navController.popBackStack() }
-
                     ){
                         Text(
                             modifier = Modifier
@@ -281,7 +275,8 @@ fun DataRoutine3(navController: NavHostController){
                         modifier = Modifier
                             .height(70.dp)
                             .padding(top = 10.dp, bottom = 10.dp)
-                            .background(color = Blue, shape = RoundedCornerShape(10.dp))
+                            .background(color = Blue,shape = RoundedCornerShape(10.dp))
+
                     ){
                         Text(
                             modifier = Modifier
@@ -300,8 +295,8 @@ fun DataRoutine3(navController: NavHostController){
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
-                            .background(color = LightBlue, shape = RoundedCornerShape(10.dp))
-                            .clickable { navController.navigate(Screen.DemoPrepareScreen4.route) }
+                            .background(color = LightBlue,shape = RoundedCornerShape(10.dp))
+                            .clickable { navController.navigate(Screen.DemoPrepareScreen.route) }
                     ){
                         Text(
                             modifier = Modifier
@@ -328,7 +323,7 @@ fun DataRoutine3(navController: NavHostController){
 }
 
 @Composable
-fun Sets(){
+fun Sets2(){
     Row(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
@@ -368,7 +363,7 @@ fun Sets(){
                 }
                 .fillMaxSize()
                 .weight(1f)
-                .background(color = LightBlue)
+                .background(color = Blue)
                 .clip(shape = RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center
 
@@ -380,7 +375,7 @@ fun Sets(){
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     fontStyle = FontStyle.Normal,
-                    color = Blue,
+                    color = White,
                 )
             )
 
@@ -392,6 +387,6 @@ fun Sets(){
 
 @Composable
 @Preview
-fun PrepareScreen3Preview() {
-    PrepareScreen3(navController = rememberNavController())
+fun PrepareScreen4Preview() {
+    PrepareScreen4(navController = rememberNavController())
 }

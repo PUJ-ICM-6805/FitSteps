@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens.exercise
+package com.example.fitsteps.screens.training
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

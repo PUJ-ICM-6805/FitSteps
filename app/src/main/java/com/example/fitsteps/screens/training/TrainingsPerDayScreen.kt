@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitsteps.R
-import com.example.fitsteps.screens.exercise.IconAndText
 import com.example.fitsteps.screens.training.trainingMainScreen.WeekButtonsRow
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.Red

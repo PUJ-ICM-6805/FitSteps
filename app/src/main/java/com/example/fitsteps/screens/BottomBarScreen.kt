@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -20,9 +19,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -31,16 +27,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.navigation.BottomBarNavGraph
 import com.example.fitsteps.navigation.BottomBarScreen
-import com.example.fitsteps.navigation.HOME_ROUTE
 import com.example.fitsteps.navigation.Screen
-import com.example.fitsteps.navigation.SetupNavGraph
 import com.example.fitsteps.screens.*
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -87,7 +79,6 @@ fun BottomBar(navController: NavHostController) {
         Screen.PlanScreen.route,
         Screen.PlanScreen.route,
         Screen.RoutineScreen.route,
-        Screen.RoutineScreen2.route,
         Screen.AddExerciseScreen.route,
         Screen.AddSpecificExerciseScreen.route,
         Screen.RunningRouteDetails.route,

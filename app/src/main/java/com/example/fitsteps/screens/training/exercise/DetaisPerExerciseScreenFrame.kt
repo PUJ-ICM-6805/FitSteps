@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens.exercise
+package com.example.fitsteps.screens.training.exercise
 
 import android.net.Uri
 import android.util.Log

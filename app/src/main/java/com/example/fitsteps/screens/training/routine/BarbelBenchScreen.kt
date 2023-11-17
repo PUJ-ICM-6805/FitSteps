@@ -1,4 +1,4 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.routine
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
-import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.navigation.BottomBarScreen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -42,11 +41,12 @@ import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 
 @Composable
-fun PrepareScreen4(navController: NavHostController) {
+fun BarbelBenchScreen(navController: NavHostController) {
     Column (
         modifier = Modifier
             .fillMaxSize()
             .background(White),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ){
         Box(
@@ -79,8 +79,10 @@ fun PrepareScreen4(navController: NavHostController) {
             ){
             Box(
                 modifier = Modifier
+
                     .padding(horizontal = 20.dp)
                     .background(color = Color.White, shape = RoundedCornerShape(15.dp))
+                    .clip(shape = RoundedCornerShape(8.dp))
                     .width(335.dp)
                     .height(175.dp)
                     .fillMaxWidth(),
@@ -123,21 +125,15 @@ fun PrepareScreen4(navController: NavHostController) {
                         .fillMaxWidth(),
                     contentAlignment = Alignment.CenterStart,
                 ){
-                    Sets2()
+                    SetsBarbel()
                 }
 
             }
 
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 0.dp),
-            horizontalAlignment = Alignment.CenterHorizontally // Centrar el contenido verticalmente
-
-        ) {
+        Row(){
             Text(
-                text = stringResource(id = R.string.preparesegs),
+                text = "30",
                 color = Blue,
                 fontSize = 70.sp,
                 fontFamily = customFontFamily,
@@ -146,27 +142,42 @@ fun PrepareScreen4(navController: NavHostController) {
                     .height(90.dp)
                     .padding(bottom = 0.dp) // Espaciado entre los textos
             )
-
             Text(
-                text = stringResource(id = R.string.finish),
-                fontFamily = customFontFamily,
-                fontWeight = FontWeight.SemiBold,
+                text = "s",
                 color = Blue,
-                fontSize = 25.sp
+                fontSize = 70.sp,
+                fontFamily = customFontFamily,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier
+                    .height(90.dp)
+                    .padding(bottom = 0.dp) // Espaciado entre los textos
             )
         }
-        DataRoutine4(navController = navController)
+
+
+        Text(
+            text = "Descansa",
+            fontFamily = customFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            color = Blue,
+            fontSize = 25.sp
+        )
+        DataRoutineBarbel(navController = navController)
+
+
+
     }
+
 }
 
 @Composable
-fun DataRoutine4(navController: NavHostController){
+fun DataRoutineBarbel(navController: NavHostController){
     Column (
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 25.dp)
-            .background(Color.White, shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp))
+            .background(Color.White,shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp))
             .clip(RoundedCornerShape(16.dp))
 
     ){
@@ -251,12 +262,12 @@ fun DataRoutine4(navController: NavHostController){
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .padding(bottom = 25.dp)
+                        .padding(bottom = 25.dp),
                 ) {
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
-                            .background(color = LightBlue,shape = RoundedCornerShape(10.dp))
+                            .background(color = LightBlue, shape = RoundedCornerShape(15.dp))
                             .clickable { navController.popBackStack() }
                     ){
                         Text(
@@ -274,10 +285,13 @@ fun DataRoutine4(navController: NavHostController){
                     }
                     Box(
                         modifier = Modifier
+                            .graphicsLayer {
+                                shape = RoundedCornerShape(10.dp)
+                                clip = true
+                            }
                             .height(70.dp)
                             .padding(top = 10.dp, bottom = 10.dp)
-                            .background(color = Blue,shape = RoundedCornerShape(10.dp))
-
+                            .background(color = Blue, shape = RoundedCornerShape(15.dp))
                     ){
                         Text(
                             modifier = Modifier
@@ -296,8 +310,8 @@ fun DataRoutine4(navController: NavHostController){
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 15.dp)
-                            .background(color = LightBlue,shape = RoundedCornerShape(10.dp))
-                            .clickable { navController.navigate(Screen.DemoPrepareScreen.route) }
+                            .background(color = LightBlue, shape = RoundedCornerShape(15.dp))
+                            .clickable { navController.navigate(BottomBarScreen.Exercise.route) }
                     ){
                         Text(
                             modifier = Modifier
@@ -324,11 +338,11 @@ fun DataRoutine4(navController: NavHostController){
 }
 
 @Composable
-fun Sets2(){
+fun SetsBarbel(){
     Row(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(8.dp))
-            .width(150.dp)
+            .fillMaxWidth()
             .height(35.dp),
     ) {
         Box(
@@ -345,7 +359,7 @@ fun Sets2(){
 
         ) {
             Text(
-                text = "1",
+                text = "5kg | 10",
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
@@ -370,7 +384,33 @@ fun Sets2(){
 
         ) {
             Text(
-                text = "2",
+                text = "10kg | 15",
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                    fontStyle = FontStyle.Normal,
+                    color = White,
+                )
+            )
+
+        }
+        Spacer(modifier = Modifier.width(20.dp)) // Agregar un espacio entre los cuadros
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    shape = RoundedCornerShape(10.dp)
+                    clip = true
+                }
+                .fillMaxSize()
+                .weight(1f)
+                .background(color = Blue)
+                .clip(shape = RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center
+
+        ) {
+            Text(
+                text = "20kg | 6",
                 style = TextStyle(
                     fontFamily = customFontFamily,
                     fontWeight = FontWeight.Medium,
@@ -388,6 +428,6 @@ fun Sets2(){
 
 @Composable
 @Preview
-fun PrepareScreen4Preview() {
-    PrepareScreen4(navController = rememberNavController())
+fun BarbelBenchScreenPreview() {
+    BarbelBenchScreen(navController = rememberNavController())
 }
