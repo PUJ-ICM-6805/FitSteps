@@ -249,4 +249,8 @@
     <string name="rithm">Ritmo</string>
     <string name="heart_rate">Ritmo cardiáco</string>
     <string name="steps">Pasos</string>
+    <string name="rest">Descansa</string>
+    <string name="s">s</string>
+    <string name="end_routine">Terminar Rutina</string>
+    <string name ="do_exercise">¡Realiza el ejercicio!</string>
 </resources>

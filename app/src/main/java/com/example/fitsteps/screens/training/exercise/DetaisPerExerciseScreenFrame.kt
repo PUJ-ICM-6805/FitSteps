@@ -2,7 +2,6 @@ package com.example.fitsteps.screens.training.exercise
 
 import android.net.Uri
 import android.util.Log
-import android.widget.MediaController
 import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -593,13 +592,10 @@ fun VideoPlayer(
         factory = { context ->
             VideoView(context).apply {
                 setVideoURI(videoUri)
-
-                val mediaController = MediaController(context)
-                mediaController.setAnchorView(this)
-
-                setMediaController(mediaController)
-
                 setOnPreparedListener {
+                    start()
+                }
+                setOnCompletionListener {
                     start()
                 }
             }

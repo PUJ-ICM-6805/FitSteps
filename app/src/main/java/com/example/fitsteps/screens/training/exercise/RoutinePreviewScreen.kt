@@ -107,7 +107,7 @@ fun RoutinePreviewScreen(
                     LargeButtons(
                         text = stringResource(id = R.string.startRoutine),
                         onClick = {
-                            navController.navigate(Screen.DemoPrepareScreen1.route) },
+                            navController.navigate(Screen.RoutineExecutionScreen.route) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(25.dp),
