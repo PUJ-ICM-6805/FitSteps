@@ -60,7 +60,8 @@ class TrainingProgramViewModel {
     }
 
     private fun loadAllOwnPrograms() {
-        programsCollection.get()
+        programsCollection.whereEqualTo("uid",userid).
+        get()
             .addOnSuccessListener { querySnapshot ->
                 val programs = ArrayList<TrainingProgram>()
                 for (document in querySnapshot) {

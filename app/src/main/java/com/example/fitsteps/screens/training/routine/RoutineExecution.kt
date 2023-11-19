@@ -113,7 +113,7 @@ fun RoutineExecutionScreen(
                         }
                     },
                     exerciseRecord = if (currentExerciseIndex.intValue==selectedRoutine.exercises.size-1)
-                        selectedRoutine.exercises[currentExerciseIndex.intValue-1] else selectedRoutine.exercises[currentExerciseIndex.intValue+1],
+                        selectedRoutine.exercises[currentExerciseIndex.intValue] else selectedRoutine.exercises[currentExerciseIndex.intValue+1],
                     isLast = currentExerciseIndex.intValue == selectedRoutine.exercises.size-1,
                     navController = navController,
                 )
