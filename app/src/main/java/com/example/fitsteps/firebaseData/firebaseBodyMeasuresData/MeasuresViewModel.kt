@@ -40,10 +40,10 @@ class MeasuresViewModel {
             FirebaseFirestore.getInstance().collection("users_body_measures")
                 .add(add)
                 .addOnSuccessListener {
-                    Log.d("Guardado de ruta", "exitoso, id: ${it.id}")
+                    Log.d("Guardado de medida", "exitoso, id: ${it.id}")
                 }
                 .addOnFailureListener {
-                    Log.d("Guardado de ruta", "error: $it")
+                    Log.d("Guardado de medida", "error: $it")
                 }
         }
     }

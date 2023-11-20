@@ -9,7 +9,9 @@ data class User(
     var experience: String,
     var avatar: String = "",
     var userId: String,
-    var document: String = ""
+    var document: String = "",
+    var phoneNumber: String = "",
+    var active: Boolean = false
 ) {
     constructor(): this(
         user_name = "",
