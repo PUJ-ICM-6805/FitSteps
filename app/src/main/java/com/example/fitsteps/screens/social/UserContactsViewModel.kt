@@ -2,6 +2,7 @@ package com.example.fitsteps.screens.social
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
 import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.Measures
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -9,11 +10,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 
-class UserContactsViewModel {
+class UserContactsViewModel: ViewModel() {
     val auth: FirebaseAuth = Firebase.auth
     var userid = auth.currentUser?.uid
-    var setUserContacts = setOf<String>()
+    var userContacts = mutableListOf<String>()
     var userPhoneNumber = mutableStateOf("")
+    val userExists = mutableStateOf(false)
 
     fun uploadUserContacts(
         contactos : List<String>
@@ -21,10 +23,9 @@ class UserContactsViewModel {
         val userId = auth.currentUser?.uid
         val phoneNumber = userPhoneNumber.value
         val add = HashMap<String, Any>()
-        setUserContacts = contactos.toSet()
         Log.d("numero", phoneNumber)
         if (userId != null) {
-            add["contacts"] = setUserContacts.toList()
+            add["contacts"] = contactos
             Log.d("contactos antes de fstore", contactos.toString())
             add["userid"] = userId
             FirebaseFirestore.getInstance().collection("users_contacts")
@@ -37,5 +38,9 @@ class UserContactsViewModel {
                     Log.d("Guardado de contactos", "error: $it")
                 }
         }
+    }
+
+    fun setPhoneNumber(it: String) {
+        userPhoneNumber.value = it
     }
 }

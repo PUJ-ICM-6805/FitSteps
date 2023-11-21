@@ -10,7 +10,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.Settings
-import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +30,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
@@ -38,11 +39,11 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -56,29 +57,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fitsteps.R
-import com.example.fitsteps.authentication.DatabaseUtils
 import com.example.fitsteps.authentication.User
-import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.Measures
 import com.example.fitsteps.permissions.ContactsPermissionTextProvider
 import com.example.fitsteps.permissions.MainViewModel
 import com.example.fitsteps.permissions.PermissionDialog
-import com.example.fitsteps.permissions.PhonePermissionTextProvider
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -89,153 +84,266 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
-import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-@SuppressLint("MissingPermission")
 @Composable
-fun SocialScreen(contactsViewModel: UserContactsViewModel = UserContactsViewModel()) {
-    val userid = Firebase.auth.currentUser?.uid
+fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserContactsViewModel() }) {
     val viewModel = viewModel<MainViewModel>()
-    val dialogQueue = viewModel.visiblePermissionDialogQueue
-    val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { perms ->
-            perms.keys.forEach { permission ->
-                viewModel.onPermissionResult(
-                    permission = permission,
-                    isGranted = perms[permission] == true
-                )
-            }
-        }
-    )
-
     val isContactsPermissionGranted by viewModel.isContactsPermissionGranted
-    val isPhonePermissionGranted by viewModel.isPhonePermissionGranted
+    val dialogQueue = viewModel.visiblePermissionDialogQueue
+    val contactsPermissionResultContracts = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            viewModel.onPermissionResult(
+                permission = android.Manifest.permission.READ_CONTACTS,
+                isGranted = isGranted
+
+            )
+        })
     val context = LocalContext.current
     var contacts by remember { mutableStateOf<List<Contact>>(emptyList()) }
+    val userid = Firebase.auth.currentUser?.uid
     val usersContactsRef = FirebaseFirestore.getInstance().collection("users_contacts")
+    var mPhoneNumber by remember { mutableStateOf("") }
     var finalContacts: List<String> = emptyList()
+    var phoneNumberEntered by remember { mutableStateOf<String?>(null) }
     val usersFromContacts = remember { mutableStateListOf<User>() }
-    val tMgr = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-    var mPhoneNumber = ""
-    val lifecycleEvent = rememberLifecycleEvent()
 
-    LaunchedEffect(isContactsPermissionGranted && isPhonePermissionGranted) {
-        if (isContactsPermissionGranted && isPhonePermissionGranted) {
-            usersFromContacts.clear()
-            contacts = getContacts(context)
-            try {
-                mPhoneNumber = tMgr.line1Number
-            } catch (ex: NullPointerException) {
-            }
-
-            if (mPhoneNumber.equals("")) {
-                val sharedPreferences =
-                    context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-                mPhoneNumber = sharedPreferences.getString("phoneNumber", "") ?: ""
-
-                // Si no hay un número almacenado, generar uno único
-                if (mPhoneNumber.isBlank()) {
-                    val uniqueID = UUID.randomUUID().toString()
-                    mPhoneNumber = uniqueID
-
-                    with(sharedPreferences.edit()) {
-                        putString("phoneNumber", mPhoneNumber)
-                        apply()
-                    }
-                }
-            } //TODO en lugar de pedir permisos para obtener el número de teléfono, se puede pedir a la hora de registrarse
-            finalContacts = getContactsUsingAppSync(usersContactsRef, contacts)
-            if (userid != null) {
-                contactsViewModel.userid = userid
-                contactsViewModel.userPhoneNumber.value = mPhoneNumber
-                Log.d("contactos antes de fstore", contacts.toString())
-                contactsViewModel.uploadUserContacts(finalContacts)
-                getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
-            } else {
-                Log.d("Guardado de contactos", "userid es null")
-            }
-        } else {
-            multiplePermissionResultLauncher.launch(
-                arrayOf(
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.READ_PHONE_STATE
-                )
-            )
-        }
-    }
-    LaunchedEffect(contacts) {
-        usersFromContacts.clear()
-        Log.d("numero", mPhoneNumber)
-        finalContacts = getContactsUsingAppSync(usersContactsRef, contacts)
-        if (userid != null && mPhoneNumber.isNotBlank()) {
-            contactsViewModel.userid = userid
-            contactsViewModel.userPhoneNumber.value = mPhoneNumber
-            contactsViewModel.uploadUserContacts(finalContacts)
-            getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
-        } else {
-            Log.d("Guardado de contactos", "userid es null")
-        }
-    }
-    LaunchedEffect(lifecycleEvent) {
-        if (isContactsPermissionGranted && isPhonePermissionGranted) {
-            usersFromContacts.clear()
-            if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-                contacts = getContacts(context)
-                try {
-                    mPhoneNumber = tMgr.line1Number
-                } catch (ex: NullPointerException) {
-                }
-
-                if (mPhoneNumber.equals("")) {
-                    val sharedPreferences =
-                        context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-                    mPhoneNumber = sharedPreferences.getString("phoneNumber", "") ?: ""
-
-                    // Si no hay un número almacenado, generar uno único
-                    if (mPhoneNumber.isBlank()) {
-                        val uniqueID = UUID.randomUUID().toString()
-                        mPhoneNumber = uniqueID
-
-                        with(sharedPreferences.edit()) {
-                            putString("phoneNumber", mPhoneNumber)
-                            apply()
-                        }
-                    }
-                } //TODO en lugar de pedir permisos para obtener el número de teléfono, se puede pedir a la hora de registrarse
-                finalContacts = getContactsUsingAppSync(usersContactsRef, contacts)
-                if (userid != null) {
-                    contactsViewModel.userid = userid
-                    contactsViewModel.userPhoneNumber.value = mPhoneNumber
-                    Log.d("contactos antes de fstore", contacts.toString())
-                    contactsViewModel.uploadUserContacts(finalContacts)
-                    getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
+    if (userid != null) {
+        //buscamos en la colección de usuarios el documento que tenga como campo userid el id del usuario actual
+        usersContactsRef.whereEqualTo("userid", userid).get()
+            .addOnSuccessListener { documents ->
+                //si el documento existe, entonces el usuario ya ha ingresado sus contactos
+                if (documents.size() > 0) {
+                    userContactsViewModel.userExists.value = true
+                    //obtenemos los contactos del usuario
+                    val queriedContacts = documents.documents[0].get("contacts") as List<String>
+                    //actualizamos el valor de los contactos del usuario en el viewmodel
+                    userContactsViewModel.userPhoneNumber.value = documents.documents[0].id
+                    userContactsViewModel.userContacts = queriedContacts.toMutableList()
+                    Log.d("DocumentSnapshot data", "Document exists!")
+                    Log.d("DocumentSnapshot data", contacts.toString())
                 } else {
-                    Log.d("Guardado de contactos", "userid es null")
+                    userContactsViewModel.userExists.value = false
+                    Log.d("DocumentSnapshot data", "No such document")
                 }
-            } else {
-                multiplePermissionResultLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.READ_PHONE_STATE
+            }
+            .addOnFailureListener { exception ->
+                Log.d("numero", "Error getting documents: ", exception)
+            }
+    }
+
+    Log.d("numeroIF", userContactsViewModel.userPhoneNumber.value)
+    if (isContactsPermissionGranted && userContactsViewModel.userExists.value) {
+        Log.d("llamando1", "TRUE TRUE")
+        //lanzamos un coroutine para obtener los usuarios que tienen la app instalada
+        LaunchedEffect(Unit) {
+            contacts = getContacts(context)
+            finalContacts = getContactsUsingAppSync(usersContactsRef, contacts)
+            userContactsViewModel.uploadUserContacts(finalContacts)
+            Log.d("contactos", finalContacts.toString())
+            getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White),
+        ) {
+            Spacer(modifier = Modifier.height(50.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.TopStart),
+                    text = stringResource(id = R.string.social),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 30.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
                     )
                 )
+
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                SearchBar()
+            }
+            val users = usersFromContacts.toSet()
+            LazyColumn {
+                items(users.toList()) { contact ->
+                    ContactItem(contact = contact)
+                }
+            }
+        }
+    } else if (!isContactsPermissionGranted && !userContactsViewModel.userExists.value) {
+        Log.d("llamando1", "FALSE FALSE")
+        MainMenu(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White),
+            onClicked = {
+                contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+            }
+        )
+        val activity = LocalContext.current as Activity
+        dialogQueue
+            .reversed()
+            .forEach { permission ->
+                PermissionDialog(
+                    permissionTextProvider = when (permission) {
+                        android.Manifest.permission.READ_CONTACTS -> {
+                            ContactsPermissionTextProvider()
+                        }
+
+                        else -> return@forEach
+                    },
+                    isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                        activity,
+                        permission
+                    ),
+                    onDismiss = viewModel::dismissDialog,
+                    onOkClick = { contactsPermissionResultContracts.launch(android.Manifest.permission.READ_CONTACTS) },
+                    onGoToAppSettingsClick = { activity.openAppSettings() },
+                )
+                PhoneNumberScreen(
+                    contactsViewModel = userContactsViewModel,
+                    onPhoneNumberEntered = {
+                        mPhoneNumber = it
+                        contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+                        Log.d("numero", userContactsViewModel.userPhoneNumber.value)
+                        Log.d("numero", mPhoneNumber)
+                        userContactsViewModel.setPhoneNumber(mPhoneNumber)
+                        contacts = getContacts(context)
+                        userContactsViewModel.userid = userid
+                        getContactsUsingAppSync(usersContactsRef, contacts) { result ->
+                            finalContacts = result
+                            Log.d("contactos", finalContacts.toString())
+                            userContactsViewModel.uploadUserContacts(finalContacts)
+                            phoneNumberEntered = it
+                        }
+
+                    }
+                )
+            }
+    } else if (isContactsPermissionGranted && !userContactsViewModel.userExists.value) {
+        Log.d("llamando1", "TRUE FALSE")
+        PhoneNumberScreen(
+            contactsViewModel = userContactsViewModel,
+            onPhoneNumberEntered = {
+                mPhoneNumber = it
+                Log.d("numero", userContactsViewModel.userPhoneNumber.value)
+                Log.d("numero", mPhoneNumber)
+                userContactsViewModel.setPhoneNumber(mPhoneNumber)
+                contacts = getContacts(context)
+                userContactsViewModel.userid = userid
+                getContactsUsingAppSync(usersContactsRef, contacts) { result ->
+                    finalContacts = result
+                    userContactsViewModel.uploadUserContacts(finalContacts)
+                    phoneNumberEntered = it
+                }
+
+            }
+        )
+    } else {
+        // Muestra MainMenu automáticamente cuando no hay interacción aún
+        LaunchedEffect(Unit) {
+            contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+        }
+        MainMenu(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White),
+            onClicked = {
+                contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+            }
+        )
+    }
+    //variable con la actividad en la que estamos
+    val activity = LocalContext.current as Activity
+    dialogQueue
+        .reversed()
+        .forEach { permission ->
+            PermissionDialog(
+                permissionTextProvider = when (permission) {
+                    android.Manifest.permission.READ_CONTACTS -> {
+                        ContactsPermissionTextProvider()
+                    }
+
+                    else -> return@forEach
+                },
+                isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                    activity,
+                    permission
+                ),
+                onDismiss = viewModel::dismissDialog,
+                onOkClick = { contactsPermissionResultContracts.launch(android.Manifest.permission.READ_CONTACTS) },
+                onGoToAppSettingsClick = { activity.openAppSettings() },
+            )
+        }
+    if (phoneNumberEntered != null) {
+        LaunchedEffect(Unit) {
+            contacts = getContacts(context)
+            finalContacts = getContactsUsingAppSync(usersContactsRef, contacts)
+            userContactsViewModel.uploadUserContacts(finalContacts)
+            Log.d("contactos", finalContacts.toString())
+            getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White),
+        ) {
+            Spacer(modifier = Modifier.height(50.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.TopStart),
+                    text = stringResource(id = R.string.social),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 30.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                SearchBar()
+            }
+            val users = usersFromContacts.toSet()
+            LazyColumn {
+                items(users.toList()) { contact ->
+                    ContactItem(contact = contact)
+                }
             }
         }
     }
+}
 
-    DisposableEffect(Unit) {
-        onDispose { }
-    }
-
+@Composable
+fun MainMenu(modifier: Modifier, onClicked: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White),
+        modifier = modifier,
     ) {
         Spacer(modifier = Modifier.height(50.dp))
         Box(
@@ -267,8 +375,8 @@ fun SocialScreen(contactsViewModel: UserContactsViewModel = UserContactsViewMode
         Text(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(10.dp),
-            text = stringResource(id = R.string.gymbro),
+                .padding(bottom = 40.dp, top = 20.dp, start = 20.dp, end = 20.dp),
+            text = stringResource(id = R.string.labelSocial),
             color = Blue,
             fontSize = 15.sp,
             style = TextStyle(
@@ -278,102 +386,36 @@ fun SocialScreen(contactsViewModel: UserContactsViewModel = UserContactsViewMode
             ),
             textAlign = TextAlign.Center,
         )
-        Log.d("usuarios finales", usersFromContacts.toString())
-        val users: Set<User> = usersFromContacts.toSet()
-        LazyColumn(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(White),
-        ) {
-            items(users.toList()) { contact ->
-                ContactItem(contact)
-            }
-        }
+                .padding(bottom = 20.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
 
-        if (!isContactsPermissionGranted) {
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 40.dp, top = 20.dp, start = 20.dp, end = 20.dp),
-                text = stringResource(id = R.string.labelSocial),
-                color = Blue,
-                fontSize = 15.sp,
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.Medium,
-                    fontStyle = FontStyle.Normal,
-                ),
-                textAlign = TextAlign.Center,
-            )
-            Box(
-                modifier = Modifier
-                    .padding(bottom = 20.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-
-                ) {
-                Image(
-                    painter = painterResource(id = R.drawable.social_contacts),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .width(50.dp)
-                        .height(50.dp),
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center,
             ) {
-                SocialButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                        .height(70.dp),
-                    onClicked = {
-                        multiplePermissionResultLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.READ_CONTACTS,
-                                Manifest.permission.READ_PHONE_STATE
-                            )
-                        )
-                    }
-                )
-            }
+            Image(
+                painter = painterResource(id = R.drawable.social_contacts),
+                contentDescription = "",
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp),
+            )
         }
-        //variable con la actividad en la que estamos
-        val activity = LocalContext.current as Activity
-        dialogQueue
-            .reversed()
-            .forEach { permission ->
-                PermissionDialog(
-                    permissionTextProvider = when (permission) {
-                        Manifest.permission.READ_CONTACTS -> {
-                            ContactsPermissionTextProvider()
-                        }
-
-                        Manifest.permission.READ_PHONE_STATE -> {
-                            PhonePermissionTextProvider()
-                        }
-
-                        else -> return@forEach
-                    },
-                    isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
-                        activity,
-                        permission
-                    ),
-                    onDismiss = viewModel::dismissDialog,
-                    onOkClick = {
-                        viewModel.dismissDialog()
-                        multiplePermissionResultLauncher.launch(
-                            arrayOf(
-                                permission
-                            )
-                        )
-                    },
-                    onGoToAppSettingsClick = { activity.openAppSettings() },
-                )
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            SocialButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                    .height(70.dp),
+                onClicked = {
+                    onClicked()
+                }
+            )
+        }
     }
 }
 
@@ -510,7 +552,9 @@ fun getContacts(context: Context): List<Contact> {
                 val phoneNumberIndex =
                     phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
                 if (phoneNumberIndex != -1) {
-                    val phoneNumber: String = phoneCursor.getString(phoneNumberIndex)
+                    var phoneNumber: String = phoneCursor.getString(phoneNumberIndex)
+                    //aplicamos regex para quitar espacios intermedios guiones y parentesis
+                    phoneNumber = phoneNumber.replace("[\\s\\-\\(\\)]".toRegex(), "")
                     contacts.add(Contact(id.toInt(), name, phoneNumber))
                 }
             }
@@ -521,6 +565,101 @@ fun getContacts(context: Context): List<Contact> {
 
     cursor?.close()
     return contacts
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ContactItem(contact: User) { //TODO mejorar la estética y estructura de la lista
+    ListItem(
+        text = { Text(contact.user_name + " " + contact.experience) },
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Phone,
+                contentDescription = null
+            )
+        }
+    )
+}
+
+@Composable
+fun PhoneNumberScreen(
+    onPhoneNumberEntered: (String) -> Unit,
+    contactsViewModel: UserContactsViewModel = UserContactsViewModel()
+) {
+    var showDialog by remember { mutableStateOf(true) }
+    var phoneNumber by remember { mutableStateOf("") }
+    Log.d("showDialog", showDialog.toString())
+    if (showDialog) {
+        Log.d("showDialog", showDialog.toString())
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+            },
+            title = {
+                Text(text = "Ingresa tu número de teléfono")
+            },
+            text = {
+                TextField(
+                    value = phoneNumber,
+                    onValueChange = {
+                        phoneNumber = it
+                    },
+                    label = {
+                        Text(text = "Número telefónico")
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // Aquí puedes realizar alguna acción con el número de teléfono ingresado
+                        showDialog = false
+                        onPhoneNumberEntered(phoneNumber)
+                    }
+                ) {
+                    Text(text = "Aceptar")
+                }
+            },
+        )
+    }
+}
+
+private fun getContactsUsingAppSync(
+    usersContactsRef: CollectionReference,
+    contacts: List<Contact>,
+    onResult: (List<String>) -> Unit
+): List<String> {
+    val contactsUsingApp = ArrayList<String>()
+    var count = 0
+
+    for (contact in contacts) {
+        usersContactsRef.document(contact.phoneNumber).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    contactsUsingApp.add(contact.phoneNumber)
+                }
+
+                count++
+                if (count == contacts.size) {
+                    // All documents have been checked
+                    onResult(contactsUsingApp)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w("DatabaseUtils", "Error checking document existence", e)
+                count++
+                if (count == contacts.size) {
+                    // All documents have been checked
+                    onResult(contactsUsingApp)
+                }
+            }
+    }
+    return contactsUsingApp
 }
 
 private suspend fun getContactsUsingAppSync(
@@ -553,7 +692,6 @@ private suspend fun getContactsUsingAppSync(
             }
     }
 }
-
 private suspend fun getContactsUsersByUserID(
     usersContactsRef: CollectionReference,
     contacts: List<String>,
@@ -606,36 +744,6 @@ private suspend fun getContactsUsersByUserID(
             }
     }
 }
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun ContactItem(contact: User) {
-    ListItem(
-        text = { Text(contact.user_name + " " + contact.experience + " ") },
-        icon = {
-            Icon(
-                imageVector = Icons.Default.Phone,
-                contentDescription = null
-            )
-        }
-    )
-}
-
-@Composable
-fun rememberLifecycleEvent(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current): Lifecycle.Event {
-    var state by remember { mutableStateOf(Lifecycle.Event.ON_ANY) }
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            state = event
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-    return state
-}
-
 @Composable
 @Preview
 fun SocialScreenPreview() {
