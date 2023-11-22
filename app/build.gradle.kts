@@ -85,6 +85,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.github.rosariopfernandes:firecoil:0.2.0")
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
+    implementation ("com.google.firebase:firebase-messaging:23.3.1")
 
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")

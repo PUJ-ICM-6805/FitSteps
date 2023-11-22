@@ -1,12 +1,12 @@
 package com.example.fitsteps
 
-import android.content.pm.PackageManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.Settings
+import androidx.activity.ComponentActivity
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.core.content.ContextCompat
@@ -47,6 +47,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.navigation.SetupNavGraph
+import com.example.fitsteps.ui.theme.FitStepsTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
