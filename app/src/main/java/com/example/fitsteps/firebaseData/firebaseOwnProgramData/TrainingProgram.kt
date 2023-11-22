@@ -6,8 +6,8 @@ data class TrainingProgram(
     val name: String ="",
     val objective: String ="",
     var routines: MutableList<Routine> = mutableListOf(),
-    var uid : String = ""
-
+    var uid : String = "",
+    var image : String = ""
 ){
    override fun toString(): String {
         return "TrainingProgram(description='$description', name='$name', objective='$objective', uid='$uid')"

@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
@@ -232,7 +233,7 @@ fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgr
                 contentAlignment = Alignment.BottomStart,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.woman),
+                    painter = rememberAsyncImagePainter(model =trainingProgram.image),
                     contentDescription = "",
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.BottomCenter,
