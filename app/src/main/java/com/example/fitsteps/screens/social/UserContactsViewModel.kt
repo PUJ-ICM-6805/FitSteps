@@ -19,28 +19,45 @@ class UserContactsViewModel: ViewModel() {
     var onlineStatus = mutableStateOf(false)
 
     fun uploadUserContacts(
-        contactos : List<String>
+        contacts : List<String>
     ) {
         val userId = auth.currentUser?.uid
         val phoneNumber = userPhoneNumber.value
         val add = HashMap<String, Any>()
+        val contactsFiltered = contacts.filter { it != phoneNumber}
+        val contactos = ArrayList(LinkedHashSet(contactsFiltered))
         Log.d("numero", phoneNumber)
-        if (userId != null) {
-            add["contacts"] = contactos
-            Log.d("contactos antes de fstore", contactos.toString())
-            add["userid"] = userId
-            FirebaseFirestore.getInstance().collection("users_contacts")
-                .document(phoneNumber)  // Establecer el número telefónico como el ID del documento
-                .set(add, SetOptions.merge())
-                .addOnSuccessListener {
-                    Log.d("Guardado de contactos", "exitoso para el número: ${userPhoneNumber.value}")
+        FirebaseFirestore.getInstance().collection("users_contacts")
+            .whereEqualTo("userid", userId)
+            .get()
+            .addOnSuccessListener { result ->
+                var previousContacts = listOf<String>()
+                if(!result.isEmpty) {
+                    previousContacts = result.documents[0].get("contacts") as List<String>
                 }
-                .addOnFailureListener {
-                    Log.d("Guardado de contactos", "error: $it")
-                }
-            for (contact in contactos) {
-                FirebaseMessaging.getInstance().subscribeToTopic(contact)
+                if (userId != null) {
+                    add["contacts"] = contactos
+                    Log.d("contactos antes de fstore", contactos.toString())
+                    add["userid"] = userId
+                    FirebaseFirestore.getInstance().collection("users_contacts")
+                        .document(phoneNumber)  // Establecer el número telefónico como el ID del documento
+                        .set(add, SetOptions.merge())
+                        .addOnSuccessListener {
+                            Log.d("Guardado de contactos", "exitoso para el número: ${userPhoneNumber.value}")
+                        }
+                        .addOnFailureListener {
+                            Log.d("Guardado de contactos", "error: $it")
+                        }
+                    for (previousContact in previousContacts) {
+                        if(!contactos.contains(previousContact)) {
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(previousContact)
+                        }
+                    }
+                    for (contact in contactos) {
+                        FirebaseMessaging.getInstance().subscribeToTopic(contact)
+                    }
             }
+
         }
     }
 

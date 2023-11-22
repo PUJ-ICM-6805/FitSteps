@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import org.json.JSONException
@@ -57,8 +58,9 @@ class RunningViewModel : ViewModel() {
         if(userId != null) {
             add["latitude"] = latLng.latitude
             add["longitude"] = latLng.longitude
+            Log.d("user number", userPhoneNumber)
             FirebaseFirestore.getInstance().collection("running_users").document(userPhoneNumber)
-                .update(add)
+                .set(add, SetOptions.merge())
                 .addOnSuccessListener {
                     Log.d("Location", "updated")
                 }
@@ -106,49 +108,79 @@ class RunningViewModel : ViewModel() {
         Log.d("Phone search", doc)
         return doc
     }
-     fun updateState(context: Context, number: String) {
-        val key =
-            "key=AAAAHNy6L3U:APA91bGXlvQE0EwOQWOnhLQRwFL1lK6OflEeZR4zYkVK5EbR9-06KUnXYsiPx6ZCh7Nzl6u_UeyYjithI-eVQTjvZtT2YVCof7-l2_jOW9alizoSmrjU18YHH-OGnzBkoXRAnX9E-lh7"
-        val FCM_API = "https://fcm.googleapis.com/fcm/send"
-        val contentType = "application/json"
-        val topic =
-            "/topics/$number" //topic has to match what the receiver subscribed to
+     fun updateState(startUpdates: Boolean, context: Context, number: String) {
+         if (startUpdates) {
+             val key =
+                 "key=AAAAHNy6L3U:APA91bGXlvQE0EwOQWOnhLQRwFL1lK6OflEeZR4zYkVK5EbR9-06KUnXYsiPx6ZCh7Nzl6u_UeyYjithI-eVQTjvZtT2YVCof7-l2_jOW9alizoSmrjU18YHH-OGnzBkoXRAnX9E-lh7"
+             val FCM_API = "https://fcm.googleapis.com/fcm/send"
+             val contentType = "application/json"
+             val topic =
+                 "/topics/$number" //topic has to match what the receiver subscribed to
 
-        val notification = JSONObject()
-        val notificationBody = JSONObject()
+             val notification = JSONObject()
+             val notificationBody = JSONObject()
 
-        try {
-            notificationBody.put("title", "Ola")
-            notificationBody.put(
-                "body",
-                "probando"
-            )   //Enter your notification message
-            notification.put("to", topic)
-            notification.put("title", "ola")
-            notification.put("notification", notificationBody)
-            Log.e("TAG", "try")
-        } catch (e: JSONException) {
-            Log.e("TAG", "onCreate: " + e.message)
-        }
+             FirebaseFirestore.getInstance().collection("users")
+                 .whereEqualTo("userId", userid)
+                 .get()
+                 .addOnSuccessListener { result ->
+                     for (document in result) {
+                         val experience = document.data["experience"] as String
+                         val gender = document.data["gender"] as String
+                         val height = document.data["height"] as Double
+                         val weight = document.data["weight"] as Double
+                         val birthDate = document.data["user_birth_date"] as String
+                         val name = document.data["user_name"] as String
+                         val avatar = document.data["avatar"] as String
+                         user = User(name, birthDate, gender, weight.toFloat(), height.toFloat(), experience, avatar, userid.toString())
+                     }
+                     try {
+                         notificationBody.put("title", "Corre junto a ${user.user_name}")
+                         notificationBody.put(
+                             "body",
+                             "¡Corre con FitSteps! tu amigo ${user.user_name} está corriendo ¡Únete a él! "
+                         )   //Enter your notification message
+                         notification.put("to", topic)
+                         notification.put("title", "Running notification")
+                         notification.put("notification", notificationBody)
+                         Log.e("TAG", "try")
+                     } catch (e: JSONException) {
+                         Log.e("TAG", "onCreate: " + e.message)
+                     }
 
-        val requestQueue: RequestQueue by lazy {
-            Volley.newRequestQueue(context)
-        }
-        val jsonObjectRequest =
-            object : JsonObjectRequest(FCM_API, notification,
-                Response.Listener<JSONObject> { response ->
-                    Log.i("TAG", "onResponse: $response")
-                },
-                Response.ErrorListener {
-                    Log.i("TAG", "onErrorResponse: Didn't work")
-                }) {
-                override fun getHeaders(): Map<String, String> {
-                    val params = java.util.HashMap<String, String>()
-                    params["Authorization"] = key
-                    params["Content-Type"] = contentType
-                    return params
-                }
-            }
-        requestQueue.add(jsonObjectRequest)
-    }
+                     val requestQueue: RequestQueue by lazy {
+                         Volley.newRequestQueue(context)
+                     }
+                     val jsonObjectRequest =
+                         object : JsonObjectRequest(FCM_API, notification,
+                             Response.Listener<JSONObject> { response ->
+                                 Log.i("TAG", "onResponse: $response")
+                             },
+                             Response.ErrorListener {
+                                 Log.i("TAG", "onErrorResponse: Didn't work")
+                             }) {
+                             override fun getHeaders(): Map<String, String> {
+                                 val params = java.util.HashMap<String, String>()
+                                 params["Authorization"] = key
+                                 params["Content-Type"] = contentType
+                                 return params
+                             }
+                         }
+                     requestQueue.add(jsonObjectRequest)
+                 }
+                 .addOnFailureListener { exception ->
+                     Log.d("Error", "Error getting documents: ", exception)
+                 }
+         } else {
+             val db = FirebaseFirestore.getInstance()
+             val documentReference = db.collection("running_users").document(number)
+             documentReference.delete()
+                 .addOnSuccessListener {
+                     Log.d("Firestore", "User location deleted")
+                 }
+                 .addOnFailureListener { e ->
+                     Log.e("Firestore", "Error at deleting user location", e)
+                 }
+         }
+     }
 }

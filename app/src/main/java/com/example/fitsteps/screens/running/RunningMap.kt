@@ -71,6 +71,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -91,6 +92,7 @@ fun DoInLifeCycle(
     onStart: () -> Unit = {},
     onResume: () -> Unit = {},
     onPause: () -> Unit = {},
+    onDestroy: () -> Unit = {},
 ) {
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks
@@ -117,6 +119,7 @@ fun DoInLifeCycle(
                 }
                 Lifecycle.Event.ON_DESTROY -> {
                     Log.d("lifecycle", "ON_DESTROY")
+                    onDestroy()
                 }
                 Lifecycle.Event.ON_ANY -> {
                     Log.d("lifecycle", "ON_ANY")
@@ -183,7 +186,7 @@ fun RunningMap(
     val sensorManager = remember { mutableStateOf<SensorManager?>(null) }
     var motionSensor = remember { mutableStateOf<Sensor?>(null) }
     val viewModel = viewModel<RunningMapViewModel>()
-    var onceStarted by remember { mutableStateOf(false) }
+    var onceStarted = remember { mutableStateOf(false) }
     val publicMode = remember { mutableStateOf(false) }
     var totalSteps by remember { mutableStateOf(0) }
     var previousSteps by remember { mutableStateOf(0) }
@@ -195,7 +198,7 @@ fun RunningMap(
     var stepsReaded by remember { mutableStateOf(false) }
     var totalDistance by remember { mutableStateOf(0.0) }
     var time by remember { mutableStateOf(0L) }
-    var userPhoneNumber by remember { mutableStateOf("") }
+    var userPhoneNumber = remember { mutableStateOf("") }
     var isMapLoaded by remember {
         mutableStateOf(false)
     }
@@ -221,7 +224,7 @@ fun RunningMap(
     )
     val triggerEventListener = object : TriggerEventListener() {
         override fun onTrigger(event: TriggerEvent?) {
-            if(onceStarted) {
+            if(onceStarted.value) {
                 if(paused.value) {
                     paused.value = false
                     Log.d("Paused", "false caused by motion")
@@ -231,7 +234,7 @@ fun RunningMap(
         }
     }
     LaunchedEffect(key1 = true) {
-        userPhoneNumber = routesViewModel.getNumber()
+        userPhoneNumber.value = routesViewModel.getNumber()
     }
     DoInLifeCycle(
         lifecycleOwner = lifecycleOwner,
@@ -284,6 +287,11 @@ fun RunningMap(
                 }
                 currentSteps = totalSteps - previousSteps
             })
+        },
+        onDestroy = {
+            if(userPhoneNumber.value != ""){
+                routesViewModel.updateState(false, context, userPhoneNumber.value)
+            }
         }
     )
     if (permissions.all {
@@ -311,7 +319,7 @@ fun RunningMap(
                     },
                     paused = paused,
                     onFinish = {
-                        if(onceStarted) {
+                        if(onceStarted.value) {
                             route = it.toMutableList()
                             Log.d("route", route.toString())
                             if(route.size > 1) {
@@ -319,7 +327,7 @@ fun RunningMap(
                                     route.toList().filterNotNull(),
                                     formatElapsedTime(time),
                                     currentSteps,
-                                    String.format("%.2f", totalDistance)
+                                    String.format(Locale.US, "%.2f", totalDistance)
                                 )
                             } else {
                                 if(showRouteInfoToast) {
@@ -329,7 +337,11 @@ fun RunningMap(
                             }
                             navController.popBackStack("running", false)
                         }
-                    }
+                    },
+                    publicMode = publicMode,
+                    userPhoneNumber = userPhoneNumber,
+                    routesViewModel = routesViewModel,
+                    onceStarted = onceStarted,
                 )
                 Icon(
                     imageVector = Icons.Default.Person,
@@ -340,13 +352,23 @@ fun RunningMap(
                         .width(40.dp)
                         .height(40.dp)
                         .clickable {
-                            if(userPhoneNumber != "") {
+                            if (userPhoneNumber.value != "" && onceStarted.value) {
                                 publicMode.value = !publicMode.value
+                                Log.d("publicMode", publicMode.value.toString())
+                                Log.d("UserNumber", userPhoneNumber.value)
                                 if (publicMode.value) {
-                                    routesViewModel.updateState(context, userPhoneNumber)
+                                    routesViewModel.updateState(true, context, userPhoneNumber.value)
+                                    Toast.makeText(context, "Running with friends enabled", Toast.LENGTH_LONG).show()
+                                } else {
+                                    routesViewModel.updateState(false, context, userPhoneNumber.value)
+                                    Toast.makeText(context, "Running with friends disabled", Toast.LENGTH_LONG).show()
                                 }
+                            } else if(!onceStarted.value && userPhoneNumber.value != "") {
+                                Toast.makeText(context, "Start running first", Toast.LENGTH_LONG).show()
                             } else {
-                                Toast.makeText(context, "Social not synchronized", Toast.LENGTH_LONG).show()
+                                Toast
+                                    .makeText(context, "Social not synchronized", Toast.LENGTH_LONG)
+                                    .show()
                             }
                         },
                     tint = Color(0xFFF4F4F4)
@@ -375,12 +397,12 @@ fun RunningMap(
                         },
                         onStart = {
                             running.value = it
-                            onceStarted = true
+                            onceStarted.value = true
                             paused.value = !it
                             previousSteps = totalSteps
                         },
                         onFinish = { it ->
-                            if(onceStarted) {
+                            if(onceStarted.value) {
                                 finished.value = it
                                 running.value = !it
                                 paused.value = it
@@ -589,14 +611,16 @@ fun GoogleMapView(
     finished: MutableState<Boolean>,
     onFinish: (List<LatLng>) -> Unit = {},
     distanceListener: (Double) -> Unit = {},
-    publicMode: MutableState<Boolean> = remember { mutableStateOf(false) },
-    userPhoneNumber: String = "",
+    publicMode: MutableState<Boolean>,
+    userPhoneNumber: MutableState<String>,
     routesViewModel: RunningViewModel = viewModel(),
+    onceStarted: MutableState<Boolean> = remember { mutableStateOf(false) },
 ) {
     val context = LocalContext.current
     val route = remember { mutableListOf<LatLng>() }
     var totalDistance by remember { mutableStateOf(0.0) }
     var routeUpdated by remember { mutableStateOf(false) }
+    var contactsLocations = remember { mutableStateOf(mutableListOf<LatLng>()) }
     var currentLocation by remember {
         mutableStateOf(LatLng(0.toDouble(), 0.toDouble()))
     }
@@ -608,6 +632,36 @@ fun GoogleMapView(
     if(finished.value && !routeUpdated) {
         onFinish(route.toList())
         routeUpdated = true
+    }
+    LaunchedEffect(key1 = publicMode.value) {
+        if(publicMode.value) {
+            val db = FirebaseFirestore.getInstance()
+            var contacts = listOf<String>()
+            db.collection("users_contacts").document(userPhoneNumber.value).get()
+                .addOnSuccessListener {
+                    contacts = it["contacts"] as List<String>
+                    db.collection("running_users")
+                        .addSnapshotListener { value, e ->
+                            if (e != null) {
+                                Log.w("Running users", "Listen failed.", e)
+                                return@addSnapshotListener
+                            }
+                            val usersLocations = ArrayList<LatLng>()
+                            for (doc in value!!) {
+                                if(contacts.contains(doc.id) && doc.id != userPhoneNumber.value) {
+                                    usersLocations.add(
+                                        LatLng(
+                                            doc["latitude"].toString().toDouble(),
+                                            doc["longitude"].toString().toDouble()
+                                        )
+                                    )
+                                }
+                            }
+                            contactsLocations.value = usersLocations
+                            Log.d("Contacts locations", contactsLocations.value.toString())
+                        }
+                }
+        }
     }
     DisposableEffect(finished.value) {
         if (!finished.value) {
@@ -626,16 +680,15 @@ fun GoogleMapView(
                             }
                             distanceListener(totalDistance)
                         }
-                        if(publicMode.value) {
-                            routesViewModel.updateLocation(currentLocation, userPhoneNumber)
+                        if(publicMode.value && userPhoneNumber.value != "") {
+                            Log.d("user_number", userPhoneNumber.value)
+                            routesViewModel.updateLocation(currentLocation, userPhoneNumber.value)
                         }
                     }
                 }
             }
             startLocationUpdates(locationCallback!!, fusedLocationClient)
-            if(publicMode.value) {
-                //TODO
-            }
+
         }
         onDispose {
             // Al salir del efecto, desvincula el callback para detener las actualizaciones de ubicación.
@@ -662,6 +715,15 @@ fun GoogleMapView(
             alpha = 0.0f,
         )
         Polyline(points = route.toList(), color = Red, width = 10f)
+        if(publicMode.value && onceStarted.value) {
+            for(contact in contactsLocations.value) {
+                Marker(
+                    state = MarkerState(position = contact),
+                    title = "FitFriend",
+                    alpha = 1.0f,
+                )
+            }
+        }
         content()
     }
 }
