@@ -1,10 +1,12 @@
 package com.example.fitsteps.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.ImageFromJSONViewModel
 import com.example.fitsteps.screens.training.trainingMainScreen.ExerciseScreen
 import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.screens.ProfileScreen
@@ -20,7 +22,8 @@ fun BottomBarNavGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
     runningViewModel: RunningViewModel = RunningViewModel(),
-    trainingProgramViewModel: TrainingProgramViewModel = TrainingProgramViewModel()
+    trainingProgramViewModel: TrainingProgramViewModel = TrainingProgramViewModel(),
+    imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() }
 ){
     NavHost(
         navController = navController,
@@ -40,7 +43,8 @@ fun BottomBarNavGraph(
         composable(route = BottomBarScreen.Exercise.route) {
             ExerciseScreen(navController = navController,
                 rootNavController = rootNavController,
-                trainingProgramViewModel = trainingProgramViewModel )
+                trainingProgramViewModel = trainingProgramViewModel,
+                imagesViewModel = imagesViewModel)
         }
         composable(route = BottomBarScreen.Social.route) {
             SocialScreen()

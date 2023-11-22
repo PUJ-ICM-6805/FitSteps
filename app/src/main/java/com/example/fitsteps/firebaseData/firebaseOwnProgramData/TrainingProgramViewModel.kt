@@ -99,7 +99,7 @@ class TrainingProgramViewModel {
             add["name"] = trainingProgram.name
             add["objective"] = trainingProgram.objective
             add["uid"] = userid.toString()
-            add["image"]= "https://firebasestorage.googleapis.com/v0/b/fitsteps-eb0ef.appspot.com/o/images%2FI2fwKtIo9aZkmmaM966asxWXyJh2?alt=media&token=5c93532d-e0e9-4137-8e7d-ea6ff600be71"
+            add["image"]= trainingProgram.image
             programsCollection
                 .add(add)
                 .addOnSuccessListener { documentReference ->

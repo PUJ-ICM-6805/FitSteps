@@ -1,5 +1,7 @@
 package com.example.fitsteps.screens.training.trainingMainScreen
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -51,9 +53,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import com.example.fitsteps.R
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.ImageFromJSONViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.VolleySingleton
 import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
 import com.example.fitsteps.navigation.PLAN_ROUTE
 import com.example.fitsteps.screens.HamburgersDropList
@@ -63,12 +69,20 @@ import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
+import org.json.JSONArray
 
 @Composable
-fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController, trainingProgramViewModel: TrainingProgramViewModel) {
+fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController, trainingProgramViewModel: TrainingProgramViewModel, imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() }) {
     val ownTrainingProgramsListState = trainingProgramViewModel.ownProgramList.observeAsState(initial = emptyList())
     val ownTrainingProgramsList = ownTrainingProgramsListState.value
-
+    val imagesInUse = remember {
+        mutableStateListOf<String>()
+    }
+    for(t in ownTrainingProgramsList){
+        if(t.image != ""){
+            imagesInUse.add(t.image)
+        }
+    }
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
         CreateNewTrainingPlanFrame(
@@ -77,6 +91,8 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                 showCreateRoutineFrame = showFrame
             },
             trainingProgramViewModel = trainingProgramViewModel,
+            imagesViewModel = imagesViewModel,
+            imagesInUse = imagesInUse,
         )
     }
     LazyColumn(
@@ -230,13 +246,13 @@ fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgr
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
-                contentAlignment = Alignment.BottomStart,
+                contentAlignment = Alignment.Center,
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(model =trainingProgram.image),
+                    painter = rememberAsyncImagePainter(model = trainingProgram.image),
                     contentDescription = "",
                     contentScale = ContentScale.Crop,
-                    alignment = Alignment.BottomCenter,
+                    modifier = Modifier.fillMaxSize()
                 )
                 Column(
                     modifier = Modifier
