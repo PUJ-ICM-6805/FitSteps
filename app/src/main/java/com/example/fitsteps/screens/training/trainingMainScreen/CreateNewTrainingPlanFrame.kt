@@ -2,7 +2,6 @@ package com.example.fitsteps.screens.training.trainingMainScreen
 
 import android.content.Context
 import android.util.Log
-import androidx.browser.trusted.sharing.ShareTarget.RequestMethod
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,11 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 import com.example.fitsteps.R
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
@@ -386,7 +382,7 @@ fun CreateNewTrainingPlanFrame(
                                             val ownTraningProgram = TrainingProgram(
                                                 input_desc,
                                                 input_name,
-                                                "TODO",
+                                                "",
                                                 image = firstUnusedImage
                                             )
                                             trainingProgramViewModel.saveTrainingProgram(

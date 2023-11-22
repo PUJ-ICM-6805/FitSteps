@@ -24,7 +24,7 @@ fun BottomBarNavGraph(
     rootNavController: NavHostController,
     runningViewModel: RunningViewModel = RunningViewModel(),
     trainingProgramViewModel: TrainingProgramViewModel = TrainingProgramViewModel(),
-    imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() }
+    imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() },
     contactsViewModel: UserContactsViewModel = UserContactsViewModel()
 ){
     NavHost(

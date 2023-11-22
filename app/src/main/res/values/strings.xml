@@ -254,4 +254,5 @@
     <string name="end_routine">Terminar Rutina</string>
     <string name ="do_exercise">¡Realiza el ejercicio!</string>
     <string name="gymbro">¡Llama a tu gymbro! 😁</string>
+    <string name="findsteps">Find Steps</string>
 </resources>

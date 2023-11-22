@@ -95,5 +95,6 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
+    //Firebase
 
 }

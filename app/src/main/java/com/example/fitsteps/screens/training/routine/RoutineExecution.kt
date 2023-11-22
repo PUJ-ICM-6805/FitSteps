@@ -50,9 +50,11 @@ import com.example.fitsteps.firebaseData.firebaseOwnProgramData.ExerciseRecord
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.ExerciseSet
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.screens.training.exercise.VideoPlayer
+import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
+import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
 import kotlinx.coroutines.delay
@@ -155,6 +157,16 @@ fun ExerciseDetails(exerciseRecord: ExerciseRecord, navigationViewModel: Navigat
                 )
             }
         }
+        LargeButtons(
+            text = stringResource(id = R.string.findsteps),
+            onClick = {//TODO KEVINCHO
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(25.dp),
+            color = Red,
+            textColor = Color.White
+        )
         Text(
             modifier = Modifier
                 .align(Alignment.Start)
@@ -169,7 +181,7 @@ fun ExerciseDetails(exerciseRecord: ExerciseRecord, navigationViewModel: Navigat
             ),
         )
         SetsRecord(
-            sets= exerciseRecord.records.last().sets,
+            sets = exerciseRecord.records.last().sets,
             navigationViewModel = navigationViewModel
             )
         if(navigationViewModel.currentRecordIndex==0){
@@ -403,16 +415,18 @@ fun DataRoutine(
                         .padding(top = 10.dp)
                         .padding(horizontal = 15.dp)
                         .clickable {
-                            if(isLast){
+                            if (isLast) {
                                 navController.navigate("home")
-                            }else {
-                                Toast.makeText(//TODO: Cambiar por un cuadro más bonito
-                                    navController.context,
-                                    "Acaba la rutina para volver al menú principal",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            } else {
+                                Toast
+                                    .makeText(//TODO: Cambiar por un cuadro más bonito
+                                        navController.context,
+                                        "Acaba la rutina para volver al menú principal",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
                             }
-                                   },
+                        },
                     text = stringResource(R.string.end_routine),
                     color = Color.White,
                     fontSize = 20.sp,
