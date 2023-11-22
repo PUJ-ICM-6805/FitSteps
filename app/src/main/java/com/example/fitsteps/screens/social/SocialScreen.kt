@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
@@ -193,6 +194,9 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                 .background(White),
             onClicked = {
                 contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    contactsPermissionResultContracts.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
             }
         )
         val activity = LocalContext.current as Activity
@@ -220,6 +224,9 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                     onPhoneNumberEntered = {
                         mPhoneNumber = it
                         contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            contactsPermissionResultContracts.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
                         Log.d("numero", userContactsViewModel.userPhoneNumber.value)
                         Log.d("numero", mPhoneNumber)
                         userContactsViewModel.setPhoneNumber(mPhoneNumber)
@@ -258,6 +265,9 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
         // Muestra MainMenu automáticamente cuando no hay interacción aún
         LaunchedEffect(Unit) {
             contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                contactsPermissionResultContracts.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
         MainMenu(
             modifier = Modifier
@@ -265,6 +275,9 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                 .background(White),
             onClicked = {
                 contactsPermissionResultContracts.launch(Manifest.permission.READ_CONTACTS)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    contactsPermissionResultContracts.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
             }
         )
     }

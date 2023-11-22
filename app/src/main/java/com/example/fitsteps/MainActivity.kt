@@ -1,18 +1,12 @@
 package com.example.fitsteps
 
-import android.content.pm.PackageManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.Settings
-import androidx.activity.compose.setContent
-import androidx.core.content.ContextCompat
-import androidx.navigation.compose.rememberNavController
-import com.example.fitsteps.navigation.SetupNavGraph
-import com.example.fitsteps.ui.theme.FitStepsTheme
-import com.google.firebase.auth.FirebaseAuth
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,8 +38,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.navigation.SetupNavGraph
+import com.example.fitsteps.ui.theme.FitStepsTheme
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

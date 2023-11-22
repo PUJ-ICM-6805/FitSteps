@@ -3,12 +3,12 @@ package com.example.fitsteps.screens.social
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.Measures
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class UserContactsViewModel: ViewModel() {
     val auth: FirebaseAuth = Firebase.auth
@@ -37,6 +37,9 @@ class UserContactsViewModel: ViewModel() {
                 .addOnFailureListener {
                     Log.d("Guardado de contactos", "error: $it")
                 }
+            for (contact in contactos) {
+                FirebaseMessaging.getInstance().subscribeToTopic(contact)
+            }
         }
     }
 
