@@ -28,6 +28,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -182,6 +184,7 @@ fun RunningMap(
     var motionSensor = remember { mutableStateOf<Sensor?>(null) }
     val viewModel = viewModel<RunningMapViewModel>()
     var onceStarted by remember { mutableStateOf(false) }
+    val publicMode = remember { mutableStateOf(false) }
     var totalSteps by remember { mutableStateOf(0) }
     var previousSteps by remember { mutableStateOf(0) }
     var currentSteps by remember { mutableStateOf(0) }
@@ -192,6 +195,7 @@ fun RunningMap(
     var stepsReaded by remember { mutableStateOf(false) }
     var totalDistance by remember { mutableStateOf(0.0) }
     var time by remember { mutableStateOf(0L) }
+    var userPhoneNumber by remember { mutableStateOf("") }
     var isMapLoaded by remember {
         mutableStateOf(false)
     }
@@ -225,6 +229,9 @@ fun RunningMap(
             }
             Log.d("Trigger", "motion detected")
         }
+    }
+    LaunchedEffect(key1 = true) {
+        userPhoneNumber = routesViewModel.getNumber()
     }
     DoInLifeCycle(
         lifecycleOwner = lifecycleOwner,
@@ -323,6 +330,26 @@ fun RunningMap(
                             navController.popBackStack("running", false)
                         }
                     }
+                )
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(10.dp)
+                        .width(40.dp)
+                        .height(40.dp)
+                        .clickable {
+                            if(userPhoneNumber != "") {
+                                publicMode.value = !publicMode.value
+                                if (publicMode.value) {
+                                    routesViewModel.updateState(context, userPhoneNumber)
+                                }
+                            } else {
+                                Toast.makeText(context, "Social not synchronized", Toast.LENGTH_LONG).show()
+                            }
+                        },
+                    tint = Color(0xFFF4F4F4)
                 )
                 if(!isMapLoaded) {
                     AnimatedVisibility(
@@ -562,6 +589,9 @@ fun GoogleMapView(
     finished: MutableState<Boolean>,
     onFinish: (List<LatLng>) -> Unit = {},
     distanceListener: (Double) -> Unit = {},
+    publicMode: MutableState<Boolean> = remember { mutableStateOf(false) },
+    userPhoneNumber: String = "",
+    routesViewModel: RunningViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val route = remember { mutableListOf<LatLng>() }
@@ -596,12 +626,17 @@ fun GoogleMapView(
                             }
                             distanceListener(totalDistance)
                         }
+                        if(publicMode.value) {
+                            routesViewModel.updateLocation(currentLocation, userPhoneNumber)
+                        }
                     }
                 }
             }
             startLocationUpdates(locationCallback!!, fusedLocationClient)
+            if(publicMode.value) {
+                //TODO
+            }
         }
-
         onDispose {
             // Al salir del efecto, desvincula el callback para detener las actualizaciones de ubicación.
             locationCallback?.let {
@@ -669,7 +704,6 @@ fun haversineDistance(coord1: LatLng, coord2: LatLng): Double {
 
     return earthRadius * c
 }
-
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable

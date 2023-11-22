@@ -1,13 +1,21 @@
 package com.example.fitsteps.firebaseData.firebaseRunningData
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.example.fitsteps.authentication.User
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
+import org.json.JSONException
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -43,6 +51,22 @@ class RunningViewModel : ViewModel() {
                 }
         }
     }
+    fun updateLocation(latLng: LatLng, userPhoneNumber: String) {
+        val userId = auth.currentUser?.uid
+        val add = HashMap<String,Any>()
+        if(userId != null) {
+            add["latitude"] = latLng.latitude
+            add["longitude"] = latLng.longitude
+            FirebaseFirestore.getInstance().collection("running_users").document(userPhoneNumber)
+                .update(add)
+                .addOnSuccessListener {
+                    Log.d("Location", "updated")
+                }
+                .addOnFailureListener {
+                    Log.d("Location", "Failed")
+                }
+        }
+    }
     fun uploadUserData() {
         FirebaseFirestore.getInstance().collection("users")
             .whereEqualTo("userId", userid)
@@ -62,5 +86,69 @@ class RunningViewModel : ViewModel() {
             .addOnFailureListener { exception ->
                 Log.d("Error", "Error getting documents: ", exception)
             }
+    }
+    suspend fun getNumber(): String{
+        val userId = Firebase.auth.currentUser?.uid
+        val database = FirebaseFirestore.getInstance()
+        val usersRef = database.collection("users_contacts")
+        var doc = ""
+        try {
+            val querySnapshot = usersRef.whereEqualTo("userid", userId).get().await()
+            if (!querySnapshot.isEmpty) {
+                for (document in querySnapshot.documents) {
+                    doc = document.id
+                    break
+                }
+            }
+        }catch (e: Exception) {
+            Log.d("Phone number", "Error getting user by uid: ${e.message}")
+        }
+        Log.d("Phone search", doc)
+        return doc
+    }
+     fun updateState(context: Context, number: String) {
+        val key =
+            "key=AAAAHNy6L3U:APA91bGXlvQE0EwOQWOnhLQRwFL1lK6OflEeZR4zYkVK5EbR9-06KUnXYsiPx6ZCh7Nzl6u_UeyYjithI-eVQTjvZtT2YVCof7-l2_jOW9alizoSmrjU18YHH-OGnzBkoXRAnX9E-lh7"
+        val FCM_API = "https://fcm.googleapis.com/fcm/send"
+        val contentType = "application/json"
+        val topic =
+            "/topics/$number" //topic has to match what the receiver subscribed to
+
+        val notification = JSONObject()
+        val notificationBody = JSONObject()
+
+        try {
+            notificationBody.put("title", "Ola")
+            notificationBody.put(
+                "body",
+                "probando"
+            )   //Enter your notification message
+            notification.put("to", topic)
+            notification.put("title", "ola")
+            notification.put("notification", notificationBody)
+            Log.e("TAG", "try")
+        } catch (e: JSONException) {
+            Log.e("TAG", "onCreate: " + e.message)
+        }
+
+        val requestQueue: RequestQueue by lazy {
+            Volley.newRequestQueue(context)
+        }
+        val jsonObjectRequest =
+            object : JsonObjectRequest(FCM_API, notification,
+                Response.Listener<JSONObject> { response ->
+                    Log.i("TAG", "onResponse: $response")
+                },
+                Response.ErrorListener {
+                    Log.i("TAG", "onErrorResponse: Didn't work")
+                }) {
+                override fun getHeaders(): Map<String, String> {
+                    val params = java.util.HashMap<String, String>()
+                    params["Authorization"] = key
+                    params["Content-Type"] = contentType
+                    return params
+                }
+            }
+        requestQueue.add(jsonObjectRequest)
     }
 }
