@@ -1,5 +1,6 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.exercise
 
+import com.example.fitsteps.firebaseData.firebaseExerciseData.ExerciseViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,127 +34,147 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.White
 import com.example.fitsteps.ui.theme.customFontFamily
-
 @Composable
 fun ExercisesPerMuscleScreen(
     navController: NavHostController,
+    exerciseViewModel: ExerciseViewModel,
+    trainingProgramViewModel: TrainingProgramViewModel
 ) {
+    val exerciseListState = exerciseViewModel.exerciseList.observeAsState(initial = emptyList())
+    val exerciseList = exerciseListState.value
+
+    val selectedMuscleState = exerciseViewModel.selectedMuscle.observeAsState()
+    val selectedMuscle = selectedMuscleState.value
+
+    val selectedExerciseState = exerciseViewModel.selectedExercise.observeAsState()
+    val selectedExercise = selectedExerciseState.value
+
     var showExerciseFrame by remember {
         mutableStateOf(false)
     }
-    if (showExerciseFrame) {
+    if (showExerciseFrame && selectedExercise != null) {
         DetailsPerExerciseScreen(
             navController = navController,
             setShow = { showFrame ->
                 showExerciseFrame = showFrame
-            }
+            }, selectedExercise,
+            trainingProgramViewModel = trainingProgramViewModel
+
         )
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White)
-            .padding(horizontal = 20.dp, vertical = 10.dp)
-    ){
-        Spacer(Modifier.height(40.dp))
-        Box(
-            Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            androidx.compose.material3.Text(
-                text = stringResource(id = R.string.chest),
-                modifier = Modifier
-                    .padding(horizontal = 25.dp, vertical =5.dp),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
-                ),
-            )
-        }
-        Box(
+    if(selectedMuscle!= null) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(10.dp)
-                ),
-            contentAlignment = Alignment.CenterStart,
+                .fillMaxSize()
+                .background(White)
+                .padding(horizontal = 20.dp, vertical = 10.dp)
         ) {
-            Row(
-
-            ){
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_search_icon),
-                    contentDescription = "Search icon",
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp, vertical = 0.dp),
-                    tint = LightBlue
-                )
+            Spacer(Modifier.height(40.dp))
+            Box(
+                Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
                 androidx.compose.material3.Text(
-                    text = stringResource(id = R.string.search),
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
+                    text = selectedMuscle,
+                    modifier = Modifier
+                        .padding(horizontal = 25.dp, vertical = 5.dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Light,
+                        fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp,
                         fontStyle = FontStyle.Normal,
-                        color = LightBlue,
-                    )
+                        color = DarkBlue,
+                    ),
                 )
             }
-
-        }
-        Box(
-            modifier = Modifier
-                .padding(bottom = 60.dp)
-        ) {
-            ExercisesCardList(
-                onClick = {
-                    showExerciseFrame = it
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(10.dp)
+                    ),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Row {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_search_icon),
+                        contentDescription = "Search icon",
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp, vertical = 0.dp),
+                        tint = LightBlue
+                    )
+                    androidx.compose.material3.Text(
+                        text = stringResource(id = R.string.search),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp),
+                        style = TextStyle(
+                            fontFamily = customFontFamily,
+                            fontWeight = FontWeight.Light,
+                            fontSize = 20.sp,
+                            fontStyle = FontStyle.Normal,
+                            color = LightBlue,
+                        )
+                    )
                 }
-            )
-        }
 
+            }
+            Box(
+                modifier = Modifier
+                    .padding(bottom = 60.dp)
+            ) {
+                if(exerciseList.isNotEmpty()) {
+                    ExercisesCardList(
+                        onClick = {
+                            showExerciseFrame = it
+                        }, viewModel = exerciseViewModel
+                    )
+                }
+            }
+
+
+        }
 
     }
-
-
 }
 @Composable
 fun ExercisesCardList(
-    onClick: (Boolean) -> Unit = {}
+    onClick: (Boolean) -> Unit = {},    viewModel: ExerciseViewModel
 ){
+    val exerciseListState = viewModel.exerciseList.observeAsState(initial = emptyList())
+    val exerciseList = exerciseListState.value
+
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
             .padding(top = 20.dp)
     ){
-        items(8){item->
+        items(exerciseList.size){item->
             Box(
                 modifier = Modifier
                     .padding(10.dp)
                     .clickable {
+                        viewModel.setSelectedExercise(exerciseList[item])
                         onClick(true)
                     }
             ) {
                 ExercisesCard(
-                    painter = painterResource(id = R.drawable.benchpress),
-                    contentDescription = "a",
-                    title = "Nombre ejercicio"
+                    painter = rememberAsyncImagePainter(
+                        model = exerciseList[item].image
+                    ),
+                    contentDescription = "Exercise Image and name",
+                    title = exerciseList[item].name
                 )
             }
         }
@@ -168,7 +190,6 @@ fun ExercisesCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
-        //elevation = 5.dp
         ){
         Box(
             modifier =Modifier.height(150.dp)
@@ -187,7 +208,8 @@ fun ExercisesCard(
                 painter = painterResource(id = R.drawable.ic_play_whitebg),
                 )
            Box(
-               modifier = Modifier.fillMaxSize()
+               modifier = Modifier
+                   .fillMaxSize()
                    .background(
                        Brush.verticalGradient(
                            colors = listOf(
@@ -201,7 +223,7 @@ fun ExercisesCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 12.dp, end = 12.dp, top =12.dp, bottom = 5.dp),
+                    .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 5.dp),
                 contentAlignment = Alignment.BottomCenter
             ){
                 androidx.compose.material3.Text(
@@ -218,9 +240,4 @@ fun ExercisesCard(
 
         }
     }
-}
-@Composable
-@Preview
-fun ExercisesPerMuscleScreenPreview() {
-    ExercisesPerMuscleScreen(navController = rememberNavController())
 }

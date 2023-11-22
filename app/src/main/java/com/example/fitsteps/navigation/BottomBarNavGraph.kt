@@ -1,13 +1,14 @@
 package com.example.fitsteps.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.ImageFromJSONViewModel
+import com.example.fitsteps.screens.training.trainingMainScreen.ExerciseScreen
 import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
-import com.example.fitsteps.screens.ExerciseScreen
 import com.example.fitsteps.screens.ProfileScreen
 import com.example.fitsteps.screens.social.SocialScreen
 import com.example.fitsteps.screens.SummaryScreen
@@ -17,12 +18,13 @@ import com.example.fitsteps.screens.running.MyRoutesPartTwo
 import com.example.fitsteps.screens.running.RunningMap
 import com.example.fitsteps.screens.social.UserContactsViewModel
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun BottomBarNavGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
     runningViewModel: RunningViewModel = RunningViewModel(),
+    trainingProgramViewModel: TrainingProgramViewModel = TrainingProgramViewModel(),
+    imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() }
     contactsViewModel: UserContactsViewModel = UserContactsViewModel()
 ){
     NavHost(
@@ -31,7 +33,7 @@ fun BottomBarNavGraph(
         startDestination = BottomBarScreen.Summary.route
     ) {
         composable(route = BottomBarScreen.Summary.route) {
-            SummaryScreen(navController = navController, rootNavController = rootNavController)
+            SummaryScreen(navController = navController, rootNavController = rootNavController, trainingProgramViewModel)
         }
         composable(route = BottomBarScreen.Running.route) {
             MainRunning(
@@ -41,14 +43,17 @@ fun BottomBarNavGraph(
             )
         }
         composable(route = BottomBarScreen.Exercise.route) {
-            ExerciseScreen(navController = navController, rootNavController = rootNavController)
+            ExerciseScreen(navController = navController,
+                rootNavController = rootNavController,
+                trainingProgramViewModel = trainingProgramViewModel,
+                imagesViewModel = imagesViewModel)
         }
         composable(route = BottomBarScreen.Social.route) {
             SocialScreen(userContactsViewModel = contactsViewModel)
         }
         customRoutineNavGraph(navController = navController)
         bodyNavGraph(navController = navController, rootNavController = rootNavController)
-        exerciseNavGraph(navController = navController)
+        exerciseNavGraph(navController = navController, trainingProgramViewModel)
         //TODO organize this
         composable(route = Screen.ProfileScreen.route) {
             ProfileScreen(navController = navController, rootNavController = rootNavController)

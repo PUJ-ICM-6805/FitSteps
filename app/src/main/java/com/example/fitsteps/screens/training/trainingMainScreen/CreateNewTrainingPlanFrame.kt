@@ -1,5 +1,8 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.trainingMainScreen
 
+import android.content.Context
+import android.util.Log
+import androidx.browser.trusted.sharing.ShareTarget.RequestMethod
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,21 +34,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.ImageFromJSONViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.VolleySingleton
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
+import org.json.JSONArray
+
 
 @Composable
 fun CreateNewTrainingPlanFrame(
@@ -56,9 +70,12 @@ fun CreateNewTrainingPlanFrame(
         color = Color.White,
         textAlign = TextAlign.Center,
     ),
+    trainingProgramViewModel: TrainingProgramViewModel,
     show: Boolean,
     setShow: (Boolean, Boolean) -> Unit,
-){
+    imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() },
+    imagesInUse : MutableList<String> = mutableListOf(),
+) {
     var resizedTextStyle by remember { mutableStateOf(style) }
     var input_name by remember {
         mutableStateOf("")
@@ -66,6 +83,19 @@ fun CreateNewTrainingPlanFrame(
     var input_desc by remember {
         mutableStateOf("")
     }
+    val localContext = LocalContext.current
+    //view model for images
+    Log.d("API", "first cond: %s".format(!imagesViewModel.alreadyRequested.value))
+    Log.d("API", "Images: %s".format(imagesViewModel.getImageLinks()))
+    if (imagesViewModel.getImageLinks().isEmpty()) {
+        Log.d("API", "Requesting images")
+        imagesAPIRequest(localContext, imagesViewModel)
+    }
+    Log.d("API", "Images: %s".format(imagesViewModel.getImageLinks()))
+    imagesInUse.forEach {
+        imagesViewModel.markImageAsUsed(it)
+    }
+
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -102,7 +132,7 @@ fun CreateNewTrainingPlanFrame(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(2f),
-                    ){
+                    ) {
                         Image(
                             painter = painterResource(id = R.drawable.frame_create_routine_foto),
                             contentDescription = "RoutineCompleted",
@@ -124,15 +154,6 @@ fun CreateNewTrainingPlanFrame(
                             Text(
                                 text = stringResource(id = R.string.create_new_plan),
                                 softWrap = false,
-                                /*onTextLayout = {
-                                        result ->
-                                    if(result.didOverflowWidth) {
-                                        resizedTextStyle = resizedTextStyle.copy(
-                                            fontSize = resizedTextStyle.fontSize * 0.95f,
-                                        )
-                                    }
-                                },
-                                style = resizedTextStyle,*/
                                 style = TextStyle(
                                     fontFamily = customFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -145,10 +166,6 @@ fun CreateNewTrainingPlanFrame(
                             )
                             Text(
                                 text = stringResource(id = R.string.create_new_plan_description),
-                                /*style = resizedTextStyle.copy(
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = resizedTextStyle.fontSize * 0.7f,
-                                ),*/
                                 style = TextStyle(
                                     fontFamily = customFontFamily,
                                     fontWeight = FontWeight.Normal,
@@ -166,7 +183,7 @@ fun CreateNewTrainingPlanFrame(
                             .fillMaxWidth()
                             .wrapContentHeight()
                             .weight(4f),
-                    ){
+                    ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth(),
@@ -190,15 +207,15 @@ fun CreateNewTrainingPlanFrame(
                                 elevation = 3.dp,
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp, vertical = 0.dp)
-                            ){
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.CenterStart,
-                                ){
+                                ) {
                                     TextField(
                                         value = input_name,
-                                        onValueChange = { input_name = it},
+                                        onValueChange = { input_name = it },
                                         placeholder = {
                                             Text(
                                                 text = stringResource(id = R.string.my_plan),
@@ -248,15 +265,15 @@ fun CreateNewTrainingPlanFrame(
                                 elevation = 3.dp,
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp, vertical = 0.dp)
-                            ){
+                            ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth(),
                                     contentAlignment = Alignment.CenterStart,
-                                ){
+                                ) {
                                     TextField(
                                         value = input_desc,
-                                        onValueChange = { input_desc = it},
+                                        onValueChange = { input_desc = it },
                                         placeholder = {
                                             Text(
                                                 text = stringResource(id = R.string.description),
@@ -291,12 +308,17 @@ fun CreateNewTrainingPlanFrame(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(1.dp).background(LightBlue).fillMaxWidth())
+                    Spacer(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .background(LightBlue)
+                            .fillMaxWidth()
+                    )
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(1f),
-                    ){
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -309,7 +331,7 @@ fun CreateNewTrainingPlanFrame(
                                     .weight(1f)
                                     .fillMaxSize()
                                     .background(Color.White)
-                                    .clickable {setShow(false, false)},
+                                    .clickable { setShow(false, false) },
                                 contentAlignment = Alignment.Center,
                             ) {
 
@@ -324,13 +346,63 @@ fun CreateNewTrainingPlanFrame(
                                     ),
                                 )
                             }
-                            Spacer(modifier = Modifier.width(1.dp).background(LightBlue).fillMaxHeight())
+                            Spacer(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .background(LightBlue)
+                                    .fillMaxHeight()
+                            )
+                            //add new program
+                            //para las imagenes, se puede usar el viewmodel de las imagenes, y se envía la primera unused que se encuentre
+                            //al enviarle esa imagen automaticamente se convierte en used
+
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .weight(1f)
                                     .background(Color.White)
-                                    .clickable { setShow(false, true) },
+                                    .clickable {
+                                        setShow(false, true)
+                                        val firstUnusedImage =
+                                            imagesViewModel.getFirstUnusedImage()
+                                        Log.d(
+                                            "API",
+                                            "First unused image: %s".format(firstUnusedImage)
+                                        )
+                                        Log.d(
+                                            "Unused image",
+                                            "Is image used: %s".format(
+                                                imagesViewModel.isImageUsed(firstUnusedImage)
+                                            )
+                                        )
+                                        if (firstUnusedImage != "") {
+                                            imagesViewModel.markImageAsUsed(firstUnusedImage)
+                                            Log.d(
+                                                "Unused image updated",
+                                                "Is image used: %s".format(
+                                                    imagesViewModel.isImageUsed(firstUnusedImage)
+                                                )
+                                            )
+                                            val ownTraningProgram = TrainingProgram(
+                                                input_desc,
+                                                input_name,
+                                                "TODO",
+                                                image = firstUnusedImage
+                                            )
+                                            trainingProgramViewModel.saveTrainingProgram(
+                                                ownTraningProgram,
+                                                onSuccess = {
+                                                    Log.d("Save program", "Save program success")
+                                                },
+                                                onFailure = { exception ->
+                                                    Log.e(
+                                                        "Save program",
+                                                        "Error saving program ${exception.message}"
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    },
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
@@ -353,8 +425,30 @@ fun CreateNewTrainingPlanFrame(
     }
 }
 
-@Composable
-@Preview
-fun CreateNewTrainingFramePreview(){
-    CreateNewTrainingPlanFrame(show = true, setShow = {_, _ -> })
+fun imagesAPIRequest(context: Context, imagesViewModel: ImageFromJSONViewModel) {
+    val url =
+        "https://pixabay.com/api/?key=40831815-1775c738159c511eff449f4bb&q=fitness(musculos|exercise)%20(training|gimnasio~)-(sneakers|yoga)&image_type=photo&pretty=true"
+    val requestQueue = VolleySingleton(context).getInstance(context)?.getRequestQueue()
+    //hay posibilidad de que se llame más de una vez y no se quiere eso
+    Log.d("API", "requestQueue: %s".format(requestQueue != null))
+    Log.d("API", "requestQueue: %s".format(!imagesViewModel.alreadyRequested.value))
+    if (requestQueue != null && !imagesViewModel.alreadyRequested.value) {
+        Log.d("API", "Requesting images in function")
+        JsonObjectRequest(Request.Method.GET, url, null, { response ->
+            Log.d("API", "Response: %s".format(response.toString()))
+            JSONArray(response.getString("hits")).let { jsonArray ->
+                val imagesLinks = mutableListOf<String>()
+                for (i in 0 until jsonArray.length()) {
+                    val image = jsonArray.getJSONObject(i)
+                    imagesLinks.add(image.getString("webformatURL"))
+                }
+                imagesViewModel.alreadyRequested.value = true
+                imagesViewModel.setImagesLinks(imagesLinks)
+            }
+        }, { error ->
+            Log.d("API", "Error: %s".format(error.toString()))
+        }).also {
+            requestQueue.add(it)
+        }
+    }
 }

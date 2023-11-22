@@ -1,5 +1,6 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.trainingMainScreen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,11 +25,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,25 +48,36 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.ImageFromJSONViewModel
 import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
 import com.example.fitsteps.navigation.PLAN_ROUTE
+import com.example.fitsteps.screens.HamburgersDropList
 import com.example.fitsteps.screens.authentication.RoundedLinearProgressIndicator
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.Red
 import com.example.fitsteps.ui.theme.customFontFamily
+import org.json.JSONArray
 
 @Composable
-fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController) {
-    var havePlans by remember {
-        mutableStateOf(false)
+fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostController, trainingProgramViewModel: TrainingProgramViewModel, imagesViewModel: ImageFromJSONViewModel = remember { ImageFromJSONViewModel() }) {
+    val ownTrainingProgramsListState = trainingProgramViewModel.ownProgramList.observeAsState(initial = emptyList())
+    val ownTrainingProgramsList = ownTrainingProgramsListState.value
+    val imagesInUse = remember {
+        mutableStateListOf<String>()
+    }
+    for(t in ownTrainingProgramsList){
+        if(t.image != ""){
+            imagesInUse.add(t.image)
+        }
     }
     var showCreateRoutineFrame by remember { mutableStateOf(false) }
     if (showCreateRoutineFrame) {
@@ -71,8 +85,10 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
             show = showCreateRoutineFrame,
             setShow = { showFrame, showExercise ->
                 showCreateRoutineFrame = showFrame
-                havePlans = showExercise
-            }
+            },
+            trainingProgramViewModel = trainingProgramViewModel,
+            imagesViewModel = imagesViewModel,
+            imagesInUse = imagesInUse,
         )
     }
     LazyColumn(
@@ -123,10 +139,11 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
             )
         }
         item {
-            WeekButtonsRow()
+            WeekButtonsRow(
+                onSelectionChanged = {}
+            )
         }
         item {
-            if(havePlans) {
                 Text(
                     text = stringResource(id = R.string.my_collection),
                     modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
@@ -138,22 +155,16 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                         color = DarkBlue,
                     )
                 )
-            }
         }
         item {
-            if (havePlans) {
                 LazyRow(
                     modifier = Modifier
                         .padding(15.dp)
                 ) {
-                    item {
-                        RoutineCard(navController = navController)
-                    }
-                    item {
-                        RoutineCard(navController = navController)
+                    items(ownTrainingProgramsList.size){item->
+                        RoutineCard(navController = navController, ownTrainingProgramsList[item], trainingProgramViewModel)
                     }
                 }
-            }
         }
         item {
             Text(
@@ -174,10 +185,10 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                     .padding(15.dp)
             ) {
                 item {
-                    RoutineCard(navController = navController)
+                    RoutineCard(navController = navController,null, TrainingProgramViewModel())//TODO: Fitsteps Routines
                 }
                 item {
-                    RoutineCard(navController = navController)
+                    RoutineCard(navController = navController,null, TrainingProgramViewModel())
                 }
             }
         }
@@ -199,7 +210,7 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                 onClick = {
                     navController.navigate(CUSTOM_ROUTINE_ROUTE)
                 },
-                color = androidx.compose.material.MaterialTheme.colors.background,
+                color = MaterialTheme.colors.background,
                 borderColor = Red,
                 textColor = Red,
                 modifier = Modifier
@@ -214,94 +225,98 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
 }
 
 @Composable
-fun RoutineCard(navController: NavHostController) {
-    Card(
-        modifier = Modifier
-            .height(190.dp)
-            .width(300.dp)
-            .padding(end = 20.dp)
-            .clickable {
-                navController.navigate(PLAN_ROUTE)
-            },
-        shape = RoundedCornerShape(20.dp),
-        backgroundColor = Color.White,
-    ){
-        Box(
+fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgram?, viewModel: TrainingProgramViewModel) {
+    if(trainingProgram != null) {
+        Card(
             modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.BottomStart,
+                .height(190.dp)
+                .width(300.dp)
+                .padding(end = 20.dp)
+                .clickable {
+                    viewModel.setSelectedProgram(trainingProgram)
+                    navController.navigate(PLAN_ROUTE)
+                },
+            shape = RoundedCornerShape(20.dp),
+            backgroundColor = Color.White,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.woman),
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.BottomCenter,
-            )
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Bottom,
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = "Full body", // TODO: Change for the actual routine type
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
-                    style = TextStyle(
-                        fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Light,
-                        fontSize = 22.sp,
-                        fontStyle = FontStyle.Normal,
-                        color = Color.White,
-                    )
+                Log.d ("Image", trainingProgram.image)
+                Image(
+                    painter = rememberAsyncImagePainter(model = trainingProgram.image),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                Text(
-                    text = "Pérdida de grasa", //TODO: Change for the actual activity
-                    modifier = Modifier.padding(start = 15.dp),
-                    style = TextStyle(
-                        fontFamily = customFontFamily,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp,
-                        fontStyle = FontStyle.Normal,
-                        color = Color.White,
-                    )
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(0.dp),
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom,
                 ) {
                     Text(
-                        text = stringResource(id = R.string.progress),
+                        text = trainingProgram.name,
                         modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
                         style = TextStyle(
                             fontFamily = customFontFamily,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Light,
+                            fontSize = 22.sp,
                             fontStyle = FontStyle.Normal,
-                            color = Color(0xFFF4F4F4),
+                            color = Color.White,
                         )
                     )
                     Text(
-                        text = "5%", //TODO: Change for the actual progress
-                        modifier = Modifier.padding(end = 15.dp),
+                        text = trainingProgram.objective,
+                        modifier = Modifier.padding(start = 15.dp),
                         style = TextStyle(
                             fontFamily = customFontFamily,
-                            fontWeight = FontWeight.Light,
-                            fontSize = 12.sp,
-                            fontStyle = FontStyle.Italic,
-                            color = Color(0xFFF4F4F4),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            fontStyle = FontStyle.Normal,
+                            color = Color.White,
                         )
                     )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .padding(0.dp),
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.progress),
+                            modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 12.sp,
+                                fontStyle = FontStyle.Normal,
+                                color = Color(0xFFF4F4F4),
+                            )
+                        )
+                        Text(
+                            text = "5%", //TODO: Change for the actual progress
+                            modifier = Modifier.padding(end = 15.dp),
+                            style = TextStyle(
+                                fontFamily = customFontFamily,
+                                fontWeight = FontWeight.Light,
+                                fontSize = 12.sp,
+                                fontStyle = FontStyle.Italic,
+                                color = Color(0xFFF4F4F4),
+                            )
+                        )
+                    }
+                    RoundedLinearProgressIndicator(
+                        modifier = Modifier
+                            .padding(top = 0.dp, bottom = 10.dp, start = 15.dp, end = 15.dp)
+                            .height(10.dp),
+                        progress = 0.1f,
+                        progressColor = Blue,
+                        backgroundColor = LightBlue,
+                    )
                 }
-                RoundedLinearProgressIndicator(
-                    modifier = Modifier
-                        .padding(top = 0.dp, bottom = 10.dp, start = 15.dp, end = 15.dp)
-                        .height(10.dp),
-                    progress = 0.1f,
-                    progressColor = Blue,
-                    backgroundColor = LightBlue,
-                )
             }
         }
     }
@@ -309,11 +324,12 @@ fun RoutineCard(navController: NavHostController) {
 @Composable
 fun WeekButtonsRow(
     multipleItems: Boolean = false,
+    onSelectionChanged: (List<String>) -> Unit,
 ) {
     val selectedValue = remember { mutableStateOf("") }
     val selectedValues = remember { mutableStateListOf<String>() }
     val items = listOf(
-        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+        "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
     )
     Row(
         modifier = Modifier
@@ -343,6 +359,7 @@ fun WeekButtonsRow(
                                 } else {
                                     selectedValue.value = item
                                 }
+                                onSelectionChanged(selectedValues.toList())
                             },
                             role = Role.RadioButton
                         )
@@ -353,22 +370,22 @@ fun WeekButtonsRow(
                 ) {
                     Text(
                         text = when(item) {
-                            "monday" -> {
+                            "Lunes" -> {
                                 stringResource(id = R.string.monday_letter)
                             }
-                            "tuesday" -> {
+                            "Martes" -> {
                                 stringResource(id = R.string.tuesday_letter)
                             }
-                            "wednesday" -> {
+                            "Miércoles" -> {
                                 stringResource(id = R.string.wednesday_letter)
                             }
-                            "thursday" -> {
+                            "Jueves" -> {
                                 stringResource(id = R.string.thursday_letter)
                             }
-                            "friday" -> {
+                            "Viernes" -> {
                                 stringResource(id = R.string.friday_letter)
                             }
-                            "saturday" -> {
+                            "Sábado" -> {
                                 stringResource(id = R.string.saturday_letter)
                             }
                             else -> {
@@ -456,10 +473,4 @@ fun LargeButtons(
             )
         }
     }
-}
-
-@Composable
-@Preview
-fun ExerciseScreenPreview() {
-    ExerciseScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }

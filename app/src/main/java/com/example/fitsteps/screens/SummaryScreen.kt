@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,15 +51,18 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.fitsteps.R
 import com.example.fitsteps.authentication.DatabaseUtils
 import com.example.fitsteps.authentication.User
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.Routine
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -67,10 +72,17 @@ import com.example.fitsteps.ui.theme.customFontFamily
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
-fun SummaryScreen(navController: NavHostController, rootNavController: NavHostController) {
+fun SummaryScreen(navController: NavHostController, rootNavController: NavHostController, trainingProgramViewModel: TrainingProgramViewModel) {
+
+    val ownTrainingProgramsListState = trainingProgramViewModel.ownProgramList.observeAsState(initial = emptyList())
+    val ownTrainingProgramsList = ownTrainingProgramsListState.value
+
     val userid = Firebase.auth.currentUser?.uid
     val userEmail = Firebase.auth.currentUser?.email
     val usuario = remember { mutableStateOf(User()) } //obligatorio
@@ -147,7 +159,9 @@ fun SummaryScreen(navController: NavHostController, rootNavController: NavHostCo
             StatsCard()
         }*/
         item {
-            CardDayActivity()
+            if(ownTrainingProgramsList.isNotEmpty()) {
+                CardDayActivity(ownTrainingProgramsList, trainingProgramViewModel, navController)
+            }
         }
         item {
             SocialInfoCard()
@@ -296,80 +310,112 @@ fun IconsRow() {
         }
     }
 }
-
+fun getActualDay() :String{
+    val formatDay = SimpleDateFormat("EEEE", Locale("es", "ES"))
+    val actualDay = Date()
+    return formatDay.format(actualDay)
+}
 @Composable
-fun CardDayActivity() {
+fun CardDayActivity(trainingProgramList: List<TrainingProgram> , trainingProgramViewModel: TrainingProgramViewModel, navController: NavHostController) {
+    Log.d("TrainingProgramList", trainingProgramList.toString())
+    val actualDay = getActualDay()
+    var routineName by remember {mutableStateOf("") }
+    var programImage by remember {mutableStateOf("") }
+    var routineEx by remember { mutableStateOf(Routine())}
+    Log.d("Actual day", actualDay)
+    outer@for(trainingProgram in trainingProgramList ){
+          for(routine in trainingProgram.routines){
+              routineEx = routine
+              val normalizedDays = routine.days.lowercase().replace(" ", "")
+              if (normalizedDays.contains(actualDay)) {
+                  routineName = routine.name
+                  programImage = trainingProgram.image
+                  break@outer
+              }
+          }
+    }
+    Log.d("RoutineName", routineName)
+    Log.d("RoutineImage", programImage)
+    if(routineName == ""){
+        routineName = "Descanso"
+        programImage = "https://firebasestorage.googleapis.com/v0/b/fitsteps-eb0ef.appspot.com/o/images%2Fsleep-training1.png?alt=media&token=32ee7de2-585e-41e4-aac7-e0b86f057245"
+    }
     Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(15.dp),
+            .fillMaxWidth()
+            .height(200.dp)
+            .padding(15.dp)
+            .clickable {
+                if (routineName != "Descanso" && routineEx.name == routineName) {
+                    trainingProgramViewModel.setSelectedRoutine(routineEx)
+                    navController.navigate(Screen.RoutineScreen.route)
+                }
+            },
         shape = RoundedCornerShape(20.dp),
         backgroundColor = Color.White,
     ){
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.BottomStart,
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(id = R.drawable.exercise_default),
+                painter = rememberAsyncImagePainter(model = programImage),
                 contentDescription = "",
-                modifier = Modifier
-                    .fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                alignment = Alignment.BottomCenter,
+                modifier = Modifier.fillMaxSize(),
             )
-            Column {
+            Column(
+                modifier = Modifier.wrapContentSize(),
+            ) {
                 Text(
                     text = stringResource(id = R.string.today),
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp, vertical = 0.dp)
+                        .background(
+                            Color.White,
+                            RoundedCornerShape(
+                                topStart = 5.dp,
+                                bottomStart = 0.dp,
+                                topEnd = 5.dp,
+                                bottomEnd = 0.dp
+                            )
+                        )
+                        .padding(horizontal = 10.dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Light,
                         fontSize = 22.sp,
                         fontStyle = FontStyle.Normal,
-                        color = Color.White,
+                        color = Color.Black,
                     )
                 )
                 Text(
-                    text = "Día de pierna", //TODO: Change for the actual activity
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                    text = routineName,
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp, vertical = 0.dp)
+                        .background(
+                            Color.White,
+                            RoundedCornerShape(
+                                topStart = 0.dp,
+                                bottomStart = 5.dp,
+                                topEnd = 5.dp,
+                                bottomEnd = 5.dp
+                            )
+                        )
+                        .padding(horizontal = 10.dp),
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp,
                         fontStyle = FontStyle.Normal,
-                        color = Color.White,
+                        color = Color.Black,
                     )
                 )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 15.dp, bottom = 10.dp),
+                        .padding(start = 15.dp, top = 10.dp),
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = White,
-                        modifier = Modifier
-                            .padding(end = 8.dp),
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = "Día 1", //TODO: Change for the actual day
-                                style = TextStyle(
-                                    fontFamily = customFontFamily,
-                                    fontWeight = FontWeight.Light,
-                                    fontSize = 16.sp,
-                                    fontStyle = FontStyle.Normal,
-                                    color = DarkBlue,
-                                ),
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp, vertical = 5.dp),
-                            )
-                        }
-                    }
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = White,
@@ -755,11 +801,5 @@ fun DropDownMenu2() {
         }
     }
 
-}
-
-@Composable
-@Preview
-fun SummaryScreenPreview() {
-    SummaryScreen(navController = rememberNavController(), rootNavController = rememberNavController())
 }
 

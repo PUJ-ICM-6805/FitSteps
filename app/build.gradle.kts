@@ -1,17 +1,17 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
+    id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
     namespace = "com.example.fitsteps"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.fitsteps"
-        minSdk = 28
+        minSdk = 29
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -54,20 +54,21 @@ android {
 }
 
 dependencies {
-    implementation ("androidx.compose.material:material-icons-extended:1.3.1")
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.0")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.0")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-    implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")
+    implementation("com.google.firebase:firebase-auth-ktx:22.2.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.8.1")//Con esta version funciona .whereArrayContains, la  24.9.1 no
     implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.google.android.datatransport:transport-runtime:3.1.9")
+    implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.android.datatransport:transport-runtime:3.2.0")
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.android.volley:volley:1.2.1")
@@ -78,18 +79,21 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.material:material:1.3.1")
+    implementation("androidx.compose.material:material:1.5.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation ("com.google.maps.android:maps-compose:2.15.0")
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
-    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+    implementation ("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation ("com.firebaseui:firebase-ui-storage:7.2.0")
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.github.rosariopfernandes:firecoil:0.2.0")
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
     implementation ("com.google.firebase:firebase-messaging:23.3.1")
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
-
     //Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
+
 }

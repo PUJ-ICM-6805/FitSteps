@@ -228,9 +228,11 @@
         <item>Biceps</item>
         <item>Oblicuos</item>
         <item>Triceps</item>
-        <item>Gluteos</item>
-        <item>Pierna</item>
+        <item>Glúteos</item>
+        <item>Cuadriceps</item>
+        <item>Isquiotibiales</item>
         <item>Espalda</item>
+        <item>Lumbar</item>
         <item>Antebrazo</item>
         <item>Pantorrilla</item>
         <item>Dorsales</item>
@@ -247,5 +249,9 @@
     <string name="rithm">Ritmo</string>
     <string name="heart_rate">Ritmo cardiáco</string>
     <string name="steps">Pasos</string>
+    <string name="rest">Descansa</string>
+    <string name="s">s</string>
+    <string name="end_routine">Terminar Rutina</string>
+    <string name ="do_exercise">¡Realiza el ejercicio!</string>
     <string name="gymbro">¡Llama a tu gymbro! 😁</string>
 </resources>

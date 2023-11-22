@@ -45,7 +45,7 @@ import com.example.fitsteps.firebaseData.firebaseRunningData.Route
 import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
-import com.example.fitsteps.screens.LargeButtons
+import com.example.fitsteps.screens.training.trainingMainScreen.LargeButtons
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.customFontFamily
 import com.google.android.gms.maps.model.LatLng

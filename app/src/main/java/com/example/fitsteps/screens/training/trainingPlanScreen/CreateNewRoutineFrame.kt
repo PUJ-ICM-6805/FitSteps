@@ -1,5 +1,6 @@
-package com.example.fitsteps.screens
+package com.example.fitsteps.screens.training.trainingPlanScreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,12 +37,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.fitsteps.R
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.Routine
+import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
+import com.example.fitsteps.screens.training.trainingMainScreen.WeekButtonsRow
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -56,16 +59,14 @@ fun CreateNewRoutineFrame(
         color = Color.White,
         textAlign = TextAlign.Center,
     ),
-    show: Boolean,
+    trainingProgramViewModel: TrainingProgramViewModel,
     setShow: (Boolean, Boolean) -> Unit,
 ){
-    var resizedTextStyle by remember { mutableStateOf(style) }
     var input_name by remember {
         mutableStateOf("")
     }
-    var input_desc by remember {
-        mutableStateOf("")
-    }
+    var selectedDays by remember { mutableStateOf<List<String>>(emptyList()) }
+
     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
@@ -124,15 +125,6 @@ fun CreateNewRoutineFrame(
                             Text(
                                 text = stringResource(id = R.string.create_routine),
                                 softWrap = false,
-                                /*onTextLayout = {
-                                        result ->
-                                    if(result.didOverflowWidth) {
-                                        resizedTextStyle = resizedTextStyle.copy(
-                                            fontSize = resizedTextStyle.fontSize * 0.95f,
-                                        )
-                                    }
-                                },
-                                style = resizedTextStyle,*/
                                 style = TextStyle(
                                     fontFamily = customFontFamily,
                                     fontWeight = FontWeight.Bold,
@@ -228,6 +220,7 @@ fun CreateNewRoutineFrame(
                             )
                             WeekButtonsRow(
                                 multipleItems = true,
+                                onSelectionChanged = { selectedDays = it },
                             )
                         }
                     }
@@ -255,7 +248,6 @@ fun CreateNewRoutineFrame(
                                     .clickable { setShow(false, false) },
                                 contentAlignment = Alignment.Center,
                             ) {
-
                                 Text(
                                     text = stringResource(id = R.string.cancel),
                                     style = TextStyle(
@@ -276,7 +268,22 @@ fun CreateNewRoutineFrame(
                                     .fillMaxSize()
                                     .weight(1f)
                                     .background(Color.White)
-                                    .clickable { setShow(false, true) },
+                                    .clickable {
+                                        setShow(false, true)
+                                        val days = selectedDays.joinToString(separator = " | ")
+                                            val routine = Routine(
+                                                name = input_name,
+                                                days = days,
+                                                exercises = arrayListOf(),
+                                                )
+                                        trainingProgramViewModel.addRoutineToActualProgram(routine = routine,
+                                            onSuccess = {
+                                                Log.d("Routine", "Routine added to program")
+                                                        },
+                                            onFailure = {exception->
+                                                Log.e("Routine", "Routine not added to program: $exception")
+                                                   })
+                                               },
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
@@ -297,10 +304,4 @@ fun CreateNewRoutineFrame(
             }
         }
     }
-}
-
-@Composable
-@Preview
-fun CreateNewRoutineFramePreview(){
-    CreateNewRoutineFrame(show = true, setShow = { _, _ -> })
 }
