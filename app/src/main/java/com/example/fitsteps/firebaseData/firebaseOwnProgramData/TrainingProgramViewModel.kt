@@ -42,6 +42,7 @@ class TrainingProgramViewModel {
         loadAllOwnPrograms()
     }
     init {
+
         programsCollection.addSnapshotListener(snapshotListener)
         loadAllOwnPrograms()
     }
@@ -60,37 +61,39 @@ class TrainingProgramViewModel {
     }
     //CARGAR DE REST
     private fun loadAllOwnPrograms() {
-        programsCollection.whereEqualTo("uid",userid).
-        get()
-            .addOnSuccessListener { querySnapshot ->
-                val programs = ArrayList<TrainingProgram>()
-                for (document in querySnapshot) {
-                    val trainingProgram = document.toObject(TrainingProgram::class.java)
+        if(userid != null) {
+            programsCollection.whereEqualTo("uid", userid).get()
+                .addOnSuccessListener { querySnapshot ->
+                    val programs = ArrayList<TrainingProgram>()
+                    for (document in querySnapshot) {
+                        val trainingProgram = document.toObject(TrainingProgram::class.java)
 
-                    //Accessing the subcolelction "routines"
-                    programsCollection.document(document.id)
-                        .collection("routines")
-                        .get()
-                        .addOnSuccessListener { queryRoutineSnapshot  ->
-                            val routines = ArrayList<Routine>()
-                            for (routineDocument in queryRoutineSnapshot) {
-                                val routine = routineDocument.toObject(Routine::class.java)
-                                routines.add(routine)
+                        //Accessing the subcolelction "routines"
+                        programsCollection.document(document.id)
+                            .collection("routines")
+                            .get()
+                            .addOnSuccessListener { queryRoutineSnapshot ->
+                                val routines = ArrayList<Routine>()
+                                for (routineDocument in queryRoutineSnapshot) {
+                                    val routine = routineDocument.toObject(Routine::class.java)
+                                    routines.add(routine)
+                                }
+                                trainingProgram.routines = routines
+
+                                programs.add(trainingProgram)
+
+                                _ownProgramList.value = programs
+                                Log.d("OwnPrograms", _ownProgramList.value.toString())
                             }
-                            trainingProgram.routines = routines
-
-                            programs.add(trainingProgram)
-
-                            _ownProgramList.value = programs
-                        }
-                        .addOnFailureListener{
-                            Log.e("LoadRoutines", "Error loading routines", it)
-                        }
+                            .addOnFailureListener {
+                                Log.e("LoadRoutines", "Error loading routines", it)
+                            }
+                    }
                 }
-            }
-            .addOnFailureListener{
-                Log.e("LoadPrograms", "Error loading programs", it)
-            }
+                .addOnFailureListener {
+                    Log.e("LoadPrograms", "Error loading programs", it)
+                }
+        }
     }
     fun saveTrainingProgram(trainingProgram: TrainingProgram, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
        val add = HashMap<String,Any>()

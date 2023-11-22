@@ -1,6 +1,5 @@
 package com.example.fitsteps.screens.training.trainingMainScreen
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -53,13 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
 import com.example.fitsteps.R
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.ImageFromJSONViewModel
-import com.example.fitsteps.firebaseData.firebaseOwnProgramData.rest.VolleySingleton
 import com.example.fitsteps.navigation.CUSTOM_ROUTINE_ROUTE
 import com.example.fitsteps.navigation.PLAN_ROUTE
 import com.example.fitsteps.screens.HamburgersDropList
@@ -248,6 +244,7 @@ fun RoutineCard(navController: NavHostController, trainingProgram: TrainingProgr
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
+                Log.d ("Image", trainingProgram.image)
                 Image(
                     painter = rememberAsyncImagePainter(model = trainingProgram.image),
                     contentDescription = "",

@@ -31,7 +31,7 @@ fun BottomBarNavGraph(
         startDestination = BottomBarScreen.Summary.route
     ) {
         composable(route = BottomBarScreen.Summary.route) {
-            SummaryScreen(navController = navController, rootNavController = rootNavController)
+            SummaryScreen(navController = navController, rootNavController = rootNavController, trainingProgramViewModel)
         }
         composable(route = BottomBarScreen.Running.route) {
             MainRunning(
