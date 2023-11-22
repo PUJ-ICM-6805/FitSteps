@@ -37,12 +37,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.ListItem
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -558,6 +554,7 @@ fun SearchBar(
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done
             ),
+            singleLine = true,
             keyboardActions = KeyboardActions(
                 onDone = {
                     isSearchEntered = true
@@ -764,7 +761,18 @@ fun PhoneNumberScreen(
                 showDialog = false
             },
             title = {
-                Text(text = "Ingresa tu número de teléfono")
+                Text(text = "Ingresa tu número de teléfono",
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontStyle = FontStyle.Normal,
+                        fontSize = 20.sp,
+                        color = Red,
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp))
             },
             text = {
                 TextField(
@@ -775,6 +783,15 @@ fun PhoneNumberScreen(
                     label = {
                         Text(text = "Número telefónico")
                     },
+                    singleLine = true
+                    ,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.White,
+                        focusedIndicatorColor = DarkBlue,
+                        cursorColor = DarkBlue,
+                        unfocusedIndicatorColor = DarkBlue,
+                        disabledIndicatorColor = DarkBlue,
+                    ),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
                     modifier = Modifier
                         .fillMaxWidth()
