@@ -9,12 +9,13 @@ import androidx.navigation.compose.composable
 import com.example.fitsteps.firebaseData.firebaseRunningData.RunningViewModel
 import com.example.fitsteps.screens.ExerciseScreen
 import com.example.fitsteps.screens.ProfileScreen
-import com.example.fitsteps.screens.SocialScreen
+import com.example.fitsteps.screens.social.SocialScreen
 import com.example.fitsteps.screens.SummaryScreen
 import com.example.fitsteps.screens.running.MainRunning
 import com.example.fitsteps.screens.running.MyRoutesPartOne
 import com.example.fitsteps.screens.running.MyRoutesPartTwo
 import com.example.fitsteps.screens.running.RunningMap
+import com.example.fitsteps.screens.social.UserContactsViewModel
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
@@ -22,6 +23,7 @@ fun BottomBarNavGraph(
     navController: NavHostController,
     rootNavController: NavHostController,
     runningViewModel: RunningViewModel = RunningViewModel(),
+    contactsViewModel: UserContactsViewModel = UserContactsViewModel()
 ){
     NavHost(
         navController = navController,
@@ -42,7 +44,7 @@ fun BottomBarNavGraph(
             ExerciseScreen(navController = navController, rootNavController = rootNavController)
         }
         composable(route = BottomBarScreen.Social.route) {
-            SocialScreen()
+            SocialScreen(userContactsViewModel = contactsViewModel)
         }
         customRoutineNavGraph(navController = navController)
         bodyNavGraph(navController = navController, rootNavController = rootNavController)
