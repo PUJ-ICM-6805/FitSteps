@@ -638,6 +638,10 @@ fun getContacts(context: Context): List<Contact> {
                     var phoneNumber: String = phoneCursor.getString(phoneNumberIndex)
                     //aplicamos regex para quitar espacios intermedios guiones y parentesis
                     phoneNumber = phoneNumber.replace("[\\s\\-\\(\\)]".toRegex(), "")
+                    //si el phoneNumber contiene un +57 al inicio, se elimina
+                    if (phoneNumber.contains("+57")) {
+                        phoneNumber = phoneNumber.replace("+57", "")
+                    }
                     contacts.add(Contact(id.toInt(), name, phoneNumber))
                 }
             }
