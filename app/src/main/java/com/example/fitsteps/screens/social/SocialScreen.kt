@@ -34,15 +34,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.ListItem
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +51,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -68,7 +66,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -121,7 +121,7 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
     var phoneNumberEntered by remember { mutableStateOf<String?>(null) }
     val usersStatus = remember { mutableStateListOf<User>() }
     val usersFromContacts = remember { mutableStateListOf<User>() }
-
+    var filteredContacts by remember { mutableStateOf<List<User>>(emptyList()) }
 
     if (userid != null) {
         //buscamos en la colección de usuarios el documento que tenga como campo userid el id del usuario actual
@@ -151,6 +151,15 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
     if (isContactsPermissionGranted && userContactsViewModel.userExists.value) {
         Log.d("llamando1", "TRUE TRUE")
         phoneNumberEntered = userContactsViewModel.userPhoneNumber.value
+        val users = usersFromContacts.toSet()
+        for(user in users) {
+            for(usersT in usersStatus) {
+                Log.d("Verificacion", (user.userId == usersT.userId).toString())
+                if(user.userId == usersT.userId) {
+                    user.active = usersT.active
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -181,7 +190,20 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
-                SearchBar()
+                SearchBar(
+                    onSearchEntered = { searchString ->
+                        Log.d("SearchBar", "Search text: $searchString")
+                        // Update the filteredContacts list based on the search string
+                        filteredContacts = if (searchString.isBlank() || searchString.isEmpty()) {
+                            Log.d("SearchBar", "Search text is blank or empty")
+                            users.toList()
+                        } else {
+                            users.toList().filter { user ->
+                                user.user_name.contains(searchString, ignoreCase = true)
+                            }
+                        }
+                    }
+                )
             }
             Text(
                 modifier = Modifier
@@ -197,20 +219,14 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                 ),
                 textAlign = TextAlign.Center,
             )
-
-            val users = usersFromContacts.toSet()
-            for(user in users) {
-                for(usersT in usersStatus) {
-                    Log.d("Verificacion", (user.userId == usersT.userId).toString())
-                    if(user.userId == usersT.userId) {
-                        user.active = usersT.active
-                    }
-                }
-            }
             //entrar a dial de llamada y poner su numero
             val localContext = LocalContext.current
+            if (filteredContacts.isEmpty()) {
+                filteredContacts = users.toList()
+            }
+            Log.d("contactos", filteredContacts.toString())
             LazyColumn {
-                items(users.toList()) { contact ->
+                items(filteredContacts) { contact ->
                     // Obtener el estado "online" del modelo de vista
                     val isOnline = contact.active
                     ContactItem(contact = contact, isOnline = isOnline, onClicked = {
@@ -364,6 +380,20 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                 .fillMaxSize()
                 .background(White),
         ) {
+            val users = usersFromContacts.toSet()
+            for(user in users) {
+                for(usersT in usersStatus) {
+                    Log.d("Verificacion", (user.userId == usersT.userId).toString())
+                    if(user.userId == usersT.userId) {
+                        user.active = usersT.active
+                    }
+                    if(user.userId == userid){
+                        //lo eliminamos de la lista
+                        usersFromContacts.remove(user)
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(50.dp))
             Box(
                 modifier = Modifier
@@ -389,7 +419,14 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
-                SearchBar()
+                SearchBar(
+                    onSearchEntered = { searchString ->
+                        // Update the filteredContacts list based on the search string
+                        filteredContacts = users.filter { user ->
+                            user.user_name.contains(searchString, ignoreCase = true)
+                        }
+                    }
+                )
             }
             Text(
                 modifier = Modifier
@@ -405,24 +442,10 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                 ),
                 textAlign = TextAlign.Center,
             )
-
-            val users = usersFromContacts.toSet()
-            for(user in users) {
-                for(usersT in usersStatus) {
-                    Log.d("Verificacion", (user.userId == usersT.userId).toString())
-                    if(user.userId == usersT.userId) {
-                        user.active = usersT.active
-                    }
-                    if(user.userId == userid){
-                        //lo eliminamos de la lista
-                        usersFromContacts.remove(user)
-                    }
-                }
-            }
             //entrar a dial de llamada y poner su numero
             val localContext = LocalContext.current
             LazyColumn {
-                items(users.toList()) { contact ->
+                items(filteredContacts.toList()) { contact ->
                     // Obtener el estado "online" del modelo de vista
                     val isOnline = contact.active
                     ContactItem(contact = contact, isOnline = isOnline, onClicked = {
@@ -466,7 +489,8 @@ fun MainMenu(modifier: Modifier, onClicked: () -> Unit) {
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
-            SearchBar()
+            SearchBar(
+            )
         }
         Text(
             modifier = Modifier
@@ -518,10 +542,12 @@ fun MainMenu(modifier: Modifier, onClicked: () -> Unit) {
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
+    onSearchEntered: (String) -> Unit = {},
     backgroundColor: Color = Color.White,
-    text: String = stringResource(id = R.string.search),
-    label: String = "",
 ) {
+    var searchText by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var isSearchEntered by remember { mutableStateOf(false) }
+
     Surface(
         modifier = modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -532,8 +558,22 @@ fun SearchBar(
         color = backgroundColor,
     ) {
         TextField(
-            value = "",
-            onValueChange = { },
+            value = searchText.text,
+            onValueChange = {
+                searchText = TextFieldValue(it)
+                Log.d("SearchBar", "Search text: ${searchText.text}")
+                isSearchEntered = false
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            singleLine = true,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    isSearchEntered = true
+                    Log.d("SearchBar", "Search entered: ${searchText.text}")
+                }
+            ),
             placeholder = {
                 Text(
                     text = "Buscar",
@@ -557,6 +597,7 @@ fun SearchBar(
                 .height(60.dp)
         )
     }
+   onSearchEntered(searchText.text)
 }
 
 
@@ -733,7 +774,18 @@ fun PhoneNumberScreen(
                 showDialog = false
             },
             title = {
-                Text(text = "Ingresa tu número de teléfono")
+                Text(text = "Ingresa tu número de teléfono",
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontStyle = FontStyle.Normal,
+                        fontSize = 20.sp,
+                        color = Red,
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp))
             },
             text = {
                 TextField(
@@ -744,6 +796,15 @@ fun PhoneNumberScreen(
                     label = {
                         Text(text = "Número telefónico")
                     },
+                    singleLine = true
+                    ,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.White,
+                        focusedIndicatorColor = DarkBlue,
+                        cursorColor = DarkBlue,
+                        unfocusedIndicatorColor = DarkBlue,
+                        disabledIndicatorColor = DarkBlue,
+                    ),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -753,7 +814,6 @@ fun PhoneNumberScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        // Aquí puedes realizar alguna acción con el número de teléfono ingresado
                         showDialog = false
                         onPhoneNumberEntered(phoneNumber)
                     }
