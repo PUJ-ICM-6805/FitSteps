@@ -7,6 +7,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import android.util.Log
+import androidx.activity.compose.setContent
+import androidx.core.content.ContextCompat
+import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.navigation.SetupNavGraph
+import com.example.fitsteps.ui.theme.FitStepsTheme
+import com.google.firebase.auth.FirebaseAuth
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,13 +45,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.navigation.SetupNavGraph
 import com.example.fitsteps.ui.theme.FitStepsTheme
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -110,6 +117,64 @@ class MainActivity : ComponentActivity() {
                         !shouldShowPermissionRationale
                     ) {
                         locationPermissionLauncher.launch(locationPermissions)
+                    }
+                    if(event == Lifecycle.Event.ON_RESUME){
+                        mAuth = FirebaseAuth.getInstance()
+                        val add = HashMap<String, Any>()
+                        if(mAuth.currentUser != null){
+                            val userid = mAuth.currentUser!!.uid
+                            add["online"] = true
+                            Log.d("Usuario", "es: $userid")
+                            FirebaseFirestore.getInstance().collection("users_statuses")
+                                .document(userid)
+                                .set(add, SetOptions.merge())
+                                .addOnSuccessListener {
+                                    Log.d("Guardado de estado", "exitoso para el id: $userid")
+                                }
+                                .addOnFailureListener {
+                                    Log.d("Guardado de estado", "error: $it")
+                                }
+                        }
+                    }
+                    if(event == Lifecycle.Event.ON_CREATE){
+                        //ponemos en true el estado del usuario
+                        mAuth = FirebaseAuth.getInstance()
+                        val add = HashMap<String, Any>()
+                        if(mAuth.currentUser != null){
+                            val userid = mAuth.currentUser!!.uid
+                            add["online"] = true
+                            Log.d("Usuario", "es: $userid")
+                            FirebaseFirestore.getInstance().collection("users_statuses")
+                                .document(userid)
+                                .set(add, SetOptions.merge())
+                                .addOnSuccessListener {
+                                    Log.d("Guardado de estado", "exitoso para el id: $userid")
+                                }
+                                .addOnFailureListener {
+                                    Log.d("Guardado de estado", "error: $it")
+                                }
+                        }
+
+                    }
+                    if(event == Lifecycle.Event.ON_STOP){
+                        //ponemos en false el estado del usuario
+                        mAuth = FirebaseAuth.getInstance()
+                        val add = HashMap<String, Any>()
+                        if(mAuth.currentUser != null){
+                            val userid = mAuth.currentUser!!.uid
+                            add["online"] = false
+                            Log.d("Usuario", "es: $userid")
+                            FirebaseFirestore.getInstance().collection("users_statuses")
+                                .document(userid)
+                                .set(add, SetOptions.merge())
+                                .addOnSuccessListener {
+                                    Log.d("Guardado de estado", "exitoso para el id: $userid")
+                                }
+                                .addOnFailureListener {
+                                    Log.d("Guardado de estado", "error: $it")
+                                }
+                        }
+
                     }
                 }
                 lifecycleOwner.lifecycle.addObserver(observer)
@@ -184,6 +249,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     private fun areLocationPermissionsAlreadyGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,

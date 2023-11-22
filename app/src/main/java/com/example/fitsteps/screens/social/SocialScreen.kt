@@ -21,15 +21,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
@@ -41,6 +44,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -69,12 +74,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fitsteps.R
 import com.example.fitsteps.authentication.User
 import com.example.fitsteps.permissions.ContactsPermissionTextProvider
 import com.example.fitsteps.permissions.MainViewModel
 import com.example.fitsteps.permissions.PermissionDialog
+import com.example.fitsteps.screens.userProfileAvatar
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -84,6 +91,8 @@ import com.example.fitsteps.ui.theme.customFontFamily
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -110,7 +119,9 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
     var mPhoneNumber by remember { mutableStateOf("") }
     var finalContacts: List<String> = emptyList()
     var phoneNumberEntered by remember { mutableStateOf<String?>(null) }
+    val usersStatus = remember { mutableStateListOf<User>() }
     val usersFromContacts = remember { mutableStateListOf<User>() }
+
 
     if (userid != null) {
         //buscamos en la colección de usuarios el documento que tenga como campo userid el id del usuario actual
@@ -139,14 +150,7 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
     Log.d("numeroIF", userContactsViewModel.userPhoneNumber.value)
     if (isContactsPermissionGranted && userContactsViewModel.userExists.value) {
         Log.d("llamando1", "TRUE TRUE")
-        //lanzamos un coroutine para obtener los usuarios que tienen la app instalada
-        LaunchedEffect(Unit) {
-            contacts = getContacts(context)
-            finalContacts = getContactsUsingAppSync(usersContactsRef, contacts)
-            userContactsViewModel.uploadUserContacts(finalContacts)
-            Log.d("contactos", finalContacts.toString())
-            getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
-        }
+        phoneNumberEntered = userContactsViewModel.userPhoneNumber.value
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -179,10 +183,41 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
             ) {
                 SearchBar()
             }
+            Text(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(10.dp),
+                text = stringResource(id = R.string.gymbro),
+                color = Blue,
+                fontSize = 15.sp,
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontStyle = FontStyle.Normal,
+                ),
+                textAlign = TextAlign.Center,
+            )
+
             val users = usersFromContacts.toSet()
+            for(user in users) {
+                for(usersT in usersStatus) {
+                    Log.d("Verificacion", (user.userId == usersT.userId).toString())
+                    if(user.userId == usersT.userId) {
+                        user.active = usersT.active
+                    }
+                }
+            }
+            //entrar a dial de llamada y poner su numero
+            val localContext = LocalContext.current
             LazyColumn {
                 items(users.toList()) { contact ->
-                    ContactItem(contact = contact)
+                    // Obtener el estado "online" del modelo de vista
+                    val isOnline = contact.active
+                    ContactItem(contact = contact, isOnline = isOnline, onClicked = {
+                        val intent = Intent(Intent.ACTION_DIAL)
+                        intent.data = Uri.parse("tel:${contact.phoneNumber}")
+                        localContext.startActivity(intent)
+                    })
                 }
             }
         }
@@ -232,35 +267,28 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                         userContactsViewModel.setPhoneNumber(mPhoneNumber)
                         contacts = getContacts(context)
                         userContactsViewModel.userid = userid
-                        getContactsUsingAppSync(usersContactsRef, contacts) { result ->
-                            finalContacts = result
-                            Log.d("contactos", finalContacts.toString())
-                            userContactsViewModel.uploadUserContacts(finalContacts)
-                            phoneNumberEntered = it
-                        }
+                        phoneNumberEntered = it
 
                     }
                 )
             }
     } else if (isContactsPermissionGranted && !userContactsViewModel.userExists.value) {
-        Log.d("llamando1", "TRUE FALSE")
-        PhoneNumberScreen(
-            contactsViewModel = userContactsViewModel,
-            onPhoneNumberEntered = {
-                mPhoneNumber = it
-                Log.d("numero", userContactsViewModel.userPhoneNumber.value)
-                Log.d("numero", mPhoneNumber)
-                userContactsViewModel.setPhoneNumber(mPhoneNumber)
-                contacts = getContacts(context)
-                userContactsViewModel.userid = userid
-                getContactsUsingAppSync(usersContactsRef, contacts) { result ->
-                    finalContacts = result
-                    userContactsViewModel.uploadUserContacts(finalContacts)
+        if(phoneNumberEntered == null || phoneNumberEntered == "") {
+            Log.d("llamando1", "TRUE FALSE")
+            PhoneNumberScreen(
+                contactsViewModel = userContactsViewModel,
+                onPhoneNumberEntered = {
+                    mPhoneNumber = it
+                    Log.d("numero", userContactsViewModel.userPhoneNumber.value)
+                    Log.d("numero", mPhoneNumber)
+                    userContactsViewModel.setPhoneNumber(mPhoneNumber)
+                    contacts = getContacts(context)
+                    userContactsViewModel.userid = userid
                     phoneNumberEntered = it
-                }
 
-            }
-        )
+                }
+            )
+        }
     } else {
         // Muestra MainMenu automáticamente cuando no hay interacción aún
         LaunchedEffect(Unit) {
@@ -310,6 +338,26 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
             userContactsViewModel.uploadUserContacts(finalContacts)
             Log.d("contactos", finalContacts.toString())
             getContactsUsersByUserID(usersContactsRef, finalContacts, usersFromContacts)
+
+            FirebaseFirestore.getInstance().collection("users_statuses").
+            addSnapshotListener(object : com.google.firebase.firestore.EventListener<QuerySnapshot>{
+                override fun onEvent(value: QuerySnapshot?, error: FirebaseFirestoreException?) {
+                    if (error != null) {
+                        Log.w("DatabaseUtils", "Listen failed.", error)
+                        return
+                    }
+                    if (value != null) {
+                        for (doc in value) {
+                            //cruzamos estos resultados con los de usersFromContacts
+                            val user = doc.toObject(User::class.java)
+                            user.userId = doc.id
+                            user.active = doc.getBoolean("online")!!
+                            Log.d("DatabaseUtils", "usersData: $user")
+                            usersStatus += user
+                        }
+                    }
+                }
+            })
         }
         Column(
             modifier = Modifier
@@ -343,10 +391,45 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
             ) {
                 SearchBar()
             }
+            Text(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(10.dp),
+                text = stringResource(id = R.string.gymbro),
+                color = Blue,
+                fontSize = 15.sp,
+                style = TextStyle(
+                    fontFamily = customFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontStyle = FontStyle.Normal,
+                ),
+                textAlign = TextAlign.Center,
+            )
+
             val users = usersFromContacts.toSet()
+            for(user in users) {
+                for(usersT in usersStatus) {
+                    Log.d("Verificacion", (user.userId == usersT.userId).toString())
+                    if(user.userId == usersT.userId) {
+                        user.active = usersT.active
+                    }
+                    if(user.userId == userid){
+                        //lo eliminamos de la lista
+                        usersFromContacts.remove(user)
+                    }
+                }
+            }
+            //entrar a dial de llamada y poner su numero
+            val localContext = LocalContext.current
             LazyColumn {
                 items(users.toList()) { contact ->
-                    ContactItem(contact = contact)
+                    // Obtener el estado "online" del modelo de vista
+                    val isOnline = contact.active
+                    ContactItem(contact = contact, isOnline = isOnline, onClicked = {
+                        val intent = Intent(Intent.ACTION_DIAL)
+                        intent.data = Uri.parse("tel:${contact.phoneNumber}")
+                        localContext.startActivity(intent)
+                    })
                 }
             }
         }
@@ -581,19 +664,55 @@ fun getContacts(context: Context): List<Contact> {
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ContactItem(contact: User) { //TODO mejorar la estética y estructura de la lista
-    ListItem(
-        text = { Text(contact.user_name + " " + contact.experience) },
-        icon = {
-            Icon(
-                imageVector = Icons.Default.Phone,
-                contentDescription = null
+fun ContactItem(contact: User, isOnline: Boolean, onClicked: () -> Unit = {}) {
+    // Agregar un círculo verde para indicar "online" o gris para indicar "offline"
+    val onlineIndicatorColor = if (isOnline) Color.Green else Color.Gray
+    var clicked by remember { mutableStateOf(false) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable(onClick = onClicked),
+        shape = RoundedCornerShape(8.dp),
+        color = Color.White,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${contact.user_name} ${contact.experience}",
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .background(onlineIndicatorColor, shape = CircleShape)
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Image(
+                painter = userProfileAvatar(contact.avatar),
+                contentDescription = "avatar",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
             )
         }
-    )
+    }
 }
+
 
 @Composable
 fun PhoneNumberScreen(
@@ -640,39 +759,6 @@ fun PhoneNumberScreen(
             },
         )
     }
-}
-
-private fun getContactsUsingAppSync(
-    usersContactsRef: CollectionReference,
-    contacts: List<Contact>,
-    onResult: (List<String>) -> Unit
-): List<String> {
-    val contactsUsingApp = ArrayList<String>()
-    var count = 0
-
-    for (contact in contacts) {
-        usersContactsRef.document(contact.phoneNumber).get()
-            .addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot.exists()) {
-                    contactsUsingApp.add(contact.phoneNumber)
-                }
-
-                count++
-                if (count == contacts.size) {
-                    // All documents have been checked
-                    onResult(contactsUsingApp)
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.w("DatabaseUtils", "Error checking document existence", e)
-                count++
-                if (count == contacts.size) {
-                    // All documents have been checked
-                    onResult(contactsUsingApp)
-                }
-            }
-    }
-    return contactsUsingApp
 }
 
 private suspend fun getContactsUsingAppSync(
@@ -729,7 +815,9 @@ private suspend fun getContactsUsersByUserID(
                                 for (document in result) {
                                     Log.d("DatabaseUtils", "${document.id} => ${document.data}")
                                     if (document.exists()) {
-                                        usersFromContacts += document.toObject(User::class.java)
+                                        val user = document.toObject(User::class.java)
+                                        user.phoneNumber = contact
+                                        usersFromContacts += user
                                         Log.d("DatabaseUtils", "usersData: $usersFromContacts")
                                     } else {
                                         Log.d("DatabaseUtils", "No such document")

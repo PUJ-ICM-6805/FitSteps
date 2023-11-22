@@ -1,5 +1,6 @@
 package com.example.fitsteps.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -58,6 +59,8 @@ import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 
 @Composable
@@ -135,6 +138,7 @@ fun HamburgersDropList(navController: NavHostController, rootNavController: NavH
                                         inclusive = true
                                     }
                                 })
+                                setOfflineStatus()
                                 FirebaseAuth.getInstance().signOut()
                             }
                             else -> {navController.navigate(
@@ -187,6 +191,24 @@ fun HamburgersDropList(navController: NavHostController, rootNavController: NavH
             }
         }
     }
+}
+
+fun setOfflineStatus() {
+        val userid = FirebaseAuth.getInstance().currentUser?.uid
+        val add = HashMap<String, Any>()
+        if(userid != null) {
+            add["online"] = false
+            Log.d("Usuario", "es: $userid")
+            FirebaseFirestore.getInstance().collection("users_statuses")
+                .document(userid)
+                .set(add, SetOptions.merge())
+                .addOnSuccessListener {
+                    Log.d("Guardado de estado", "exitoso para el id: $userid")
+                }
+                .addOnFailureListener {
+                    Log.d("Guardado de estado", "error: $it")
+                }
+        }
 }
 
 

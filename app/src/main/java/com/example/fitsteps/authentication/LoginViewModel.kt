@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -20,6 +21,7 @@ class LoginViewModel : ViewModel() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener {task ->
                     if(task.isSuccessful) {
+                        setOnlineStatus()
                         Log.d("Autenticación", "logueado")
                         home()
                     }
@@ -75,6 +77,24 @@ class LoginViewModel : ViewModel() {
                 }
                 .addOnFailureListener {
                     Log.d("Creacion de cuenta", "error: $it")
+                }
+        }
+    }
+
+    fun setOnlineStatus() {
+        val userid = auth.currentUser?.uid
+        val add = HashMap<String, Any>()
+        if(userid != null) {
+            add["online"] = true
+            Log.d("Usuario", "es: $userid")
+            FirebaseFirestore.getInstance().collection("users_statuses")
+                .document(userid)
+                .set(add, SetOptions.merge())
+                .addOnSuccessListener {
+                    Log.d("Guardado de estado", "exitoso para el id: $userid")
+                }
+                .addOnFailureListener {
+                    Log.d("Guardado de estado", "error: $it")
                 }
         }
     }

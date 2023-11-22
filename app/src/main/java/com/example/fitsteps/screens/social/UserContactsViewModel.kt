@@ -16,6 +16,7 @@ class UserContactsViewModel: ViewModel() {
     var userContacts = mutableListOf<String>()
     var userPhoneNumber = mutableStateOf("")
     val userExists = mutableStateOf(false)
+    var onlineStatus = mutableStateOf(false)
 
     fun uploadUserContacts(
         contactos : List<String>
@@ -45,5 +46,9 @@ class UserContactsViewModel: ViewModel() {
 
     fun setPhoneNumber(it: String) {
         userPhoneNumber.value = it
+    }
+
+    fun updateOnlineStatus(userId: String, online: Boolean) {
+        onlineStatus.value = online
     }
 }
