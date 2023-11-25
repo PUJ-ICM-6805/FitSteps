@@ -397,7 +397,9 @@ fun CreateNewTrainingPlanFrame(
                                                     )
                                                 }
                                             )
+                                            trainingProgramViewModel.loadAllOwnPrograms()
                                         }
+
                                     },
                                 contentAlignment = Alignment.Center,
                             ) {

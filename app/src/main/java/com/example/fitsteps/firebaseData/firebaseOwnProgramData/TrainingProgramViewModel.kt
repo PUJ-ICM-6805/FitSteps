@@ -35,33 +35,37 @@ class TrainingProgramViewModel {
         get() = _ownProgramList
 
     private val snapshotListener = EventListener<QuerySnapshot> { snapshot, exception ->
-        if(exception != null) {
+        if (exception != null) {
             Log.e("TrainingProgram", "Error loading exercises in listener", exception)
             return@EventListener
         }
         loadAllOwnPrograms()
     }
+
     init {
 
         programsCollection.addSnapshotListener(snapshotListener)
         loadAllOwnPrograms()
     }
+
     fun setSelectedProgram(trainingProgram: TrainingProgram) {
         _selectedProgram.value = trainingProgram
         Log.d("DATA CHANGED", "Training program changed to${_selectedProgram.value}")
     }
+
     fun setSelectedRoutine(routine: Routine) {
         _selectedRoutine.value = routine
         loadExercisesFromActualRoutine({
-            Log.d("EXERCISES","Exercises loaded")
-        },{
-            Log.e("EXERCISES","Error loading exercises",it)
+            Log.d("EXERCISES", "Exercises loaded")
+        }, {
+            Log.e("EXERCISES", "Error loading exercises", it)
         })
         Log.d("DATA CHANGED", "Routine changed to${_selectedRoutine.value}")
     }
+
     //CARGAR DE REST
-    private fun loadAllOwnPrograms() {
-        if(userid != null) {
+    fun loadAllOwnPrograms() {
+        if (userid != null) {
             programsCollection.whereEqualTo("uid", userid).get()
                 .addOnSuccessListener { querySnapshot ->
                     val programs = ArrayList<TrainingProgram>()
@@ -95,14 +99,19 @@ class TrainingProgramViewModel {
                 }
         }
     }
-    fun saveTrainingProgram(trainingProgram: TrainingProgram, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-       val add = HashMap<String,Any>()
+
+    fun saveTrainingProgram(
+        trainingProgram: TrainingProgram,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val add = HashMap<String, Any>()
         if (userid != null) {
             add["description"] = trainingProgram.description
             add["name"] = trainingProgram.name
             add["objective"] = trainingProgram.objective
             add["uid"] = userid.toString()
-            add["image"]= trainingProgram.image
+            add["image"] = trainingProgram.image
             programsCollection
                 .add(add)
                 .addOnSuccessListener { documentReference ->
@@ -119,13 +128,19 @@ class TrainingProgramViewModel {
         }
 
     }
-    fun addRoutineToActualProgram(routine: Routine,onSuccess: () -> Unit,onFailure: (Exception) -> Unit){
+
+    fun addRoutineToActualProgram(
+        routine: Routine,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         _selectedProgram.value?.addRoutine(routine)
-        val add = HashMap<String,Any>()
-        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+        val add = HashMap<String, Any>()
+        programsCollection.whereEqualTo("uid", userid)
+            .whereEqualTo("name", _selectedProgram.value?.name)
             .get()
-            .addOnSuccessListener {result ->
-                for(document in result){
+            .addOnSuccessListener { result ->
+                for (document in result) {
                     val auxRef = programsCollection.document(document.id)
                     add["name"] = routine.name
                     add["days"] = routine.days
@@ -133,7 +148,7 @@ class TrainingProgramViewModel {
                     auxRef.collection("routines")
                         .add(add)
                         .addOnSuccessListener {
-                            Log.d("Routine","Routine added with ID: ${it.id}")
+                            Log.d("Routine", "Routine added with ID: ${it.id}")
                             onSuccess()
                         }
                         .addOnFailureListener { e ->
@@ -143,23 +158,30 @@ class TrainingProgramViewModel {
                 }
             }
     }
-    private fun loadExercisesFromActualRoutine(onSuccess: () -> Unit, onFailure: (Exception) -> Unit){
-        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+
+    private fun loadExercisesFromActualRoutine(
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        programsCollection.whereEqualTo("uid", userid)
+            .whereEqualTo("name", _selectedProgram.value?.name)
             .get()
-            .addOnSuccessListener {result ->
-                for(document in result){
+            .addOnSuccessListener { result ->
+                for (document in result) {
                     val auxRef = programsCollection.document(document.id)
-                    auxRef.collection("routines").whereEqualTo("name",_selectedRoutine.value?.name)
+                    auxRef.collection("routines").whereEqualTo("name", _selectedRoutine.value?.name)
                         .get()
-                        .addOnSuccessListener {routineResult ->
-                            for(routineDocument in routineResult){
-                                val auxRoutineRef = auxRef.collection("routines").document(routineDocument.id)
+                        .addOnSuccessListener { routineResult ->
+                            for (routineDocument in routineResult) {
+                                val auxRoutineRef =
+                                    auxRef.collection("routines").document(routineDocument.id)
                                 auxRoutineRef.collection("exercises")
                                     .get()
-                                    .addOnSuccessListener {exerciseResult ->
+                                    .addOnSuccessListener { exerciseResult ->
                                         val exercises = ArrayList<ExerciseRecord>()
-                                        for(exerciseDocument in exerciseResult){
-                                            val exercise = exerciseDocument.toObject(ExerciseRecord::class.java)
+                                        for (exerciseDocument in exerciseResult) {
+                                            val exercise =
+                                                exerciseDocument.toObject(ExerciseRecord::class.java)
                                             exercises.add(exercise)
                                         }
                                         _selectedRoutine.value?.exercises = exercises
@@ -175,21 +197,24 @@ class TrainingProgramViewModel {
                 }
             }
     }
-    private fun updateTimeFromActualRoutine(){
-        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+
+    private fun updateTimeFromActualRoutine() {
+        programsCollection.whereEqualTo("uid", userid)
+            .whereEqualTo("name", _selectedProgram.value?.name)
             .get()
-            .addOnSuccessListener {result ->
-                for(document in result){
+            .addOnSuccessListener { result ->
+                for (document in result) {
                     val auxRef = programsCollection.document(document.id)
-                    auxRef.collection("routines").whereEqualTo("name",_selectedRoutine.value?.name)
+                    auxRef.collection("routines").whereEqualTo("name", _selectedRoutine.value?.name)
                         .get()
-                        .addOnSuccessListener {routineResult ->
-                            for(routineDocument in routineResult){
-                                val auxRoutineRef = auxRef.collection("routines").document(routineDocument.id)
+                        .addOnSuccessListener { routineResult ->
+                            for (routineDocument in routineResult) {
+                                val auxRoutineRef =
+                                    auxRef.collection("routines").document(routineDocument.id)
                                 _selectedRoutine.value?.calculateTime()
-                                auxRoutineRef.update("time",_selectedRoutine.value?.time)
+                                auxRoutineRef.update("time", _selectedRoutine.value?.time)
                                     .addOnSuccessListener {
-                                        Log.d("Routine","Routine updated")
+                                        Log.d("Routine", "Routine updated")
                                     }
                                     .addOnFailureListener { e ->
                                         Log.e("Routine", "Error updating routine", e)
@@ -199,22 +224,29 @@ class TrainingProgramViewModel {
                 }
             }
     }
-    fun addExerciseToActualRoutine(exercise: ExerciseRecord,onSuccess: () -> Unit,onFailure: (Exception) -> Unit){
+
+    fun addExerciseToActualRoutine(
+        exercise: ExerciseRecord,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         _selectedRoutine.value?.addExercise(exercise)
-        programsCollection.whereEqualTo("uid",userid).whereEqualTo("name",_selectedProgram.value?.name)
+        programsCollection.whereEqualTo("uid", userid)
+            .whereEqualTo("name", _selectedProgram.value?.name)
             .get()
-            .addOnSuccessListener {result ->
-                for(document in result){
+            .addOnSuccessListener { result ->
+                for (document in result) {
                     val auxRef = programsCollection.document(document.id)
-                    auxRef.collection("routines").whereEqualTo("name",_selectedRoutine.value?.name)
+                    auxRef.collection("routines").whereEqualTo("name", _selectedRoutine.value?.name)
                         .get()
-                        .addOnSuccessListener {routineResult ->
-                            for(routineDocument in routineResult){
-                                val auxRoutineRef = auxRef.collection("routines").document(routineDocument.id)
+                        .addOnSuccessListener { routineResult ->
+                            for (routineDocument in routineResult) {
+                                val auxRoutineRef =
+                                    auxRef.collection("routines").document(routineDocument.id)
                                 auxRoutineRef.collection("exercises")
                                     .add(exercise)
                                     .addOnSuccessListener {
-                                        Log.d("Exercise","Exercise added with ID: ${it.id}")
+                                        Log.d("Exercise", "Exercise added with ID: ${it.id}")
                                         onSuccess()
                                     }
                                     .addOnFailureListener { e ->

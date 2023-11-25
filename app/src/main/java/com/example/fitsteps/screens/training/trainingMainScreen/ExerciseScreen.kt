@@ -125,7 +125,6 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
             )
         }
         item {
-
             Text(
                 text = stringResource(id = R.string.my_training),
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
@@ -166,7 +165,7 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                     }
                 }
         }
-        item {
+        /*item {
             Text(
                 text = stringResource(id = R.string.fitsteps_plans),
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
@@ -179,7 +178,7 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                 )
             )
         }
-        item {
+        item {/*
             LazyRow(
                 modifier = Modifier
                     .padding(15.dp)
@@ -190,8 +189,8 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                 item {
                     RoutineCard(navController = navController,null, TrainingProgramViewModel())
                 }
-            }
-        }
+            }*/
+        }*/
         item {
             LargeButtons(
                 text = stringResource(id = R.string.add_new_routine),
@@ -204,8 +203,9 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                 iconColor = Color(0xFFF4F4F4),
             )
         }
+        /*
         item {
-            LargeButtons(
+            /*LargeButtons(
                 text = stringResource(id = R.string.add_personalized_routine),
                 onClick = {
                     navController.navigate(CUSTOM_ROUTINE_ROUTE)
@@ -217,10 +217,15 @@ fun ExerciseScreen(navController: NavHostController, rootNavController:NavHostCo
                     .padding(horizontal = 15.dp, vertical = 5.dp)
                     .fillMaxWidth(),
             )
+
         }
+        */
+         */
         item {
             Spacer(modifier = Modifier.height(80.dp))
+
         }
+
     }
 }
 
