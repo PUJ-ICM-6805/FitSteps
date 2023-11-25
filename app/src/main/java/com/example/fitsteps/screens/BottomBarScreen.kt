@@ -1,23 +1,21 @@
 package com.example.fitsteps.screens
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,8 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.fitsteps.authentication.DatabaseUtils
 import com.example.fitsteps.navigation.BottomBarNavGraph
 import com.example.fitsteps.navigation.BottomBarScreen
 import com.example.fitsteps.navigation.Screen
@@ -38,10 +41,15 @@ import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.LightBlue
 import com.example.fitsteps.ui.theme.customFontFamily
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BottomBarScreen(navController: NavHostController = rememberNavController(), rootNavController: NavHostController) {
+    LaunchedEffect(key1 = true) {
+        val DatabaseUtils = DatabaseUtils()
+        DatabaseUtils.UploadFCM()
+    }
     Scaffold(
         modifier = Modifier
             .background(MaterialTheme.colors.surface),
@@ -160,6 +168,7 @@ fun RowScope.AddItem(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 @Preview
 fun PreviewBottomBar() {

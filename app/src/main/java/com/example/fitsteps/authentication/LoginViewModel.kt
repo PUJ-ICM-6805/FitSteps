@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -27,34 +28,13 @@ class LoginViewModel : ViewModel() {
 
     private val _loading = MutableLiveData(false)
 
-    init{
-        loadCurrentUser()
-    }
-    private fun loadCurrentUser(){
-        if(userid!= null){
-            usersCollection.whereEqualTo("userId", userid)
-                .get()
-                .addOnSuccessListener { documents ->
-                    if(documents.size() > 0){
-                        val user = documents.first().toObject(User::class.java)
-                        user.document = documents.first().id
-                        _currentUser.value = user
-                        Log.d ("LoginViewModel", "Current user: ${user.user_name}")
-                        Log.d ("Weight and height", "Current user: ${user.weight} ${user.height}")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.d("LoginViewModel", "Error getting documents: ", exception)
-                }
-        }
-    }
-
     fun signInWithEmailAndPassword(email: String, password: String, home: ()-> Unit, error: (String)-> Unit)
     = viewModelScope.launch {
         try {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener {task ->
                     if(task.isSuccessful) {
+                        setOnlineStatus()
                         Log.d("Autenticación", "logueado")
                         home()
                     }
@@ -110,6 +90,24 @@ class LoginViewModel : ViewModel() {
                 }
                 .addOnFailureListener {
                     Log.d("Creacion de cuenta", "error: $it")
+                }
+        }
+    }
+
+    fun setOnlineStatus() {
+        val userid = auth.currentUser?.uid
+        val add = HashMap<String, Any>()
+        if(userid != null) {
+            add["online"] = true
+            Log.d("Usuario", "es: $userid")
+            FirebaseFirestore.getInstance().collection("users_statuses")
+                .document(userid)
+                .set(add, SetOptions.merge())
+                .addOnSuccessListener {
+                    Log.d("Guardado de estado", "exitoso para el id: $userid")
+                }
+                .addOnFailureListener {
+                    Log.d("Guardado de estado", "error: $it")
                 }
         }
     }

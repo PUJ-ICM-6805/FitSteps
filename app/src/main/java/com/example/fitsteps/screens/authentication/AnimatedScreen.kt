@@ -9,22 +9,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.fitsteps.ui.theme.Red
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.alpha
 import androidx.navigation.NavHostController
 import com.example.fitsteps.R
 import com.example.fitsteps.navigation.BOTTOM_NAVIGATION_ROUTE
 import com.example.fitsteps.navigation.MAIN_SCREEN_ROUTE
 import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.ui.theme.Red
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 

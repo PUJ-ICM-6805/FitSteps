@@ -70,6 +70,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.android.datatransport:transport-runtime:3.2.0")
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("com.google.firebase:firebase-config-ktx:21.6.0")
+    implementation("com.android.volley:volley:1.2.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -89,7 +91,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.github.rosariopfernandes:firecoil:0.2.0")
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
-    implementation("com.android.volley:volley:1.2.1")
+    implementation ("com.google.firebase:firebase-messaging:23.3.1")
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.5")
 
