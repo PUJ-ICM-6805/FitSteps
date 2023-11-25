@@ -34,9 +34,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,6 +65,7 @@ import com.example.fitsteps.firebaseData.firebaseOwnProgramData.Routine
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgram
 import com.example.fitsteps.firebaseData.firebaseOwnProgramData.TrainingProgramViewModel
 import com.example.fitsteps.navigation.Screen
+import com.example.fitsteps.screens.social.UserContactsViewModel
 import com.example.fitsteps.ui.theme.Blue
 import com.example.fitsteps.ui.theme.DarkBlue
 import com.example.fitsteps.ui.theme.LightBlue
@@ -78,9 +81,17 @@ import java.util.Locale
 
 
 @Composable
-fun SummaryScreen(navController: NavHostController, rootNavController: NavHostController, trainingProgramViewModel: TrainingProgramViewModel) {
+fun SummaryScreen(
+    navController: NavHostController,
+    rootNavController: NavHostController,
+    trainingProgramViewModel: TrainingProgramViewModel,
+    usuarios: UserContactsViewModel = remember {
+        UserContactsViewModel()
+    },
+) {
 
-    val ownTrainingProgramsListState = trainingProgramViewModel.ownProgramList.observeAsState(initial = emptyList())
+    val ownTrainingProgramsListState =
+        trainingProgramViewModel.ownProgramList.observeAsState(initial = emptyList())
     val ownTrainingProgramsList = ownTrainingProgramsListState.value
 
     val userid = Firebase.auth.currentUser?.uid
@@ -103,20 +114,23 @@ fun SummaryScreen(navController: NavHostController, rootNavController: NavHostCo
             Spacer(modifier = Modifier.height(20.dp))
         }
         item {
-               Box(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .height(30.dp),
-                   contentAlignment = Alignment.CenterStart,
-               ) {
-                   HamburgersDropList(navController = navController, rootNavController = rootNavController)
-               }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                HamburgersDropList(
+                    navController = navController,
+                    rootNavController = rootNavController
+                )
+            }
         }
         item {
             Spacer(modifier = Modifier.height(40.dp))
         }
         item {
-            Box (
+            Box(
                 contentAlignment = Alignment.BottomStart
             ) {
                 Text(
@@ -134,8 +148,8 @@ fun SummaryScreen(navController: NavHostController, rootNavController: NavHostCo
         }
         item {
             Row(
-               modifier = Modifier
-                   .fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -159,12 +173,14 @@ fun SummaryScreen(navController: NavHostController, rootNavController: NavHostCo
             StatsCard()
         }*/
         item {
-            if(ownTrainingProgramsList.isNotEmpty()) {
+            if (ownTrainingProgramsList.isNotEmpty()) {
                 CardDayActivity(ownTrainingProgramsList, trainingProgramViewModel, navController)
             }
         }
         item {
-            SocialInfoCard()
+            //usamos usuarios para llenar la información de SocialInfoCard()
+            //SocialInfoCard()
+            SocialInfoCard(usuarios)
         }
         item {
             Spacer(modifier = Modifier.height(80.dp))
@@ -218,13 +234,13 @@ fun WeeklySummary() {
 
 @Composable
 fun StatsCard() {
-    Card (
+    Card(
         modifier = Modifier
             .fillMaxSize()
             .padding(15.dp),
         shape = RoundedCornerShape(15.dp),
         backgroundColor = Color.White,
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -273,72 +289,82 @@ fun IconsRow() {
                     .weight(1f),
                 contentAlignment = Alignment.Center,
             ) {
-            androidx.compose.material3.Surface(
-                modifier = Modifier
-                    .selectable(
-                        selected = (selectedValue.value == item),
-                        onClick = { selectedValue.value = item },
-                        role = Role.RadioButton
-                    ),
-                shape = RoundedCornerShape(5.dp),
-                color = if (selectedValue.value == item) Red else LightBlue,
-            ) {
+                androidx.compose.material3.Surface(
+                    modifier = Modifier
+                        .selectable(
+                            selected = (selectedValue.value == item),
+                            onClick = { selectedValue.value = item },
+                            role = Role.RadioButton
+                        ),
+                    shape = RoundedCornerShape(5.dp),
+                    color = if (selectedValue.value == item) Red else LightBlue,
+                ) {
 
                     Icon(
-                        painter = when(item) {
+                        painter = when (item) {
                             "running" -> {
                                 painterResource(id = R.drawable.ic_running)
                             }
+
                             "weight" -> {
                                 painterResource(id = R.drawable.ic_exercise)
                             }
+
                             "time" -> {
                                 painterResource(id = R.drawable.ic_time)
                             }
+
                             else -> {
                                 painterResource(id = R.drawable.ic_calendar)
-                        }
-                    },
-                    contentDescription = "",
-                    tint = if (selectedValue.value == item) Color.White else Blue,
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp, vertical = 5.dp)
-                        .size(35.dp)
+                            }
+                        },
+                        contentDescription = "",
+                        tint = if (selectedValue.value == item) Color.White else Blue,
+                        modifier = Modifier
+                            .padding(horizontal = 15.dp, vertical = 5.dp)
+                            .size(35.dp)
                     )
                 }
             }
         }
     }
 }
-fun getActualDay() :String{
+
+fun getActualDay(): String {
     val formatDay = SimpleDateFormat("EEEE", Locale("es", "ES"))
     val actualDay = Date()
     return formatDay.format(actualDay)
 }
+
 @Composable
-fun CardDayActivity(trainingProgramList: List<TrainingProgram> , trainingProgramViewModel: TrainingProgramViewModel, navController: NavHostController) {
+fun CardDayActivity(
+    trainingProgramList: List<TrainingProgram>,
+    trainingProgramViewModel: TrainingProgramViewModel,
+    navController: NavHostController
+) {
     Log.d("TrainingProgramList", trainingProgramList.toString())
     val actualDay = getActualDay()
-    var routineName by remember {mutableStateOf("") }
-    var programImage by remember {mutableStateOf("") }
-    var routineEx by remember { mutableStateOf(Routine())}
+    var routineName by remember { mutableStateOf("") }
+    var programImage by remember { mutableStateOf("") }
+    var routineEx by remember { mutableStateOf(Routine()) }
     Log.d("Actual day", actualDay)
-    outer@for(trainingProgram in trainingProgramList ){
-          for(routine in trainingProgram.routines){
-              routineEx = routine
-              val normalizedDays = routine.days.lowercase().replace(" ", "")
-              if (normalizedDays.contains(actualDay)) {
-                  routineName = routine.name
-                  programImage = trainingProgram.image
-                  break@outer
-              }
-          }
+    outer@ for (trainingProgram in trainingProgramList) {
+        for (routine in trainingProgram.routines) {
+            routineEx = routine
+            val normalizedDays = routine.days.lowercase().replace(" ", "")
+            if (normalizedDays.contains(actualDay)) {
+                routineName = routine.name
+                programImage = trainingProgram.image
+                break@outer
+            }
+        }
     }
     Log.d("RoutineName", routineName)
     Log.d("RoutineImage", programImage)
-    if(routineName == ""){
+    if (routineName == "") {
         routineName = "Descanso"
-        programImage = "https://firebasestorage.googleapis.com/v0/b/fitsteps-eb0ef.appspot.com/o/images%2Fsleep-training1.png?alt=media&token=32ee7de2-585e-41e4-aac7-e0b86f057245"
+        programImage =
+            "https://firebasestorage.googleapis.com/v0/b/fitsteps-eb0ef.appspot.com/o/images%2Fsleep-training1.png?alt=media&token=32ee7de2-585e-41e4-aac7-e0b86f057245"
     }
     Card(
         modifier = Modifier
@@ -353,7 +379,7 @@ fun CardDayActivity(trainingProgramList: List<TrainingProgram> , trainingProgram
             },
         shape = RoundedCornerShape(20.dp),
         backgroundColor = Color.White,
-    ){
+    ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
@@ -449,7 +475,7 @@ fun WeeklyInfoRows(
     number: String = "0",
     icon: Int = R.drawable.ic_running,
     text: Int = R.string.km,
-){
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -504,7 +530,7 @@ fun WeeklyInfoRows(
 }
 
 @Composable
-fun SocialInfoCard() {
+fun SocialInfoCard(usuarios: UserContactsViewModel) {
     Card(
         modifier = Modifier
             .fillMaxSize()
@@ -526,55 +552,104 @@ fun SocialInfoCard() {
                     color = DarkBlue,
                 )
             )
-            Spacer(modifier = Modifier
-                .height(2.dp)
-                .fillMaxWidth()
-                .background(LightBlue))
-            BadgesRow(
-                text = "Alcanzó nuevo récord", //TODO: Change for the actual description
-                name = "Sara", //TODO: Change for the user name
-                img = R.drawable.profile_example_one,
-            )
-            Spacer(modifier = Modifier
-                .height(2.dp)
-                .fillMaxWidth()
-                .background(LightBlue))
-            BadgesRow(
-                text = "Superó su mejor tiempo", //TODO: Change for the actual description
-                name = "Felipe", //TODO: Change for the user name
-                img = R.drawable.profile_example_two,
+            Spacer(
+                modifier = Modifier
+                    .height(2.dp)
+                    .fillMaxWidth()
+                    .background(LightBlue)
             )
 
+            // Iterate over the list of users and create BadgesRow for each user
+            if (usuarios.usersByContacts.isNotEmpty()) {
+                for (user in usuarios.usersByContacts) {
+                    if (user.active) {
+                        Log.d("Usuario", user.toString())
+                        BadgesRow(
+                            text = "Está en linea, comunícate con tu gymbro", // Use the actual description from the user
+                            name = user.user_name, // Use the actual user name
+                            img = user.avatar // Use the actual profile picture from the user
+                        )
+
+                        // Add a spacer between each BadgesRow
+                        Spacer(
+                            modifier = Modifier
+                                .height(2.dp)
+                                .fillMaxWidth()
+                                .background(LightBlue)
+                        )
+                    }
+                }
+                //si todos los usuarios están inactivos
+                if (usuarios.usersByContacts.all { !it.active }) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(15.dp),
+                    ) {
+                        Column {
+                            Text(
+                                text = "No hay nadie conectado en este momento 😔",
+                                modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                                style = TextStyle(
+                                    fontFamily = customFontFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 20.sp,
+                                    fontStyle = FontStyle.Normal,
+                                    color = DarkBlue,
+                                )
+                            )
+                            Text(
+                                text = "Deberías entonces entrenar solo, no te preocupes, puedes hacerlo",
+                                modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                                style = TextStyle(
+                                    fontFamily = customFontFamily,
+                                    fontWeight = FontWeight.Light,
+                                    fontSize = 14.sp,
+                                    fontStyle = FontStyle.Normal,
+                                    color = DarkBlue,
+                                )
+                            )
+                        }
+                    }
+                }
+            } else {
+                Text(
+                    text = "No tienes contactos aún 🫠",
+                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 0.dp),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Light,
+                        fontSize = 16.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+            }
         }
     }
 }
 
+
 @Composable
 fun BadgesRow(
-    icon: Int = R.drawable.ic_badge,
-    text: String = "",
-    img: Int = R.drawable.profile_example_one,
-    name: String = "",
+    icon: Int = R.drawable.online,
+    text: String,
+    img: String,
+    name: String,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp),
     ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = "",
-            tint = Red,
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .size(50.dp)
-        )
         Image(
-            painter = painterResource(img),
+            painter = userProfileAvatar(img),
             contentDescription = "",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape),
+                .size(80.dp)
+                .clip(CircleShape)
+                .fillMaxSize(),
         )
         Column {
             Text(
@@ -614,7 +689,7 @@ fun DropDownMenu() {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
 
-    var textfieldSize by remember { mutableStateOf(Size.Zero)}
+    var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
     val icon = if (expanded)
         painterResource(id = R.drawable.ic_arrow_up)
@@ -628,7 +703,7 @@ fun DropDownMenu() {
             .background(DarkBlue, RoundedCornerShape(30.dp))
             .wrapContentHeight(),
         shape = RoundedCornerShape(10.dp),
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -647,9 +722,11 @@ fun DropDownMenu() {
                     }
                     .background(DarkBlue, RoundedCornerShape(30.dp)),
                 trailingIcon = {
-                    Icon(icon,"contentDescription",
+                    Icon(
+                        icon, "contentDescription",
                         Modifier.clickable { expanded = !expanded },
-                        tint = Color.White)
+                        tint = Color.White
+                    )
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = DarkBlue,
@@ -714,7 +791,7 @@ fun DropDownMenu2() {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf("") }
 
-    var textfieldSize by remember { mutableStateOf(Size.Zero)}
+    var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
     val icon = if (expanded)
         painterResource(id = R.drawable.ic_arrow_up)
@@ -728,7 +805,7 @@ fun DropDownMenu2() {
             .background(DarkBlue, RoundedCornerShape(30.dp))
             .height(50.dp),
         shape = RoundedCornerShape(10.dp),
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -747,9 +824,11 @@ fun DropDownMenu2() {
                     }
                     .background(DarkBlue, RoundedCornerShape(30.dp)),
                 trailingIcon = {
-                    Icon(icon,"contentDescription",
+                    Icon(
+                        icon, "contentDescription",
                         Modifier.clickable { expanded = !expanded },
-                        tint = Color.White)
+                        tint = Color.White
+                    )
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = DarkBlue,

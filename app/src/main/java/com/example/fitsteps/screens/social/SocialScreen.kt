@@ -74,7 +74,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fitsteps.R
 import com.example.fitsteps.authentication.User
@@ -99,7 +98,9 @@ import kotlin.coroutines.suspendCoroutine
 
 
 @Composable
-fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserContactsViewModel() }) {
+fun SocialScreen(
+    userContactsViewModel: UserContactsViewModel = remember { UserContactsViewModel() }
+) {
     val viewModel = viewModel<MainViewModel>()
     val isContactsPermissionGranted by viewModel.isContactsPermissionGranted
     val dialogQueue = viewModel.visiblePermissionDialogQueue
@@ -160,6 +161,8 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                 }
             }
         }
+        userContactsViewModel.usersByContacts = users.toList().toMutableList()
+        Log.d("contactos", userContactsViewModel.usersByContacts.toString())
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -392,7 +395,12 @@ fun SocialScreen(userContactsViewModel: UserContactsViewModel = remember { UserC
                         usersFromContacts.remove(user)
                     }
                 }
+
             }
+
+            userContactsViewModel.usersByContacts = users.toList().toMutableList()
+            Log.d("contactos", userContactsViewModel.usersByContacts.toString())
+
 
             Spacer(modifier = Modifier.height(50.dp))
             Box(

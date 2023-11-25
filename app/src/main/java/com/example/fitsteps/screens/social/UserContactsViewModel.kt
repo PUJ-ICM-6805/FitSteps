@@ -3,6 +3,7 @@ package com.example.fitsteps.screens.social
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.fitsteps.authentication.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,6 +18,7 @@ class UserContactsViewModel: ViewModel() {
     var userPhoneNumber = mutableStateOf("")
     val userExists = mutableStateOf(false)
     var onlineStatus = mutableStateOf(false)
+    var usersByContacts = mutableListOf<User>()
 
     fun uploadUserContacts(
         contacts : List<String>
@@ -63,9 +65,5 @@ class UserContactsViewModel: ViewModel() {
 
     fun setPhoneNumber(it: String) {
         userPhoneNumber.value = it
-    }
-
-    fun updateOnlineStatus(userId: String, online: Boolean) {
-        onlineStatus.value = online
     }
 }
