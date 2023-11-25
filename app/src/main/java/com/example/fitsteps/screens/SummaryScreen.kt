@@ -632,7 +632,6 @@ fun SocialInfoCard(usuarios: UserContactsViewModel) {
 
 @Composable
 fun BadgesRow(
-    icon: Int = R.drawable.online,
     text: String,
     img: String,
     name: String,
