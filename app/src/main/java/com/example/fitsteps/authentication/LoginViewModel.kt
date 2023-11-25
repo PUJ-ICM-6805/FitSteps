@@ -7,12 +7,25 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
+
+    //Firebase auth
     private val auth: FirebaseAuth = Firebase.auth
+    val userid = auth.currentUser?.uid
+
+    //Firebase firestore
+    private val db = Firebase.firestore
+    private  val usersCollection = db.collection("users")
+    private val _currentUser = MutableLiveData<User>()
+
+    val currentUser: MutableLiveData<User>
+        get() = _currentUser
+
     private val _loading = MutableLiveData(false)
 
     fun signInWithEmailAndPassword(email: String, password: String, home: ()-> Unit, error: (String)-> Unit)
