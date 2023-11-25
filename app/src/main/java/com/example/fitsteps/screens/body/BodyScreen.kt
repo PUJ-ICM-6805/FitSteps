@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +39,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fitsteps.R
+import com.example.fitsteps.authentication.LoginViewModel
+import com.example.fitsteps.authentication.User
 import com.example.fitsteps.firebaseData.firebaseBodyMeasuresData.MeasuresViewModel
 import com.example.fitsteps.navigation.Screen
 import com.example.fitsteps.screens.HamburgersDropList
@@ -53,127 +56,136 @@ fun BodyScreen(
     navController: NavHostController,
     rootNavController: NavHostController,
     measuresViewModel: MeasuresViewModel = MeasuresViewModel(),
+    loginViewModel: LoginViewModel = LoginViewModel(),
 ) {
-    var showBodyFrame by remember {
-        mutableStateOf(false)
-    }
-    if (showBodyFrame) {
-        BodyScreenFrame(
-            onClick = { showFrame ->
-                showBodyFrame = showFrame
-            }
-        )
-    }
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White),
-    ){
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            Column {
-                Spacer(modifier = Modifier.height(20.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(30.dp),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    HamburgersDropList(navController = navController, rootNavController = rootNavController)
-                }
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-        ) {
-            Text(
-                modifier = Modifier
-                    .align(Alignment.TopStart),
-                text = stringResource(id = R.string.body),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 30.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
-                )
-            )
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .clickable {
-                         showBodyFrame = true
-                    },
-                text = stringResource(id = R.string.add),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = Red,
-                )
-            )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ){
-            Navigation(navController = navController)
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
-            contentAlignment = Alignment.TopStart,
-        ){
-            Text(
-                text = stringResource(id = R.string.weight2),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 23.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
-                )
-            )
-        }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.TopStart,
-        ){
-            WeightCard()
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
-            contentAlignment = Alignment.TopStart,
-        ){
-            Text(
-                text = stringResource(id = R.string.diagnostic),
-                style = TextStyle(
-                    fontFamily = customFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 23.sp,
-                    fontStyle = FontStyle.Normal,
-                    color = DarkBlue,
-                )
-            )
-        }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.TopStart,
-        ){
-            DiagnosticCard()
-        }
-    }
+    val currentUserState = loginViewModel.currentUser.observeAsState()
+    val currentUser = currentUserState.value
 
+    if(currentUser != null) {
+
+        var showBodyFrame by remember {
+            mutableStateOf(false)
+        }
+        if (showBodyFrame) {
+            BodyScreenFrame(
+                onClick = { showFrame ->
+                    showBodyFrame = showFrame
+                }
+            )
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White),
+        ) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        HamburgersDropList(
+                            navController = navController,
+                            rootNavController = rootNavController
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.TopStart),
+                    text = stringResource(id = R.string.body),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 30.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .clickable {
+                            showBodyFrame = true
+                        },
+                    text = stringResource(id = R.string.add),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = Red,
+                    )
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Navigation(navController = navController)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.weight2),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 23.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                WeightCard(currentUser)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.diagnostic),
+                    style = TextStyle(
+                        fontFamily = customFontFamily,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 23.sp,
+                        fontStyle = FontStyle.Normal,
+                        color = DarkBlue,
+                    )
+                )
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                DiagnosticCard(currentUser)
+            }
+        }
+    }
 }
 @Composable
 fun Navigation(navController: NavController){
@@ -231,7 +243,7 @@ fun Navigation(navController: NavController){
 
 }
 @Composable
-fun WeightCard(){
+fun WeightCard(currentUser: User){
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = Color.White,
@@ -284,7 +296,7 @@ fun WeightCard(){
             ){
                 Text(
                     modifier =Modifier.padding(start = 2.dp),
-                    text = "63,2 Kg",
+                    text = currentUser.weight.toString()+" Kg",
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Normal,
@@ -295,7 +307,7 @@ fun WeightCard(){
                 )
                 Text(
                     modifier =Modifier.padding(end = 10.dp),
-                    text = "60,0 Kg",
+                    text = currentUser.weight.toString()+" Kg",
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Normal,
@@ -317,7 +329,12 @@ fun WeightCard(){
 
 }
 @Composable
-fun DiagnosticCard(){
+fun DiagnosticCard(currentUser: User){
+    val BMI = currentUser.weight / ((currentUser.height/100) * (currentUser.height/100))
+    val BMIFormat = String.format("%.2f", BMI)
+    val idealWeight1 = 22.84 * ((currentUser.height/100) * (currentUser.height/100))
+
+    val idealWeight2 = 25.84 * ((currentUser.height/100) * (currentUser.height/100))
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = Color.White,
@@ -346,17 +363,6 @@ fun DiagnosticCard(){
                         )
                 )
                 Text(
-                    text = stringResource(id =R.string.bodyfat),
-                    style = TextStyle(
-                        fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Light,
-                        fontSize = 12.sp,
-                        fontStyle = FontStyle.Normal,
-                        color = Blue,
-                    )
-
-                )
-                Text(
                     text = stringResource(id =R.string.idealWeight),
                     style = TextStyle(
                         fontFamily = customFontFamily,
@@ -372,7 +378,7 @@ fun DiagnosticCard(){
                 horizontalArrangement = Arrangement.SpaceEvenly
             ){
                 Text(
-                    text ="22,84",
+                    text = BMIFormat,
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Medium,
@@ -382,17 +388,7 @@ fun DiagnosticCard(){
                     )
                 )
                 Text(
-                    text ="13,83",
-                    style = TextStyle(
-                        fontFamily = customFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 18.sp,
-                        fontStyle = FontStyle.Normal,
-                        color = Blue,
-                    )
-                )
-                Text(
-                    text ="53-72 Kg",
+                    text = "${idealWeight1.toInt()} - ${idealWeight2.toInt()} Kg",
                     style = TextStyle(
                         fontFamily = customFontFamily,
                         fontWeight = FontWeight.Medium,
