@@ -28,6 +28,29 @@ class LoginViewModel : ViewModel() {
 
     private val _loading = MutableLiveData(false)
 
+
+    init{
+        loadCurrentUser()
+    }
+    private fun loadCurrentUser(){
+        if(userid!= null){
+            usersCollection.whereEqualTo("userId", userid)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if(documents.size() > 0){
+                        val user = documents.first().toObject(User::class.java)
+                        user.document = documents.first().id
+                        _currentUser.value = user
+                        Log.d ("LoginViewModel", "Current user: ${user.user_name}")
+                        Log.d ("Weight and height", "Current user: ${user.weight} ${user.height}")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("LoginViewModel", "Error getting documents: ", exception)
+                }
+        }
+    }
+
     fun signInWithEmailAndPassword(email: String, password: String, home: ()-> Unit, error: (String)-> Unit)
     = viewModelScope.launch {
         try {
